@@ -37,7 +37,7 @@ export const NumberInputIcon = ({ children = <Info /> }: NumberInputIconProps) =
 export const NumberInputAddorn = ({ children }: NumberInputAddornProps) => {
 
   return (
-    <div className="flex items-center h-full p-2 rounded-tl rounded-bl group-focus-within:bg-primary group-focus-within:text-white transition">
+    <div className="flex items-center h-full p-2 rounded-tl rounded-bl group-focus-within:bg-primary group-focus-within:text-white transition addorn">
       {children}
     </div>
   )

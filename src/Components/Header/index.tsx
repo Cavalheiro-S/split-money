@@ -1,5 +1,3 @@
-import clsx from "clsx"
-
 type linkType = {
     title: string,
     url: string
@@ -30,10 +28,10 @@ export default function Header() {
 
 
     return (
-        <header className="py-6 px-10 border-b-2 grid grid-cols-3">
+        <header className="py-6 md:px-10 px-4 border-b-2 grid grid-cols-2 items-center md:grid-cols-3">
             <span className="font-bold text-primary drop-shadow-lg text-sm ">Split Money</span>
             <div className="flex items-center justify-center text-sm text-neutral-800 col-start-2">
-                <ul className="flex">
+                <ul className="flex items-center justify-items-center">
                     {links.map(renderLinks)}
                 </ul>
             </div>

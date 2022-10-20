@@ -6,18 +6,20 @@ import clsx from "clsx";
 interface CardProps {
   title: string,
   subTitle?: string,
-  children?: ReactNode
+  children?: ReactNode,
+  className?: string,
 }
 
 interface CardIconProps {
   icon?: ReactNode,
   IconBGColor?: "yellow" | "green" | "red" | "blue",
+  className?: string,
 }
 
-export const CardRoot = ({ title, subTitle, children }: CardProps) => {
+export const CardRoot = ({ title, subTitle, children, className }: CardProps) => {
 
   return (
-    <div className='flex rounded border justify-center items-center gap-6 p-6'>
+    <div className={clsx('flex rounded border justify-center items-center gap-6 p-6', className)}>
       {children}
       <div className="flex flex-col items-center">
         <span className='font-bold text-neutral-700'>{title}</span>
@@ -27,8 +29,8 @@ export const CardRoot = ({ title, subTitle, children }: CardProps) => {
   )
 }
 
-export const CardIcon = ({ icon = <Info/>, IconBGColor = "yellow" }: CardIconProps) => {
-  
+export const CardIcon = ({ icon = <Info />, IconBGColor = "yellow", className }: CardIconProps) => {
+
   return (
     <div className={
       clsx("h-10 w-10 flex items-center justify-center rounded-full",
@@ -37,7 +39,7 @@ export const CardIcon = ({ icon = <Info/>, IconBGColor = "yellow" }: CardIconPro
           "bg-green-500": IconBGColor === "green",
           "bg-red-500": IconBGColor === "red",
           "bg-blue-500": IconBGColor === "blue"
-        })}>
+        }, className)}>
       <Slot className="text-white w-7 h-7">
         {icon}
       </Slot>
