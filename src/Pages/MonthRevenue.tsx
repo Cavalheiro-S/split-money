@@ -1,8 +1,15 @@
 import * as HoverCard from "@radix-ui/react-hover-card"
+import * as Select from '@radix-ui/react-select';
+import * as Accordion from '@radix-ui/react-accordion';
 import { Bank, Book, CreditCard, Sunglasses } from 'phosphor-react';
 import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode, useState } from 'react';
 import { Card } from '../Components/Card';
 import { NumberInput, NumberInputAddorn } from '../Components/NumberInput';
+import clsx from "clsx";
+
+interface MonthRevenueProps {
+    className?: string
+}
 
 interface CardValueProps {
     value: string,
@@ -12,7 +19,7 @@ interface CardValueProps {
     description: string,
 }
 
-export default function MonthRevenue() {
+export default function MonthRevenue({ className }: MonthRevenueProps) {
 
     const [rendaMensal, setRendaMensal] = useState<number | string>("");
 
@@ -28,28 +35,28 @@ export default function MonthRevenue() {
             name: "Investimentos",
             iconBGColor: "green",
             icon: <Bank />,
-            description: "Dinheiro alocado em renda fixa , renda variável , ou guardado em bancos digitais"
+            description: "Dinheiro alocado em renda fixa , renda variável , ou guardado em bancos digitais."
         },
         {
             value: "R$ " + despEssenciaisValor.toFixed(2),
             name: "Despesas Essenciais",
             iconBGColor: "red",
             icon: <CreditCard />,
-            description: "Dinheiro necessário para despesas que não podem ser substituídas ou cortadas"
+            description: "Dinheiro necessário para despesas que não podem ser substituídas ou cortadas."
         },
         {
             value: "R$ " + lazerValor.toFixed(2),
             name: "Lazer",
             iconBGColor: "blue",
             icon: <Sunglasses />,
-            description: "Quantia reservada para gastos relacionados a diversão"
+            description: "Quantia reservada para gastos relacionados a diversão."
         },
         {
             value: "R$ " + educacaoValor.toFixed(2),
             name: "Educação",
             iconBGColor: "yellow",
             icon: <Book />,
-            description: "Destinado a compra de cursos, livros, palestras e outras coisas relacionadas a desenvolvimento pessoal"
+            description: "Destinado a compra de cursos, livros, palestras e outras coisas relacionadas a desenvolvimento pessoal."
         },
     ]
 
@@ -86,23 +93,26 @@ export default function MonthRevenue() {
 
     const renderCards = (card: CardValueProps) => {
         return (
-            <HoverCard.Root >
-                <HoverCard.Trigger>
-                    <Card.Root className='hover:shadow-md transition' title={card.value} subTitle={card.name}>
-                        <Card.Icon IconBGColor={card.iconBGColor} icon={card.icon} />
-                    </Card.Root>
-                </HoverCard.Trigger>
-                <HoverCard.Portal>
-                    <HoverCard.Content className="bg-white rounded w-48 p-4 border-2">
-                        <HoverCard.Arrow />
+            <Accordion.Root type="multiple" className="w-full md:w-72">
+                <Accordion.Item value="item-1">
+                    <Accordion.Header>
+                        <Accordion.Trigger className="w-full">
+                            <Card.Root className='hover:shadow-md transition' title={card.value} subTitle={card.name}>
+                                <Card.Icon IconBGColor={card.iconBGColor} icon={card.icon} />
+                            </Card.Root>
+                        </Accordion.Trigger>
+                    </Accordion.Header>
+                    <Accordion.Content className="border-x-2 border-b-2 p-4 md:h-40">
+                        <h3 className="font-bold text-neutral-700">Descrição</h3>
                         {card.description}
-                    </HoverCard.Content>
-                </HoverCard.Portal>
-            </HoverCard.Root>
+                    </Accordion.Content>
+                </Accordion.Item>
+            </Accordion.Root>
+
         )
     }
     return (
-        <div className='my-10 mx-4 md:mx-[100px] flex flex-col'>
+        <div className={clsx('my-10 mx-4 flex flex-col xl:w-3/6', className)}>
             <h2 className=' md:mx-0 font-bold text-3xl text-neutral-800'>Divida sua renda mensal</h2>
             <h3 className=' md:mx-0 text-neutral-400 text-xl mb-10'>Equilibre sua renda entre investimentos, educação, despesas essenciais e lazer</h3>
             <div className="flex flex-col md:flex md:flex-row md:items-end gap-4">
@@ -115,7 +125,7 @@ export default function MonthRevenue() {
                 </div>
                 <button onClick={evento => handleClick(evento)} className='bg-primary font-bold md:w:fit px-3 py-1 h-10 text-white rounded hover:bg-primary-hover transition'>Calcular</button>
             </div>
-            <div className='md:grid flex flex-col grid-cols-2 grid-rows-2 gap-4 pt-4  md:mx-0'>
+            <div className='flex gap-4 pt-4 flex-wrap md:mx-0'>
                 {cardsInfo.map(renderCards)}
             </div>
 

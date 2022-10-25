@@ -1,11 +1,11 @@
 import Header from "../Components/Header";
-import MonthRevenue from "./MonthRevenue";
+import { Outlet } from "react-router-dom";
 
 export default function Main() {
     return (
-        <>
-            <Header />
-            <MonthRevenue />
-        </>
+        <div className="flex flex-col items-center">
+            <Header className="w-screen" />
+            <Outlet />
+        </div>
     )
 }

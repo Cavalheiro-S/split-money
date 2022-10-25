@@ -1,11 +1,9 @@
-import Main from "./Pages/Main"
+import { AppRoutes } from "./Routes"
 
 function App() {
 
   return (
-    <>
-      <Main />
-    </>
+    <AppRoutes />
   )
 }
 
