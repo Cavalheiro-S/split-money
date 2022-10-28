@@ -11,7 +11,6 @@ type linkType = {
 }
 
 export default function Header({ className }: HeaderProps) {
-
     const links: linkType[] = [
         {
             title: "Renda Mensal",
@@ -20,7 +19,7 @@ export default function Header({ className }: HeaderProps) {
         {
             title: "Histórico",
             url: "/history",
-        }
+        },
     ]
 
     const renderLinks = (link: linkType) => {
@@ -32,7 +31,6 @@ export default function Header({ className }: HeaderProps) {
             </li>
         )
     }
-
 
     return (
         <header className={clsx("py-6 md:px-10 px-4 border-b-2 grid grid-cols-2 items-center md:grid-cols-3", className)} >
