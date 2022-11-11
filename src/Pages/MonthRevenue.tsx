@@ -5,7 +5,7 @@ import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode, useState } from 'reac
 import { Button } from "../Components/Button";
 import { Card } from '../Components/Card';
 import { Input } from '../Components/Input';
-
+import { v4 as uuid } from 'uuid';
 interface MonthRevenueProps {
     className?: string
 }
@@ -59,7 +59,7 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
     ]
 
     const handleClick = (event: FormEvent) => {
-        event.preventDefault();
+        console.log("teste");
         calculatePercentage();
     }
 
@@ -91,7 +91,7 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
 
     const renderCards = (card: CardValueProps) => {
         return (
-            <Accordion.Root type="multiple" className="w-full md:w-72">
+            <Accordion.Root key={uuid()} type="multiple" className="w-full md:w-72">
                 <Accordion.Item value="item-1">
                     <Accordion.Header>
                         <Accordion.Trigger className="w-full">
@@ -110,7 +110,7 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
         )
     }
     return (
-        <div className={clsx('my-10 flex flex-col', className)}>
+        <div className={clsx('my-10 mx-4 md:mx-0 flex flex-col', className)}>
             <h2 className=' md:mx-0 font-bold text-3xl text-neutral-800'>Divida sua renda mensal</h2>
             <h3 className=' md:mx-0 text-neutral-400 text-xl mb-10'>Equilibre sua renda entre investimentos, educação, despesas essenciais e lazer</h3>
             <div className="flex flex-col md:flex md:flex-row md:items-end gap-4">
@@ -131,7 +131,7 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
             <div className='flex gap-4 pt-4 flex-wrap md:mx-0'>
                 {cardsInfo.map(renderCards)}
             </div>
-
         </div >
     )
 }
+

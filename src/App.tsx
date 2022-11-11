@@ -1,9 +1,12 @@
+import { HistoryProvider } from "./Context/HistoryContext"
 import { AppRoutes } from "./Routes"
 
 function App() {
 
   return (
-    <AppRoutes />
+    <HistoryProvider>
+      <AppRoutes />
+    </HistoryProvider>
   )
 }
 

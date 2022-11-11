@@ -22,11 +22,11 @@ export const ButtonIcon = ({ children = <PlusCircle />, className }: ButtonIconP
     )
 }
 
-export const ButtonRoot = ({ children, className }: ButtonRootProps) => {
+export const ButtonRoot = (props: ButtonRootProps) => {
 
     return (
-        <button className={clsx("flex items-center gap-2 bg-primary text-white rounded px-4 py-1  font-semibold hover:bg-primary-hover transition h-10", className)}>
-            {children}
+        <button {...props} className={clsx("flex items-center gap-2 bg-primary text-white rounded px-4 py-1  font-semibold hover:bg-primary-hover transition h-10", props.className)}>
+            {props.children}
         </button>)
 }
 
