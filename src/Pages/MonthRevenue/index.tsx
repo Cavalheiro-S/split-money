@@ -2,9 +2,9 @@ import * as Accordion from '@radix-ui/react-accordion';
 import clsx from "clsx";
 import { Bank, Book, Calculator, CreditCard, Sunglasses } from 'phosphor-react';
 import { ChangeEvent, FormEvent, KeyboardEvent, ReactNode, useState } from 'react';
-import { Button } from "../Components/Button";
-import { Card } from '../Components/Card';
-import { Input } from '../Components/Input';
+import { Button } from "../../Components/Button";
+import { Card } from '../../Components/Card';
+import { Input } from '../../Components/Input';
 import { v4 as uuid } from 'uuid';
 interface MonthRevenueProps {
     className?: string
