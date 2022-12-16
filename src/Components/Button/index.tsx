@@ -9,7 +9,7 @@ interface ButtonRootProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 }
 
 interface ButtonIconProps {
-    children?: ReactNode,
+    children?: ReactNode | string,
     className?: string,
 }
 

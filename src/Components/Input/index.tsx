@@ -1,7 +1,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import clsx from "clsx";
 import { Info } from 'phosphor-react';
-import { InputHTMLAttributes, ReactNode } from 'react';
+import React, { InputHTMLAttributes, ReactNode } from 'react';
 
 interface InputInputProps extends InputHTMLAttributes<HTMLInputElement> { }
 
@@ -16,9 +16,20 @@ interface InputIconProps {
 }
 
 interface InputAddornProps {
-  children: string
+  children: string | ReactNode,
   className?: string;
 }
+
+const InputInput = React.forwardRef<HTMLInputElement, InputInputProps>((props, ref) => {
+  return (
+    <input
+      {...props}
+      ref={ref}
+      className='bg-transparent outline-none w-full text-gray-900 placeholder:text-gray-400 px-3 font-sans'
+      pattern={props.type === "number" ? "[0-9]+" : undefined}
+    />
+  )
+});
 
 const InputRoot = ({ children, className }: InputRootProps) => {
 
@@ -46,17 +57,6 @@ export const InputAddorn = ({ children, className }: InputAddornProps) => {
     </div>
   )
 
-}
-
-const InputInput = (props: InputInputProps) => {
-
-  return (
-    <input
-      className='bg-transparent outline-none w-full text-gray-900 placeholder:text-gray-400 px-3 font-sans'
-      pattern={props.type === "number" ? "[0-9]+" : undefined}
-      {...props}
-    />
-  )
 }
 
 export const Input = {
