@@ -1,7 +1,11 @@
 import { Password } from "phosphor-react";
+import { useContext } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components/Button";
 import { Input } from "../../Components/Input";
+import { AuthContext } from "../../Context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 interface Inputs {
     email: string;
@@ -9,11 +13,22 @@ interface Inputs {
 }
 
 export const Signin = () => {
-
+    const navigate = useNavigate();
+    const { signIn } = useAuth();
     const { register, handleSubmit, setError, formState: { errors } } = useForm<Inputs>()
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
-        console.log(data);
+    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+        try {
+            await signIn(data.email, data.password)
+            navigate("/monthRevenue")
+        }
+        catch {
+            setError("email", { type: "manual", message: "Email ou senha inválidos" })
+        }
 
+    }
+
+    const handleClickSignUp = () => {
+        navigate("/signup")
     }
 
     return (
@@ -31,7 +46,7 @@ export const Signin = () => {
                         <Input.Input type={"email"} id="email" {...register("email", { required: true, minLength: 3 })} />
                     </Input.Root>
                 </label>
-                {errors.email && <span className="text-red-500 text-sm">O email deve ser preenchido</span>}
+                {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                 <label className="flex flex-col gap-2" htmlFor="password">Senha
                     <Input.Root>
                         <Input.Addorn>
@@ -41,9 +56,17 @@ export const Signin = () => {
                     </Input.Root>
                 </label>
                 {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
-                <Button.Root id="signin" type="submit" className="self-end">
-                    Entrar
-                </Button.Root>
+                <div className="flex justify-end gap-2">
+                    <Button.Root 
+                    onClick={handleClickSignUp}
+                    className="bg-transparent text-primary border border-primary hover:text-white" 
+                    id="signup" type="button">
+                        Criar conta
+                    </Button.Root>
+                    <Button.Root id="signin" type="submit"  className="self-end">
+                        Entrar
+                    </Button.Root>
+                </div>
             </form>
         </div>
     )

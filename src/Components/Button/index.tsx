@@ -1,6 +1,7 @@
 import { Slot } from "@radix-ui/react-slot"
 import clsx from "clsx"
 import { PlusCircle } from "phosphor-react"
+import React from "react"
 import { ReactNode } from "react"
 
 interface ButtonRootProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -22,13 +23,14 @@ export const ButtonIcon = ({ children = <PlusCircle />, className }: ButtonIconP
     )
 }
 
-export const ButtonRoot = (props: ButtonRootProps) => {
+export const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>((props, ref) => {
 
     return (
-        <button {...props} className={clsx("flex items-center gap-2 bg-primary text-white rounded px-4 py-1  font-semibold hover:bg-primary-hover transition h-10", props.className)}>
+        <button {...props} ref={ref} className={clsx("flex items-center gap-2 bg-primary text-white rounded px-4 py-1  font-semibold hover:bg-primary-hover transition h-10", props.className)}>
             {props.children}
-        </button>)
-}
+        </button>
+    )
+})
 
 
 export const Button = {

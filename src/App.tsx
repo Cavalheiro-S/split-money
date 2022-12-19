@@ -1,12 +1,15 @@
+import { AuthProvider } from "./Context/AuthContext"
 import { HistoryProvider } from "./Context/HistoryContext"
 import { AppRoutes } from "./Routes"
 
 function App() {
 
   return (
-    <HistoryProvider>
-      <AppRoutes />
-    </HistoryProvider>
+    <AuthProvider>
+      <HistoryProvider>
+        <AppRoutes />
+      </HistoryProvider>
+    </AuthProvider>
   )
 }
 

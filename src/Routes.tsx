@@ -1,9 +1,11 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, useContext } from "react";
 import { BrowserRouter, Navigate, NavigateProps, Route, RouteProps, Routes } from "react-router-dom";
+import { AuthContext } from "./Context/AuthContext";
 import History from "./Pages/History";
 import Main from "./Pages/Main";
 import MonthRevenue from "./Pages/MonthRevenue";
 import Signin from "./Pages/Signin";
+import Signup from "./Pages/Signup";
 
 interface PrivateRouteProps {
     children: ReactElement
@@ -12,7 +14,8 @@ interface PrivateRouteProps {
 export const AppRoutes = () => {
 
     const PrivateRoute = ({ children }: PrivateRouteProps) => {
-        if (false)
+        const auth = useContext(AuthContext)
+        if (auth.user.logged)
             return children
         return <Navigate to="/signin" />
     }
@@ -22,6 +25,7 @@ export const AppRoutes = () => {
             <Routes>
                 <Route path="/" element={<Main />}>
                     <Route path="/signin" element={<Signin />} />
+                    <Route path="/signup" element={<Signup />} />
                     <Route path="/monthRevenue" element={
                         <PrivateRoute>
                             <MonthRevenue />
