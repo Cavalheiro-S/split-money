@@ -4,7 +4,7 @@ import { auth } from "../firebase";
 
 interface AuthContextData {
     user: UserProps;
-    setUser: React.Dispatch<React.SetStateAction<UserProps>>;
+    setUser: React.Dispatch<React.SetStateAction<UserProps>> | null;
 }
 
 interface AuthProviderProps {
