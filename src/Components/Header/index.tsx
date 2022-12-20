@@ -35,7 +35,7 @@ export default function Header({ className }: HeaderProps) {
     ]
 
     const renderLinks = (link: linkType) => {
-        
+
         if (link.action){
             return (
                 <li className="flex marker:text-transparent items-center text-center" key={uuid()}>
@@ -56,6 +56,7 @@ export default function Header({ className }: HeaderProps) {
     }
 
     const renderAutenticatedLinks = () => {
+        
         if (auth.user.logged)
             return links.map(renderLinks)
         return (

@@ -59,7 +59,6 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
     ]
 
     const handleClick = (event: FormEvent) => {
-        console.log("teste");
         calculatePercentage();
     }
 

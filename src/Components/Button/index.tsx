@@ -26,7 +26,7 @@ export const ButtonIcon = ({ children = <PlusCircle />, className }: ButtonIconP
 export const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>((props, ref) => {
 
     return (
-        <button {...props} ref={ref} className={clsx("flex items-center gap-2 bg-primary text-white rounded px-4 py-1  font-semibold hover:bg-primary-hover transition h-10", props.className)}>
+        <button {...props} ref={ref} className={clsx("flex items-center gap-2 bg-primary outline-primary-hover text-white rounded px-4 py-1  font-semibold hover:bg-primary-hover transition h-10", props.className)}>
             {props.children}
         </button>
     )
