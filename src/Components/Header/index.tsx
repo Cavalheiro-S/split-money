@@ -73,9 +73,9 @@ export default function Header({ className }: HeaderProps) {
             const options = [
                 {
                     option:
-                        <div className="flex items-center">
-                            <UserList className="h-6 w-6" />
-                            <span className="ml-2">Perfil</span>
+                        <div className="flex items-center gap-2">
+                            <UserList className="h-5 w-5" />
+                            <span className="text-sm">Perfil</span>
                         </div>,
                     onSelect: () => {
                         navigate("/profile");
@@ -83,9 +83,9 @@ export default function Header({ className }: HeaderProps) {
                 },
                 {
                     option:
-                        <div className="flex">
-                            <SignOut className="h-6 w-6" />
-                            <span className="ml-2">Sair</span>
+                        <div className="flex items-center gap-2">
+                            <SignOut className="h-5 w-5" />
+                            <span className="text-sm">Sair</span>
                         </div>,
                     onSelect: () => {
                         signOut();
