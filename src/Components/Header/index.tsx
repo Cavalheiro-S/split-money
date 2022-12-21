@@ -1,9 +1,11 @@
 import clsx from "clsx"
+import { CaretDown, SignOut, UserCircle, UserList } from "phosphor-react";
 import { useContext } from "react";
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { v4 as uuid } from 'uuid';
 import { AuthContext } from "../../Context/AuthContext";
 import { useAuth } from "../../hooks/useAuth";
+import { DropdownMenu, DropdownMenuOptionProps } from "../DropdownMenu";
 
 interface HeaderProps {
     className?: string,
@@ -11,57 +13,107 @@ interface HeaderProps {
 
 type linkType = {
     title: string,
-    url: string,
-    action?: () => void
+    url?: string,
+    dropdown?: boolean,
+    dropdownOptions?: DropdownMenuOptionProps[]
 }
 
 export default function Header({ className }: HeaderProps) {
     const auth = useContext(AuthContext);
+    const navigate = useNavigate();
     const { signOut } = useAuth();
     const links: linkType[] = [
         {
-            title: "Renda Mensal",
-            url: "/monthRevenue",
+            title: "Dashboard",
+            url: "/dashboard",
         },
         {
-            title: "Histórico",
-            url: "/history",
+            title: "Ferramentas",
+            dropdown: true,
+            dropdownOptions: [
+                {
+                    option: "Renda Mensal",
+                    onSelect: () => navigate("/monthRevenue")
+                },
+                {
+                    option: "Histórico de Transações",
+                    onSelect: () => navigate("/history")
+                }
+            ]
         },
-        {
-            title: "Sair",
-            url: "/signin",
-            action: () => { signOut()}
-        }
     ]
 
     const renderLinks = (link: linkType) => {
 
-        if (link.action){
+        if (link.dropdown) {
+
             return (
-                <li className="flex marker:text-transparent items-center text-center" key={uuid()}>
-                    <button onClick={link.action} className="px-4 py-1 rounded font-semibold hover:text-primary-hover transition">
-                        {link.title}
-                    </button>
-                </li>
+                <DropdownMenu
+                    className="flex items-center"
+                    selected={
+                        <span className="rounded hover:text-primary-hover transition">
+                            {link.title}
+                        </span>
+                    }
+                    options={link.dropdownOptions ?? []} />
             )
         }
         return (
             <li className="flex marker:text-transparent items-center text-center" key={uuid()}>
-                <Link to={link.url} className="px-4 py-1 rounded font-semibold hover:text-primary-hover transition">
+                <Link to={link.url ?? "/"} className="px-4 py-1 rounded hover:text-primary-hover transition">
                     {link.title}
                 </Link>
             </li>
         )
-
     }
 
     const renderAutenticatedLinks = () => {
-        
-        if (auth.user.logged)
-            return links.map(renderLinks)
+
+        if (auth.user.logged) {
+            const options = [
+                {
+                    option:
+                        <div className="flex items-center">
+                            <UserList className="h-6 w-6" />
+                            <span className="ml-2">Perfil</span>
+                        </div>,
+                    onSelect: () => {
+                        navigate("/profile");
+                    }
+                },
+                {
+                    option:
+                        <div className="flex">
+                            <SignOut className="h-6 w-6" />
+                            <span className="ml-2">Sair</span>
+                        </div>,
+                    onSelect: () => {
+                        signOut();
+                        navigate("/signin");
+                    }
+                },
+            ]
+            return (
+                <>
+                    <nav className="flex text-sm justify-center text-neutral-800 md:col-start-2">
+                        {links.map(renderLinks)}
+                    </nav>
+                    <DropdownMenu
+                        className="md:col-start-3 justify-self-end"
+                        selected={
+                            <div className="flex items-center gap-2">
+                                <UserCircle className="text-primary h-8 w-8" />
+                                <span className="text-sm">Lucas Cavalheiro</span>
+                            </div>
+                        }
+                        options={options} />
+                </>
+            )
+
+        }
         return (
-            <li className="flex marker:text-transparent items-center text-center" key={uuid()}>
-                <Link to="/signin" className="px-4 py-1 rounded font-semibold hover:text-primary-hover transition">
+            <li className="flex marker:text-transparent items-center justify-end text-center md:col-start-3" key={uuid()}>
+                <Link to="/signin" className="px-4 py-1 rounded hover:text-primary-hover transition">
                     Entrar
                 </Link>
             </li>
@@ -70,10 +122,8 @@ export default function Header({ className }: HeaderProps) {
 
     return (
         <header className={clsx("flex py-6 md:px-10 px-4 border-b-2 md:grid items-center md:grid-cols-3", className)} >
-            <span className="font-bold text-primary drop-shadow-lg text-sm ">Split Money</span>
-            <nav className="flex flex-1 text-sm justify-end text-neutral-800 md:col-start-3">
-                {renderAutenticatedLinks()}
-            </nav>
+            <span onClick={() => navigate("/")} className="font-bold text-primary drop-shadow-lg text-sm ">Split Money</span>
+            {renderAutenticatedLinks()}
         </header>
     )
 }

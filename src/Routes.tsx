@@ -1,9 +1,11 @@
 import { ReactElement, useContext } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthContext } from "./Context/AuthContext";
+import { Dashboard } from "./Pages/Dashboard";
 import History from "./Pages/History";
 import Main from "./Pages/Main";
 import MonthRevenue from "./Pages/MonthRevenue";
+import { Profile } from "./Pages/Profile";
 import Signin from "./Pages/Signin";
 import Signup from "./Pages/Signup";
 
@@ -47,6 +49,16 @@ export const AppRoutes = () => {
                     <Route path="/history" element={
                         <PrivateRoute>
                             <History />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/profile" element={
+                        <PrivateRoute>
+                            <Profile />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/dashboard" element={
+                        <PrivateRoute>
+                            <Dashboard />
                         </PrivateRoute>
                     } />
                 </Route>

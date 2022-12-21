@@ -78,7 +78,7 @@ export default function DialogCustom() {
 
     return (
         <Dialog.Root open={HistoryValue.open} onOpenChange={handleOpen}>
-            <Dialog.Trigger className='md:ml-auto' asChild>
+            <Dialog.Trigger className='md:ml-auto z-10' asChild>
                 <Button.Root className='justify-center'>
                     <Button.Icon className='text-lg' />
                     Adicionar
