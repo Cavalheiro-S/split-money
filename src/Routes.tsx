@@ -1,6 +1,7 @@
 import { ReactElement, useContext } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthContext } from "./Context/AuthContext";
+import { useAuth } from "./hooks/useAuth";
 import { Dashboard } from "./Pages/Dashboard";
 import History from "./Pages/History";
 import Main from "./Pages/Main";
@@ -16,8 +17,8 @@ interface RouteProps {
 export const AppRoutes = () => {
 
     const PrivateRoute = ({ children }: RouteProps) => {
-        const auth = useContext(AuthContext)
-        if (auth.user.logged)
+        const { currentUser } = useAuth();
+        if (currentUser)
             return children
         return <Navigate to="/signin" />
     }

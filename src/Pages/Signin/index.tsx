@@ -1,3 +1,4 @@
+import { FirebaseError } from "firebase/app";
 import { EnvelopeSimple, Lock, SpinnerGap } from "phosphor-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -32,7 +33,8 @@ export const Signin = () => {
             await signIn(data.email, data.password)
             navigate("/monthRevenue")
         }
-        catch {
+        catch (error) {
+            
             setError("email", { type: "manual", message: "Email ou senha inválidos" })
             setNotification({
                 title: "Erro",

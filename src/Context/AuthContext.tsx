@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, UserCredential } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, User, UserCredential } from "firebase/auth";
 import { createContext, ReactElement, ReactNode, useEffect, useState } from "react";
 import { auth } from "../firebase";
 
@@ -11,16 +11,14 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-interface UserProps{
-    email: string | null;
-    id: string | null;
+interface UserProps extends User {
     logged: boolean;
 
 }
 
 export const AuthContext = createContext({} as AuthContextData);
 
-export const AuthProvider = ({ children } : AuthProviderProps) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<UserProps>({} as UserProps);
 
     const state = {
@@ -30,19 +28,11 @@ export const AuthProvider = ({ children } : AuthProviderProps) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if(user){
-                setUser({
-                    email: user.email,
-                    id: user.uid,
-                    logged: true
-                })
+            if (user) {
+                setUser({ ...user, logged: true })
             }
-            else{
-                setUser({
-                    email: null,
-                    id: null,
-                    logged: false
-                })
+            else {
+                setUser(user => ({ ...user, logged: false }))
             }
         })
         return unsubscribe;

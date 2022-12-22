@@ -1,12 +1,9 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as SignOut } from "firebase/auth"
-import { AuthContext } from "../Context/AuthContext"
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as SignOut, updateEmail as UpdateEmail } from "firebase/auth"
 import { auth } from "../firebase"
-import { useContext } from "react"
 
 
 export const useAuth = () => {
-    const { user, setUser } = useContext(AuthContext)
-
+    const { currentUser } = auth;
     const signUp = (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)
     }
@@ -19,5 +16,11 @@ export const useAuth = () => {
         return SignOut(auth);
     }
 
-    return { signUp, signIn, signOut }
+    const updateEmail = (email: string) => {
+        if (currentUser)
+            return UpdateEmail(currentUser, email)
+        throw Error("No user found")
+    }
+
+    return { currentUser, signUp, signIn, signOut, updateEmail }
 }

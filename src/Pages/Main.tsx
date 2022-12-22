@@ -5,7 +5,7 @@ export default function Main() {
     return (
         <div className="flex flex-col">
             <Header className="h-[10vh] w-screen px-10" />
-            <div className="h-[90vh] md:px-10 my-10 relative">
+            <div className="h-[90vh] md:px-10 py-10 relative">
                 <Outlet />
             </div>
         </div>
