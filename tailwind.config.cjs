@@ -8,7 +8,8 @@ module.exports = {
       colors: {
         "primary": "#E63946",
         "primary-hover": "#FF5461",
-        "secondary": "#1D3557"
+        "secondary": "#1D3557",
+        "font": "#333"
       },
       fontFamily: {
         sans: "Inter, sans-serif"

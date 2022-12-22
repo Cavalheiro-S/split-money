@@ -4,7 +4,7 @@ import List from './List';
 export default function History() {
 
     return (
-        <div className='flex flex-col my-10'>
+        <div className='flex flex-col'>
             <div className='flex flex-col gap-2 md:flex-row md:items-end mb-10 md:px-0'>
                 <div>
                     <h2 className='text-3xl font-bold text-gray-800 text-start'>Histórico</h2>

@@ -20,13 +20,14 @@ interface InputAddornProps {
   className?: string;
 }
 
-const InputInput = React.forwardRef<HTMLInputElement, InputInputProps>((props, ref) => {
+const InputInput = React.forwardRef<HTMLInputElement, InputInputProps>(({ type, className, ...props }, ref) => {
   return (
     <input
       {...props}
+      type={type}
       ref={ref}
-      className='bg-transparent outline-none w-full text-gray-900 placeholder:text-gray-400 px-3 font-sans'
-      pattern={props.type === "number" ? "[0-9]+" : undefined}
+      className={clsx('bg-transparent outline-none w-full text-font placeholder:text-gray-400 px-3 font-sans', className)}
+      pattern={type === "number" ? "[0-9]+" : undefined}
     />
   )
 });
@@ -40,7 +41,7 @@ const InputRoot = ({ children, className }: InputRootProps) => {
   )
 }
 
-export const InputIcon = ({ children = <Info />, className }: InputIconProps) => {
+const InputIcon = ({ children = <Info />, className }: InputIconProps) => {
 
   return (
     <Slot className={clsx("w-7 h-7 pl-1", className)}>
@@ -49,7 +50,7 @@ export const InputIcon = ({ children = <Info />, className }: InputIconProps) =>
   )
 }
 
-export const InputAddorn = ({ children, className }: InputAddornProps) => {
+const InputAddorn = ({ children, className }: InputAddornProps) => {
 
   return (
     <div className={clsx("flex items-center h-full p-2 rounded-tl rounded-bl group-focus-within:bg-primary group-focus-within:text-white transition addorn", className)}>
