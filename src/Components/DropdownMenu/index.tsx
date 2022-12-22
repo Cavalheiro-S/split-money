@@ -25,7 +25,7 @@ export const DropdownMenu = ({ selected, options, className }: DropdownMenuProps
                     <CaretDown className="text-primary" />
                 </>
             </DropdownMenuRadix.Trigger>
-            <DropdownMenuRadix.Content className="flex flex-col gap-2 p-2 bg-white rounded-md shadow-md z-40">
+            <DropdownMenuRadix.Content className="flex flex-col gap-2 p-2 bg-white rounded-md shadow-md z-40 mt-4 min-w-[240px] border">
                 {options.map(option => (
                     <DropdownMenuRadix.Item className="px-8 py-2 outline-none hover:bg-primary-hover transition hover:text-white select-none" key={uuid()} onSelect={option.onSelect}>
                         {option.option}

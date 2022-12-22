@@ -3,23 +3,18 @@ import { createContext, ReactElement, ReactNode, useEffect, useState } from "rea
 import { auth } from "../firebase";
 
 interface AuthContextData {
-    user: UserProps;
-    setUser: React.Dispatch<React.SetStateAction<UserProps>> | null;
+    user: User;
+    setUser: React.Dispatch<React.SetStateAction<User>> | null;
 }
 
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-interface UserProps extends User {
-    logged: boolean;
-
-}
-
 export const AuthContext = createContext({} as AuthContextData);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [user, setUser] = useState<UserProps>({} as UserProps);
+    const [user, setUser] = useState<User>({} as User);
 
     const state = {
         user,
@@ -27,9 +22,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, user => {
             if (user) {
-                setUser({ ...user, logged: true })
+                setUser(user)
             }
             else {
                 setUser(user => ({ ...user, logged: false }))

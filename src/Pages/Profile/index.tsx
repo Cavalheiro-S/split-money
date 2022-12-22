@@ -1,15 +1,14 @@
-import { Pencil } from "phosphor-react"
+import clsx from "clsx"
 import { FirebaseError } from "firebase/app"
-import { useContext, useEffect, useState } from "react"
+import { Pencil, SpinnerGap } from "phosphor-react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "../../Components/Button"
 import { Heading } from "../../Components/Heading"
 import { Input } from "../../Components/Input"
 import { Notification } from "../../Components/Notification"
 import { Text } from "../../Components/Text"
-import { AuthContext } from "../../Context/AuthContext"
 import { useAuth } from "../../hooks/useAuth"
-import clsx from "clsx"
 
 interface Inputs {
     name: string;
@@ -20,29 +19,30 @@ interface Inputs {
 
 export const Profile = () => {
 
-    const { register, formState: { errors }, setError, getValues, setValue, handleSubmit } = useForm<Inputs>()
+    const { register, formState: { errors }, setError, setValue, handleSubmit } = useForm<Inputs>()
     const [disabled, setDisabled] = useState(true)
+    const { currentUser } = useAuth();
     const [notification, setNotification] = useState(false)
     const [loading, setLoading] = useState(false)
-    const { user } = useContext(AuthContext);
     const { updateEmail } = useAuth();
 
     const handleSubmitForm = async (data: Inputs) => {
         setNotification(false)
         setDisabled(!disabled)
         try {
-            if (!disabled && data.email !== user.email) {
+
+            if (!disabled && data.email !== currentUser?.email) {
                 setLoading(true)
                 await updateEmail(data.email)
                 setNotification(true)
-                return;
+                setLoading(false)
             }
         }
         catch (err) {
-            if (err instanceof FirebaseError) {
+            if (err instanceof FirebaseError)
                 setError("email", { message: err.message })
-            }
-            setValue("email", user.email ?? "")
+
+            setValue("email", currentUser?.email ?? "")
             console.log(err)
             setError("email", { message: "Falha ao alterar email" })
         }
@@ -56,7 +56,7 @@ export const Profile = () => {
     const onSubmit = handleSubmit(handleSubmitForm)
 
     useEffect(() => {
-        setValue("email", user.email ?? "")
+        setValue("email", currentUser?.email ?? "")
     }, [])
 
     return (
@@ -76,11 +76,16 @@ export const Profile = () => {
                             </Input.Root>
                         </label>
                     </Text>
-                    <Button.Root className={clsx("flex justify-center", {
-                        "bg-transparent border border-primary text-primary hover:bg-primary-hover hover:text-white": disabled,
-                    })}>
+                    <Button.Root
+                        disabled={loading}
+                        className={
+                            clsx("flex justify-center",
+                                {
+                                    "bg-transparent border border-primary text-primary hover:bg-primary-hover hover:text-white": disabled,
+                                })}>
                         <Button.Icon>
-                            <Pencil className="h-5 w-5" />
+                            {loading ? <SpinnerGap className="h-5 w-5 animate-spin" /> : <Pencil className="h-5 w-5" />}
+
                         </Button.Icon>
                         {disabled ? "Editar" : "Salvar"}
                     </Button.Root>

@@ -1,9 +1,7 @@
 import clsx from "clsx";
 import { SignOut, UserCircle, UserList } from "phosphor-react";
-import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
-import { AuthContext } from "../../Context/AuthContext";
 import { useAuth } from "../../hooks/useAuth";
 import { DropdownMenu, DropdownMenuOptionProps } from "../DropdownMenu";
 
@@ -19,9 +17,8 @@ type linkType = {
 }
 
 export default function Header({ className }: HeaderProps) {
-    const auth = useContext(AuthContext);
     const navigate = useNavigate();
-    const { signOut } = useAuth();
+    const { signOut, currentUser } = useAuth();
     const links: linkType[] = [
         {
             title: "Dashboard",
@@ -70,7 +67,7 @@ export default function Header({ className }: HeaderProps) {
 
     const renderAutenticatedLinks = () => {
 
-        if (auth.user.logged) {
+        if (currentUser) {
             const options = [
                 {
                     option:
@@ -88,7 +85,6 @@ export default function Header({ className }: HeaderProps) {
                         </div>,
                     onSelect: () => {
                         signOut();
-                        navigate("/signin");
                     }
                 },
             ]

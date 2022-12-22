@@ -4,8 +4,10 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components/Button";
+import { Heading } from "../../Components/Heading";
 import { Input } from "../../Components/Input";
 import { Notification, NotificationProps } from "../../Components/Notification";
+import { Text } from "../../Components/Text";
 import { useAuth } from "../../hooks/useAuth";
 
 interface Inputs {
@@ -31,7 +33,7 @@ export const Signin = () => {
             setLoading(true);
             setNotification({ ...notification, title: "" })
             await signIn(data.email, data.password)
-            navigate("/monthRevenue")
+            navigate("/dashboard")
         }
         catch (error) {
             
@@ -59,8 +61,8 @@ export const Signin = () => {
                 <form className="flex flex-col w-96 gap-6" onSubmit={handleSubmit(onSubmit)}>
                     <div className="flex flex-col w-full mb-4">
 
-                        <h3 className="text-3xl font-bold">Login</h3>
-                        <span className="text-gray-400">Informe suas credencias para logar</span>
+                        <Heading className="text-3xl font-bold">Login</Heading>
+                        <Text className="text-gray-400">Informe suas credencias para logar</Text>
                     </div>
                     <label className="flex flex-col gap-2" htmlFor="email">Email
                         <Input.Root>
