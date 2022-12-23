@@ -2,7 +2,7 @@ import { ReactElement, useContext } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { PrivateRoute } from "./Components/PrivateRoute";
 import { AuthContext } from "./Context/AuthContext";
-import { useAuth } from "./Hooks/useAuth";
+import { useAuth } from "./hooks/useAuth";
 import { Dashboard } from "./Pages/Dashboard";
 import History from "./Pages/History";
 import Main from "./Pages/Main";

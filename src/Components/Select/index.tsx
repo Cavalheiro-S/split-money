@@ -1,4 +1,5 @@
 import clsx from "clsx"
+import React from "react"
 import { ReactNode, SelectHTMLAttributes } from "react"
 
 interface SelectRootProps {
@@ -18,19 +19,18 @@ const SelectRoot = ({ children, className }: SelectRootProps) => {
     )
 }
 
-const SelectInput = (props: SelectInputProps) => {
+const SelectInput = React.forwardRef<HTMLSelectElement, SelectInputProps>(({ children, ...props }, ref) => {
     return (
-        <select className={clsx("w-full bg-transparent outline-none px-3",)} {...props}>{props.children}</select>
+        <select ref={ref} className={clsx("w-full bg-transparent outline-none px-3",)} {...props}>{children}</select>
     )
-    
-}
+})
 
-const SelectOptions = (props: SelectOptionProps) => {
+const SelectOptions = React.forwardRef<HTMLOptionElement, SelectOptionProps>(({children, ...props}, ref) => {
 
     return (
-        <option {...props}>{props.children}</option>
+        <option ref={ref} {...props}>{children}</option>
     )
-}
+})
 
 
 export const Select = {

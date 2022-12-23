@@ -5,8 +5,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../Components/Button";
 import { Input } from "../../../Components/Input";
-import { useAuth } from "../../../Hooks/useAuth";
-import { useDatabase } from "../../../Hooks/useDatabase";
+import { useAuth } from "../../../hooks/useAuth";
+import { useDatabase } from "../../../hooks/useDatabase";
 import { returnErrorMessage } from "../../../Utils/firebase";
 
 interface FormInfoProps {

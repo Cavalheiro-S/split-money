@@ -3,8 +3,8 @@ import { SignOut, UserCircle, UserList } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
-import { useAuth } from "../../Hooks/useAuth";
-import { useDatabase, UserProps } from "../../Hooks/useDatabase";
+import { useAuth } from "../../hooks/useAuth";
+import { useDatabase, UserProps } from "../../hooks/useDatabase";
 import { DropdownMenu, DropdownMenuOptionProps } from "../DropdownMenu";
 
 interface HeaderProps {

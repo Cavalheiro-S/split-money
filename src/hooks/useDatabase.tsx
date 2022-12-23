@@ -8,6 +8,14 @@ export interface UserProps {
     salary: number;
 }
 
+export interface RegisterProps {
+    uid: string;
+    name: string;
+    type: "investiment" | "expense";
+    value: number;
+    date: Date;
+}
+
 export const useDatabase = () => {
 
     const db = getDatabase(app);
@@ -21,9 +29,18 @@ export const useDatabase = () => {
         return snapshot.val();
     }
 
-    const deleteUserInfo = async (uid: string) => {
+    const deleteUser = async (uid: string) => {
         await set(ref(db, `users/${uid}`), null);
     }
 
-    return { saveUser, loadUser };
+    const saveRegister = async (userUid: string, register: RegisterProps) => {
+        return await set(ref(db, `users/${userUid}/register`), register);
+    }
+
+    const loadRegister = async (userUid: string) => {
+        const snapshot = await get(ref(db, `users/${userUid}/register`));
+        return snapshot.val();
+    }
+
+    return { saveUser, loadUser, deleteUser, saveRegister, loadRegister };
 }

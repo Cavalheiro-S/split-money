@@ -8,8 +8,8 @@ import { Heading } from "../../Components/Heading";
 import { Input } from "../../Components/Input";
 import { Notification, NotificationProps } from "../../Components/Notification";
 import { Text } from "../../Components/Text";
-import { useAuth } from "../../Hooks/useAuth";
-import { useDatabase, UserProps } from "../../Hooks/useDatabase";
+import { useAuth } from "../../hooks/useAuth";
+import { useDatabase, UserProps } from "../../hooks/useDatabase";
 
 interface Inputs {
     email: string;
@@ -42,8 +42,8 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
             navigate("/dashboard")
         }
         catch (error) {
-            if(error instanceof FirebaseError){
-                if(error.code === "auth/user-not-found"){
+            if (error instanceof FirebaseError) {
+                if (error.code === "auth/user-not-found") {
                     setError("email", { type: "manual", message: "Email não cadastrado" })
                     setNotification({
                         title: "Erro",
@@ -52,7 +52,7 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
                     });
                     return;
                 }
-                if(error.code === "auth/wrong-password"){
+                if (error.code === "auth/wrong-password") {
                     setError("password", { type: "manual", message: "Senha incorreta" })
                     setNotification({
                         title: "Erro",

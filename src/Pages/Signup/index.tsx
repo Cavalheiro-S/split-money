@@ -1,7 +1,7 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import clsx from "clsx";
 import { useState } from "react";
-import { useAuth } from "../../Hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { FormInfo } from "./FormInfo";
 import { FormLogin } from "./FormLogin";
 interface Inputs {
