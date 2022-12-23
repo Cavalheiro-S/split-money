@@ -8,24 +8,30 @@ import { Heading } from "../../Components/Heading";
 import { Input } from "../../Components/Input";
 import { Notification, NotificationProps } from "../../Components/Notification";
 import { Text } from "../../Components/Text";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../Hooks/useAuth";
+import { useDatabase, UserProps } from "../../Hooks/useDatabase";
 
 interface Inputs {
     email: string;
     password: string;
 }
 
-export const Signin = () => {
-    const navigate = useNavigate();
-    const [notification, setNotification] = useState<NotificationProps>({
-        title: "",
-        message: "Email ou senha inválidos",
-        type: "error"
-    });
+interface SigninProps {
+    notificationRedirect?: NotificationProps;
+}
 
+export const Signin = ({ notificationRedirect }: SigninProps) => {
+
+    const navigate = useNavigate();
     const { signIn } = useAuth();
+    const { saveUser } = useDatabase();
     const { register, handleSubmit, setError, formState: { errors } } = useForm<Inputs>()
     const [loading, setLoading] = useState(false);
+    const [notification, setNotification] = useState<NotificationProps>({
+        title: notificationRedirect?.title ?? "",
+        message: notificationRedirect?.message ?? "Email ou senha inválidos",
+        type: notificationRedirect?.type ?? "error"
+    });
 
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -36,7 +42,28 @@ export const Signin = () => {
             navigate("/dashboard")
         }
         catch (error) {
-            
+            if(error instanceof FirebaseError){
+                if(error.code === "auth/user-not-found"){
+                    setError("email", { type: "manual", message: "Email não cadastrado" })
+                    setNotification({
+                        title: "Erro",
+                        message: "Email não cadastrado",
+                        type: "error"
+                    });
+                    return;
+                }
+                if(error.code === "auth/wrong-password"){
+                    setError("password", { type: "manual", message: "Senha incorreta" })
+                    setNotification({
+                        title: "Erro",
+                        message: "Senha incorreta",
+                        type: "error"
+                    });
+                    return;
+                }
+            }
+            console.log(error);
+
             setError("email", { type: "manual", message: "Email ou senha inválidos" })
             setNotification({
                 title: "Erro",
@@ -73,6 +100,7 @@ export const Signin = () => {
                         </Input.Root>
                         {errors.email?.type === "required" && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                         {errors.email?.type === "minLength" && <span className="text-red-500 text-sm">Email deve ter no mínimo 3 caracteres</span>}
+                        {errors.email?.type === "manual" && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                     </label>
                     <label className="flex flex-col gap-2" htmlFor="password">Senha
                         <Input.Root>

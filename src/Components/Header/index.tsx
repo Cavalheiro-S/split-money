@@ -1,8 +1,10 @@
 import clsx from "clsx";
 import { SignOut, UserCircle, UserList } from "phosphor-react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../Hooks/useAuth";
+import { useDatabase, UserProps } from "../../Hooks/useDatabase";
 import { DropdownMenu, DropdownMenuOptionProps } from "../DropdownMenu";
 
 interface HeaderProps {
@@ -19,6 +21,21 @@ type linkType = {
 export default function Header({ className }: HeaderProps) {
     const navigate = useNavigate();
     const { signOut, currentUser } = useAuth();
+    const { loadUser } = useDatabase();
+    const [loggedUser, setLoggedUser] = useState<UserProps | null>(null);
+
+
+    useEffect(() => {
+        const getLoggedUserInfo = async () => {
+            if (!currentUser) return
+            const user = await loadUser(currentUser.uid);
+            setLoggedUser(user);
+        }
+        getLoggedUserInfo();
+        console.log(loggedUser);
+        
+    }, [currentUser])
+
     const links: linkType[] = [
         {
             title: "Dashboard",
@@ -98,7 +115,7 @@ export default function Header({ className }: HeaderProps) {
                         selected={
                             <div className="flex items-center gap-2">
                                 <UserCircle className="text-primary h-8 w-8" />
-                                <span className="text-sm hover:text-primary transition select-none">Lucas Cavalheiro</span>
+                                <span className="text-sm hover:text-primary transition select-none">{loggedUser?.name}</span>
                             </div>
                         }
                         options={options} />

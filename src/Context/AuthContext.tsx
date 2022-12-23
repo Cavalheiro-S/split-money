@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword, onAuthStateChanged, User, UserCredential } from "firebase/auth";
 import { createContext, ReactElement, ReactNode, useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth } from "../Utils/firebase";
 
 interface AuthContextData {
     user: User;

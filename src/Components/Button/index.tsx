@@ -6,6 +6,7 @@ import { ReactNode } from "react"
 
 interface ButtonRootProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     children: ReactNode,
+    styleType?: "primary" | "secondary",
     className?: string,
 }
 
@@ -23,12 +24,19 @@ export const ButtonIcon = ({ children = <PlusCircle />, className }: ButtonIconP
     )
 }
 
-export const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>((props, ref) => {
+export const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(({ children, className, styleType = "primary", ...props }, ref) => {
 
     return (
-        <button {...props} ref={ref} className={clsx("flex items-center gap-2 bg-primary outline-primary-hover text-white rounded px-4 py-1  font-semibold hover:bg-primary-hover transition h-10", props.className)}>
-            {props.children}
-        </button>
+        <button {...props} ref={ref} className={
+            clsx("flex items-center gap-2 justify-center rounded px-4 py-1 font-semibold transition h-10",
+                {
+                    "bg-primary outline-primary-hover text-white hover:bg-primary-hover": styleType === "primary",
+                    "bg-transparent text-primary hover:bg-primary-hover hover:text-white": styleType === "secondary",
+                },
+                className)
+        }>
+            {children}
+        </button >
     )
 })
 

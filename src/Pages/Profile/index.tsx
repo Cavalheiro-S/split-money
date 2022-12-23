@@ -8,7 +8,7 @@ import { Heading } from "../../Components/Heading"
 import { Input } from "../../Components/Input"
 import { Notification } from "../../Components/Notification"
 import { Text } from "../../Components/Text"
-import { useAuth } from "../../hooks/useAuth"
+import { useAuth } from "../../Hooks/useAuth"
 
 interface Inputs {
     name: string;
@@ -19,7 +19,7 @@ interface Inputs {
 
 export const Profile = () => {
 
-    const { register, formState: { errors }, setError, setValue, handleSubmit } = useForm<Inputs>()
+    const { register, formState: { errors }, setError, setValue, setFocus, handleSubmit } = useForm<Inputs>()
     const [disabled, setDisabled] = useState(true)
     const { currentUser } = useAuth();
     const [notification, setNotification] = useState(false)
@@ -29,6 +29,7 @@ export const Profile = () => {
     const handleSubmitForm = async (data: Inputs) => {
         setNotification(false)
         setDisabled(!disabled)
+        setFocus("email")
         try {
 
             if (!disabled && data.email !== currentUser?.email) {
@@ -43,8 +44,8 @@ export const Profile = () => {
                 setError("email", { message: err.message })
 
             setValue("email", currentUser?.email ?? "")
-            console.log(err)
             setError("email", { message: "Falha ao alterar email" })
+            console.log(err)
         }
 
         finally {

@@ -4,8 +4,8 @@ import {
     signOut as SignOut,
     updateEmail as UpdateEmail
 } from "firebase/auth";
-import { Navigate, useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../Utils/firebase";
 
 
 export const useAuth = () => {
@@ -22,12 +22,13 @@ export const useAuth = () => {
     const signOut = async () => {
         await SignOut(auth);
         navigate("/signin")
-        return 
+        return
     }
 
     const updateEmail = async (email: string) => {
         const date = new Date(currentUser?.metadata.lastSignInTime ?? 0)
-        if(date.getMinutes() - new Date().getMinutes() > 5){
+        console.log(new Date().getMinutes() - date.getMinutes());
+        if (new Date().getMinutes() - date.getMinutes() > 5) {
             await signOut()
             return
         }
