@@ -28,7 +28,6 @@ export const useDatabase = () => {
     }
 
     const saveRegister = async (userUid: string, register: RegisterProps) => {
-        register
         return await push(ref(db, `users/${userUid}/register`), register);
     }
 

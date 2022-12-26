@@ -20,9 +20,8 @@ export default function Register() {
                 return;
             }
             const registersDatabase = await loadAllRegisters(currentUser.uid);
-            console.log(registersDatabase);
-            
             setRegisters(registersDatabase);
+            
         }
         load();
     }, [])

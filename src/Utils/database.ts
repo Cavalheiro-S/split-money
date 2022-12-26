@@ -3,27 +3,30 @@ import { RegisterProps } from "../Context/RegisterContext";
 
 export const convertSnapshotToRegisterArray = (snapshot: DataSnapshot) => {
     if (!snapshot.exists()) return [] as RegisterProps[];
-    const object = snapshot.val();
+    const registersSnapshot = snapshot.val();
 
-    const [objectIds, objectValues] = Object.entries(object);
-    console.log(Object.entries(object));
+    const registersSnapshotEntries = Object.entries<RegisterProps>(registersSnapshot);
 
-    console.log(objectValues);
-    const registers = objectValues.map((item: any, index) => {
+    const registers = registersSnapshotEntries.map(([id, register]) => {
+
         return {
-            id: objectIds[index],
-            name: item.name,
-            value: item.value,
-            type: item.type,
-            date: item.date,
+            id: id,
+            name: register.name,
+            value: register.value,
+            type: register.type,
+            date: register.date,
         } as RegisterProps;
     })
+    console.log(registers);
+
     return registers;
 }
 
 export const convertSnapshotToRegister = (snapshot: DataSnapshot) => {
     if (!snapshot.exists()) return {} as RegisterProps;
     const object = snapshot.val();
+    const [id, registerValue] = Object.entries(object);
+
     const register = {
         id: object.id,
         name: object.name,

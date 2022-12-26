@@ -59,8 +59,6 @@ export default function DialogCustom() {
                 date: data.date
             }
             const registerSaved = await saveRegister(currentUser.uid, newItem);
-            newItem.id = registerSaved.key ?? newItem.id;
-
             setRegisters([...registers, newItem]);
         }
         setDialogOpen({ open: false });
