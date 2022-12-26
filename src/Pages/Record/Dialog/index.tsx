@@ -22,8 +22,8 @@ export default function DialogCustom() {
 
     const { registers, setRegisters, dialogOpen, setDialogOpen } = useContext(RegisterContext);
     const { currentUser, signOut } = useAuth();
-    const { saveRegister, deleteRegister, loadAllRegisters } = useDatabase();
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<Inputs>()
+    const { saveRegister, deleteRegister, loadAllRegisters, updateRegister } = useDatabase();
+    const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm<Inputs>()
 
     useEffect(() => {
         if (dialogOpen.register) {
@@ -44,26 +44,72 @@ export default function DialogCustom() {
             signOut();
             return;
         }
+        const newItem: RegisterProps = {
+            id: uuid(),
+            name: data.name,
+            type: data.type,
+            value: data.value,
+            date: data.date
+        }
         if (dialogOpen.register?.id) {
-            await deleteRegister(currentUser.uid, dialogOpen.register.id);
+            await updateRegister(currentUser.uid, dialogOpen.register.id, newItem);
             const loadedRegisters = await loadAllRegisters(currentUser.uid);
             setRegisters(loadedRegisters);
         }
 
         else {
-            const newItem: RegisterProps = {
-                id: uuid(),
-                name: data.name,
-                type: data.type,
-                value: data.value,
-                date: data.date
-            }
-            const registerSaved = await saveRegister(currentUser.uid, newItem);
+
+            await saveRegister(currentUser.uid, newItem);
             setRegisters([...registers, newItem]);
         }
         setDialogOpen({ open: false });
     }
 
+    const handleDelete = async () => {
+        if (!currentUser) {
+            signOut();
+            return;
+        }
+        if (dialogOpen.register?.id) {
+            await deleteRegister(currentUser.uid, dialogOpen.register.id);
+            const loadedRegisters = await loadAllRegisters(currentUser.uid);
+            setRegisters(loadedRegisters);
+        }
+        setDialogOpen({ open: false });
+    }
+
+    const verifyIfIsEditing = () => {
+        if (dialogOpen.register?.name !== getValues("name")) return true
+        if (dialogOpen.register?.value !== getValues("value")) return true
+        if (dialogOpen.register?.type !== getValues("type")) return true
+        if (dialogOpen.register?.date !== getValues("date")) return true
+    }
+
+    const renderActionButtons = () => {
+        if (dialogOpen.register?.id) {
+            const editButtonDisabled = verifyIfIsEditing();
+            return (
+                <>
+                    <Button.Root styleType='secondary' className='w-full' onClick={() => handleDelete()} type='button'>
+                        <Button.Icon className='text-xl'>
+                            <Trash />
+                        </Button.Icon>
+                        Remover
+                    </Button.Root>
+                    <Button.Root disabled={!editButtonDisabled} className='justify-center w-full' type="submit">
+                        <Button.Icon className='text-xl' />
+                        Editar
+                    </Button.Root>
+                </>
+            )
+        }
+        return (
+            <Button.Root className='justify-center w-full' type="submit">
+                <Button.Icon className='text-xl' />
+                Adicionar
+            </Button.Root >
+        )
+    }
 
     return (
         <Dialog.Root open={dialogOpen.open}>
@@ -81,7 +127,7 @@ export default function DialogCustom() {
                         </Dialog.DialogClose>
                         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
                             <Dialog.DialogTitle className='text-md font-bold'>
-                                Editar item
+                                {dialogOpen.register?.id ? 'Editar registro' : 'Adicionar registro'}
                             </Dialog.DialogTitle>
                             <fieldset className='flex flex-col gap-2'>
                                 <label className="text-sm" htmlFor='name'>Nome</label>
@@ -115,21 +161,7 @@ export default function DialogCustom() {
                                 {errors.date && <span className='text-xs text-red-500'>Campo obrigatório</span>}
                             </fieldset>
                             <div className='flex justify-between gap-3'>
-                                {dialogOpen.register?.id ? (
-                                    <Button.Root type='submit'>
-                                        <Button.Icon className='text-xl'>
-                                            <Trash />
-                                        </Button.Icon>
-                                        Remover
-                                    </Button.Root>
-                                ) :
-                                    (
-                                        <Button.Root className='justify-center w-full' type="submit">
-                                            <Button.Icon className='text-xl' />
-                                            Adicionar
-                                        </Button.Root>
-                                    )
-                                }
+                                {renderActionButtons()}
 
                             </div>
                         </form>

@@ -28,10 +28,10 @@ export const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>((
 
     return (
         <button {...props} ref={ref} className={
-            clsx("flex items-center gap-2 justify-center rounded px-4 py-1 font-semibold transition h-10",
+            clsx("flex items-center gap-2 justify-center rounded px-4 py-1 font-semibold transition h-10 disabled:hover:bg-white disabled:hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed",
                 {
                     "bg-primary outline-primary-hover text-white hover:bg-primary-hover": styleType === "primary",
-                    "bg-transparent text-primary hover:bg-primary-hover hover:text-white": styleType === "secondary",
+                    "bg-transparent text-primary border border-primary hover:bg-primary hover:text-white": styleType === "secondary",
                 },
                 className)
         }>

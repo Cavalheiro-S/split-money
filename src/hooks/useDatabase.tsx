@@ -1,4 +1,4 @@
-import { get, getDatabase, ref, set, push, remove, query } from "firebase/database";
+import { get, getDatabase, ref, set, push, remove, update } from "firebase/database";
 import { RegisterProps } from "../Context/RegisterContext";
 import { convertSnapshotToRegister, convertSnapshotToRegisterArray } from "../Utils/database";
 import { app } from "../Utils/firebase";
@@ -44,8 +44,12 @@ export const useDatabase = () => {
         return register;
     }
 
+    const updateRegister = async (userUid: string, registerId: string, register: RegisterProps) => {
+        return await update(ref(db, `users/${userUid}/register/${registerId}`), register);
+    }
+
     const deleteRegister = async (userUid: string, registerId: string) => {
         return await remove(ref(db, `users/${userUid}/register/${registerId}`));
     }
-    return { saveUser, loadUser, deleteUser, saveRegister, loadAllRegisters, loadRegisterById, deleteRegister };
+    return { saveUser, loadUser, deleteUser, saveRegister, loadAllRegisters, loadRegisterById, deleteRegister, updateRegister };
 }

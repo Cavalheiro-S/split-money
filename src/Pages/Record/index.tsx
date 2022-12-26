@@ -1,4 +1,5 @@
-import { useContext, useEffect } from 'react';
+import { SpinnerGap } from 'phosphor-react';
+import { useContext, useEffect, useState } from 'react';
 import { Heading } from '../../Components/Heading';
 import { Text } from '../../Components/Text';
 import { RegisterContext } from '../../Context/RegisterContext';
@@ -12,19 +13,28 @@ export default function Register() {
     const { loadAllRegisters } = useDatabase();
     const { currentUser, signOut } = useAuth();
     const { registers, setRegisters } = useContext(RegisterContext);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const load = async () => {
-            if (!currentUser) {
-                signOut();
-                return;
+        try {
+            const load = async () => {
+                if (!currentUser) {
+                    signOut();
+                    return;
+                }
+                setLoading(true);
+                const registersDatabase = await loadAllRegisters(currentUser.uid);
+                setRegisters(registersDatabase);
             }
-            const registersDatabase = await loadAllRegisters(currentUser.uid);
-            setRegisters(registersDatabase);
-            
+            load();
         }
-        load();
-    }, [])
+        catch (error) {
+            console.log(error);
+        }
+        finally {
+            setLoading(false);
+        }
+    }, [registers])
 
     return (
         <div className='flex flex-col'>
@@ -35,7 +45,8 @@ export default function Register() {
                 </div>
                 <DialogCustom />
             </div>
-            <Table />
+            {loading ? <SpinnerGap className='animate-spin h-6 w-6' /> : <Table />}
+
         </div>
     )
 }

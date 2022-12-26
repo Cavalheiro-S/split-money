@@ -17,7 +17,6 @@ export const convertSnapshotToRegisterArray = (snapshot: DataSnapshot) => {
             date: register.date,
         } as RegisterProps;
     })
-    console.log(registers);
 
     return registers;
 }
