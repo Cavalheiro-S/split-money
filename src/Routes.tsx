@@ -4,7 +4,7 @@ import { PrivateRoute } from "./Components/PrivateRoute";
 import { AuthContext } from "./Context/AuthContext";
 import { useAuth } from "./hooks/useAuth";
 import { Dashboard } from "./Pages/Dashboard";
-import History from "./Pages/History";
+import Record from "./Pages/Record";
 import Main from "./Pages/Main";
 import MonthRevenue from "./Pages/MonthRevenue";
 import { Profile } from "./Pages/Profile";
@@ -12,8 +12,8 @@ import Signin from "./Pages/Signin";
 import Signup from "./Pages/Signup";
 
 export const AppRoutes = () => {
-    
-   
+
+
     return (
         <BrowserRouter>
             <Routes>
@@ -26,9 +26,9 @@ export const AppRoutes = () => {
                             <MonthRevenue />
                         </PrivateRoute>
                     } />
-                    <Route path="/history" element={
+                    <Route path="/record" element={
                         <PrivateRoute>
-                            <History />
+                            <Record />
                         </PrivateRoute>
                     } />
                     <Route path="/profile" element={

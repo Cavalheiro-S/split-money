@@ -4,13 +4,6 @@ import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { FormInfo } from "./FormInfo";
 import { FormLogin } from "./FormLogin";
-interface Inputs {
-    name: string;
-    salary: number;
-    email: string;
-    password: string;
-    confirmPassword: string;
-}
 
 export const Signup = () => {
     const { currentUser } = useAuth();
@@ -36,7 +29,7 @@ export const Signup = () => {
                         <Tabs.Trigger
                             disabled={!currentUser}
                             className={clsx("w-full p-2 disabled:text-gray-500",
-                                { "text-primary": activeTab === "info", })}
+                                { "text-primary border-b border-b-primary": activeTab === "info", })}
                             onClick={() => setActiveTab("info")}
                             value="info">
                             Informações relevantes

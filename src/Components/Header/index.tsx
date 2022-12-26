@@ -32,8 +32,7 @@ export default function Header({ className }: HeaderProps) {
             setLoggedUser(user);
         }
         getLoggedUserInfo();
-        console.log(loggedUser);
-        
+                
     }, [currentUser])
 
     const links: linkType[] = [
@@ -51,7 +50,7 @@ export default function Header({ className }: HeaderProps) {
                 },
                 {
                     option: "Histórico de Transações",
-                    onSelect: () => navigate("/history")
+                    onSelect: () => navigate("/record")
                 }
             ]
         },

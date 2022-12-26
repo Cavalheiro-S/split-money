@@ -39,13 +39,13 @@ export const Profile = () => {
                 setLoading(false)
             }
         }
-        catch (err) {
-            if (err instanceof FirebaseError)
-                setError("email", { message: err.message })
+        catch (error) {
+            if (error instanceof FirebaseError)
+                setError("email", { message: error.message })
 
             setValue("email", currentUser?.email ?? "")
             setError("email", { message: "Falha ao alterar email" })
-            console.log(err)
+            console.log(error)
         }
 
         finally {

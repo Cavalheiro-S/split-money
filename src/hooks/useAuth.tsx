@@ -27,7 +27,6 @@ export const useAuth = () => {
 
     const updateEmail = async (email: string) => {
         const date = new Date(currentUser?.metadata.lastSignInTime ?? 0)
-        console.log(new Date().getMinutes() - date.getMinutes());
         if (new Date().getMinutes() - date.getMinutes() > 5) {
             await signOut()
             return

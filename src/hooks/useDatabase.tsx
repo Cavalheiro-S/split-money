@@ -1,4 +1,6 @@
-import { get, getDatabase, ref, set } from "firebase/database";
+import { get, getDatabase, ref, set, push, remove, query } from "firebase/database";
+import { RegisterProps } from "../Context/RegisterContext";
+import { convertSnapshotToRegister, convertSnapshotToRegisterArray } from "../Utils/database";
 import { app } from "../Utils/firebase";
 
 export interface UserProps {
@@ -6,14 +8,6 @@ export interface UserProps {
     name: string;
     email: string;
     salary: number;
-}
-
-export interface RegisterProps {
-    uid: string;
-    name: string;
-    type: "investiment" | "expense";
-    value: number;
-    date: Date;
 }
 
 export const useDatabase = () => {
@@ -34,13 +28,25 @@ export const useDatabase = () => {
     }
 
     const saveRegister = async (userUid: string, register: RegisterProps) => {
-        return await set(ref(db, `users/${userUid}/register`), register);
+        register
+        return await push(ref(db, `users/${userUid}/register`), register);
     }
 
-    const loadRegister = async (userUid: string) => {
+    const loadAllRegisters = async (userUid: string) => {
         const snapshot = await get(ref(db, `users/${userUid}/register`));
-        return snapshot.val();
+        const registers = convertSnapshotToRegisterArray(snapshot);
+        return registers;
     }
 
-    return { saveUser, loadUser, deleteUser, saveRegister, loadRegister };
+    const loadRegisterById = async (userUid: string, registerId: string) => {
+        
+        const snapshot = await get(ref(db, `users/${userUid}/register/${registerId}`));
+        const register = convertSnapshotToRegister(snapshot);
+        return register;
+    }
+
+    const deleteRegister = async (userUid: string, registerId: string) => {
+        return await remove(ref(db, `users/${userUid}/register/${registerId}`));
+    }
+    return { saveUser, loadUser, deleteUser, saveRegister, loadAllRegisters, loadRegisterById, deleteRegister };
 }

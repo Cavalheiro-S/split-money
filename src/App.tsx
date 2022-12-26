@@ -1,14 +1,14 @@
 import { AuthProvider } from "./Context/AuthContext"
-import { HistoryProvider } from "./Context/HistoryContext"
+import { RegisterProvider } from "./Context/RegisterContext"
 import { AppRoutes } from "./Routes"
 
 function App() {
 
   return (
     <AuthProvider>
-      <HistoryProvider>
+      <RegisterProvider>
         <AppRoutes />
-      </HistoryProvider>
+      </RegisterProvider>
     </AuthProvider>
   )
 }
