@@ -2,6 +2,7 @@ import { Info } from "phosphor-react"
 import { ReactNode } from "react"
 import { Slot } from "@radix-ui/react-slot"
 import clsx from "clsx";
+import { Text } from "../Text";
 
 interface CardProps {
   title: string,
@@ -23,8 +24,8 @@ export const CardRoot = ({ title, subTitle, children, className }: CardProps) =>
       <div className="flex w-64 items-center gap-6">
         {children}
         <div className="flex flex-col items-start">
-          <span className='font-bold text-neutral-700'>{title}</span>
-          <span className="font-bold text-neutral-400">{subTitle}</span>
+          <Text size="lg" className='text-neutral-700'>{title}</Text>
+          <Text className="text-neutral-400 font-semibold">{subTitle}</Text>
         </div>
       </div>
     </div>
@@ -42,7 +43,7 @@ export const CardIcon = ({ icon = <Info />, IconBGColor = "yellow", className }:
           "bg-red-500": IconBGColor === "red",
           "bg-blue-500": IconBGColor === "blue"
         }, className)}>
-      <Slot className="text-white w-7 h-7">
+      <Slot className="text-white w-6 h-6">
         {icon}
       </Slot>
     </div>

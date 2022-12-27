@@ -6,6 +6,8 @@ import { Button } from "../../Components/Button";
 import { Card } from '../../Components/Card';
 import { Input } from '../../Components/Input';
 import { v4 as uuid } from 'uuid';
+import { Heading } from '../../Components/Heading';
+import { Text } from '../../Components/Text';
 interface MonthRevenueProps {
     className?: string
 }
@@ -100,8 +102,8 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
                         </Accordion.Trigger>
                     </Accordion.Header>
                     <Accordion.Content className="border-x-2 border-b-2 p-4 md:h-40">
-                        <h3 className="font-bold text-neutral-700">Descrição</h3>
-                        {card.description}
+                        <Text size='lg'>Descrição</Text><br/>
+                        <Text className='text-gray-500'>{card.description}</Text>
                     </Accordion.Content>
                 </Accordion.Item>
             </Accordion.Root>
@@ -110,17 +112,20 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
     }
     return (
         <div className={clsx('mx-4 md:mx-0 flex flex-col', className)}>
-            <h2 className=' md:mx-0 font-bold text-3xl text-neutral-800'>Divida sua renda mensal</h2>
-            <h3 className=' md:mx-0 text-neutral-400 text-xl mb-10'>Equilibre sua renda entre investimentos, educação, despesas essenciais e lazer</h3>
+            <Heading size='lg' className='md:mx-0'>Divida sua renda mensal</Heading>
+            <Text size='lg' className=' md:mx-0 text-neutral-400 mb-10'>Equilibre sua renda entre investimentos, educação, despesas essenciais e lazer</Text>
             <div className="flex flex-col md:flex md:flex-row md:items-end gap-4">
                 <div className='flex flex-col md:m-0'>
-                    <label className="mb-2" htmlFor="renda">Renda Mensal:</label>
-                    <Input.Root>
-                        <Input.Addorn>R$</Input.Addorn>
-                        <Input.Input onKeyDown={event => handleEnterKeyDown(event)} step="5" value={revenue} onChange={event => handleChangeInput(event)} id='renda' placeholder='Digite sua renda mensal' />
-                    </Input.Root >
+                    <Text className='flex flex-col gap-2' size='lg' asChild>
+                        <label htmlFor="renda">Renda Mensal:
+                            <Input.Root>
+                                <Input.Addorn>R$</Input.Addorn>
+                                <Input.Input onKeyDown={event => handleEnterKeyDown(event)} step="5" value={revenue} onChange={event => handleChangeInput(event)} id='renda' placeholder='Digite sua renda mensal' />
+                            </Input.Root >
+                        </label>
+                    </Text>
                 </div>
-                <Button.Root className='justify-center' onClick={event => handleClick(event)}>
+                <Button.Root onClick={event => handleClick(event)}>
                     <Button.Icon className='text-xl'>
                         <Calculator />
                     </Button.Icon>

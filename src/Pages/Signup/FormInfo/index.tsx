@@ -1,10 +1,11 @@
 import { FirebaseError } from "firebase/app";
-import { EnvelopeSimple, Lock, SpinnerGap, User } from "phosphor-react";
+import { SpinnerGap, User } from "phosphor-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../Components/Button";
 import { Input } from "../../../Components/Input";
+import { Text } from "../../../Components/Text";
 import { useAuth } from "../../../hooks/useAuth";
 import { useDatabase } from "../../../hooks/useDatabase";
 import { returnErrorMessage } from "../../../Utils/firebase";
@@ -65,8 +66,8 @@ export const FormInfo = ({ activeTab, setActiveTab }: FormInfoProps) => {
                     </Input.Addorn>
                     <Input.Input id="name" {...register("name", { required: true, valueAsNumber: false })} />
                 </Input.Root>
-                {errors.name?.type == "required" && <span className="text-red-500 text-sm">Campo não pode ser vazio</span>}
-                {errors.name?.type == "valueAsNumber" && <span className="text-red-500 text-sm">Campo não pode ser um número</span>}
+                {errors.name?.type == "required" && <Text type="error">Campo não pode ser vazio</Text>}
+                {errors.name?.type == "valueAsNumber" && <Text type="error">Campo não pode ser um número</Text>}
             </label>
             <label className="flex flex-col gap-2" htmlFor="salary">Salário
                 <Input.Root>
@@ -75,14 +76,11 @@ export const FormInfo = ({ activeTab, setActiveTab }: FormInfoProps) => {
                     </Input.Addorn>
                     <Input.Input id="salary" type="number" {...register("salary", { required: true, valueAsNumber: true })} />
                 </Input.Root>
-                {errors.name?.type == "required" && <span className="text-red-500 text-sm">Campo não pode ser vazio</span>}
+                {errors.name?.type == "required" && <Text type="error">Campo não pode ser vazio</Text>}
             </label>
-            <div className="flex flex-col gap-2">
-                <Button.Root id="signup" disabled={loading} type="submit">
-                    {loading ? <SpinnerGap className="h-6 w-6 animate-spin" /> : "Finalizar Cadastro"}
-                </Button.Root>
-                
-            </div>
+            <Button.Root id="signup" disabled={loading} type="submit">
+                {loading ? <SpinnerGap className="h-6 w-6 animate-spin" /> : "Finalizar Cadastro"}
+            </Button.Root>
         </form>
     )
 }

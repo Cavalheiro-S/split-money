@@ -63,7 +63,7 @@ export const Profile = () => {
     return (
         <>
             <div className="mb-10">
-                <Heading size="xl">
+                <Heading size="lg">
                     Perfil
                 </Heading>
                 <Text size="lg" className="text-md text-gray-500">Informe alguns dados para nos ajudar a te proporcionar uma melhor experiência</Text>

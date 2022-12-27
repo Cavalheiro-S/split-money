@@ -9,7 +9,7 @@ import { Input } from "../../Components/Input";
 import { Notification, NotificationProps } from "../../Components/Notification";
 import { Text } from "../../Components/Text";
 import { useAuth } from "../../hooks/useAuth";
-import { useDatabase, UserProps } from "../../hooks/useDatabase";
+import { useDatabase } from "../../hooks/useDatabase";
 
 interface Inputs {
     email: string;
@@ -87,9 +87,8 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
             < div className="flex flex-col justify-center items-center h-full" >
                 <form className="flex flex-col w-96 gap-6" onSubmit={handleSubmit(onSubmit)}>
                     <div className="flex flex-col w-full mb-4">
-
-                        <Heading className="text-3xl font-bold">Login</Heading>
-                        <Text className="text-gray-400">Informe suas credencias para logar</Text>
+                        <Heading size="xl">Login</Heading>
+                        <Text size="lg" className="text-gray-400">Informe suas credencias para logar</Text>
                     </div>
                     <label className="flex flex-col gap-2" htmlFor="email">Email
                         <Input.Root>
@@ -98,9 +97,9 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
                             </Input.Addorn>
                             <Input.Input type={"email"} id="email" {...register("email", { required: "Email deve ser preenchido", minLength: 4 })} />
                         </Input.Root>
-                        {errors.email?.type === "required" && <span className="text-red-500 text-sm">{errors.email.message}</span>}
-                        {errors.email?.type === "minLength" && <span className="text-red-500 text-sm">Email deve ter no mínimo 3 caracteres</span>}
-                        {errors.email?.type === "manual" && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+                        {errors.email?.type === "required" && <Text type="error">{errors.email.message}</Text>}
+                        {errors.email?.type === "minLength" && <Text type="error">Email deve ter no mínimo 3 caracteres</Text>}
+                        {errors.email?.type === "manual" && <Text type="error">{errors.email.message}</Text>}
                     </label>
                     <label className="flex flex-col gap-2" htmlFor="password">Senha
                         <Input.Root>
@@ -109,7 +108,7 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
                             </Input.Addorn>
                             <Input.Input id="password" type="password" {...register("password", { required: "A senha deve ser preenchida" })} />
                         </Input.Root>
-                        {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
+                        {errors.password && <Text type="error">{errors.password.message}</Text>}
                     </label>
                     <div className="flex flex-col gap-2">
                         <Button.Root disabled={loading} className="justify-center" id="signin" type="submit">
@@ -117,7 +116,7 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
                         </Button.Root>
                         <Button.Root
                             onClick={handleClickSignUp}
-                            className="justify-center bg-transparent text-primary border border-primary hover:text-white hover:bg-primary"
+                            styleType="secondary"
                             disabled={loading}
                             id="signup" type="button">
                             Criar conta
