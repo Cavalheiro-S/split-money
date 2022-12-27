@@ -10,6 +10,7 @@ import { Select } from '../../../Components/Select';
 import { RegisterContext, RegisterProps } from '../../../Context/RegisterContext';
 import { useAuth } from '../../../hooks/useAuth';
 import { useDatabase } from '../../../hooks/useDatabase';
+import { convertToMoneyValues, replaceCommaInDot } from '../../../Utils/util';
 
 interface Inputs {
     name: string,
@@ -39,30 +40,43 @@ export default function DialogCustom() {
         setValue("date", moment().toDate());
     }, [dialogOpen.register, setValue])
 
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        if (!currentUser) {
-            signOut();
-            return;
-        }
-        const newItem: RegisterProps = {
+    const formatValues = (data: Inputs) => {
+        const { value } = data;
+        const valueFormated = convertToMoneyValues(value.toString());
+
+        return {
+            ...data,
             id: uuid(),
-            name: data.name,
-            type: data.type,
-            value: data.value,
-            date: data.date
-        }
-        if (dialogOpen.register?.id) {
-            await updateRegister(currentUser.uid, dialogOpen.register.id, newItem);
-            const loadedRegisters = await loadAllRegisters(currentUser.uid);
-            setRegisters(loadedRegisters);
-        }
+            value: valueFormated
+        } as RegisterProps
+    }
 
-        else {
+    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+        try {
+            if (!currentUser) {
+                signOut();
+                return;
+            }
 
-            await saveRegister(currentUser.uid, newItem);
-            setRegisters([...registers, newItem]);
+            const formatedValues = formatValues(data);
+            
+            if (dialogOpen.register?.id) {
+                await updateRegister(currentUser.uid, dialogOpen.register.id, formatedValues);
+                const loadedRegisters = await loadAllRegisters(currentUser.uid);
+                setRegisters(loadedRegisters);
+                return
+            }
+
+            await saveRegister(currentUser.uid, formatedValues);
+            setRegisters([...registers, formatedValues]);
+
         }
-        setDialogOpen({ open: false });
+        catch (error) {
+            console.log(error);
+        }
+        finally {
+            setDialogOpen({ open: false });
+        }
     }
 
     const handleDelete = async () => {
@@ -78,7 +92,7 @@ export default function DialogCustom() {
         setDialogOpen({ open: false });
     }
 
-    const verifyIfIsEditing = () => {
+    const verifyIsEditing = () => {
         if (dialogOpen.register?.name !== getValues("name")) return true
         if (dialogOpen.register?.value !== getValues("value")) return true
         if (dialogOpen.register?.type !== getValues("type")) return true
@@ -87,7 +101,7 @@ export default function DialogCustom() {
 
     const renderActionButtons = () => {
         if (dialogOpen.register?.id) {
-            const editButtonDisabled = verifyIfIsEditing();
+            const editButtonDisabled = verifyIsEditing();
             return (
                 <>
                     <Button.Root styleType='secondary' className='w-full' onClick={() => handleDelete()} type='button'>
@@ -140,7 +154,7 @@ export default function DialogCustom() {
                                 <label className="text-sm" htmlFor="value">Valor</label>
                                 <Input.Root>
                                     <Input.Addorn>R$</Input.Addorn>
-                                    <Input.Input id='value' {...register("value", { required: true })} min={0} type="number" placeholder='Valor' />
+                                    <Input.Input id='value' {...register("value", { required: true })} type={"text"} inputMode={"numeric"} placeholder='Valor' />
                                 </Input.Root>
                                 {errors.value && <span className='text-xs text-red-500'>Campo obrigatório</span>}
                             </fieldset>

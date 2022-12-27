@@ -27,9 +27,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 setUser(user)
             }
             else {
-                setUser(user => ({ ...user, logged: false }))
+                setUser({}  as User)
             }
         })
+        
         return unsubscribe;
     }, [])
 
