@@ -97,12 +97,14 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
                     <Accordion.Header>
                         <Accordion.Trigger className="w-full">
                             <Card.Root className='hover:shadow-md transition' title={card.value} subTitle={card.name}>
-                                <Card.Icon IconBGColor={card.iconBGColor} icon={card.icon} />
+                                <Card.Icon IconBGColor={card.iconBGColor}>
+                                    {card.icon}
+                                </Card.Icon>
                             </Card.Root>
                         </Accordion.Trigger>
                     </Accordion.Header>
                     <Accordion.Content className="border-x-2 border-b-2 p-4 md:h-40">
-                        <Text size='lg'>Descrição</Text><br/>
+                        <Text size='lg'>Descrição</Text><br />
                         <Text className='text-gray-500'>{card.description}</Text>
                     </Accordion.Content>
                 </Accordion.Item>

@@ -1,7 +1,6 @@
 import {
-    createUserWithEmailAndPassword,
-    inMemoryPersistence,
-    signInWithEmailAndPassword,
+    browserLocalPersistence,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword,
     signOut as SignOut,
     updateEmail as UpdateEmail
 } from "firebase/auth";
@@ -16,8 +15,8 @@ export const useAuth = () => {
 
     useEffect(() => {
 
-        auth.setPersistence(inMemoryPersistence)
-    },[currentUser, navigate])
+        auth.setPersistence(browserLocalPersistence)
+    }, [currentUser, navigate])
 
     const signUp = (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)

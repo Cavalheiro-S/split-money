@@ -1,5 +1,5 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, User, UserCredential } from "firebase/auth";
-import { createContext, ReactElement, ReactNode, useEffect, useState } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import { auth } from "../Utils/firebase";
 
 interface AuthContextData {
@@ -27,10 +27,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 setUser(user)
             }
             else {
-                setUser({}  as User)
+                setUser({} as User)
             }
         })
-        
+
         return unsubscribe;
     }, [])
 
