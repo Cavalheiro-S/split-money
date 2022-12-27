@@ -1,9 +1,11 @@
 import {
     createUserWithEmailAndPassword,
+    inMemoryPersistence,
     signInWithEmailAndPassword,
     signOut as SignOut,
     updateEmail as UpdateEmail
 } from "firebase/auth";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../Utils/firebase";
 
@@ -11,6 +13,13 @@ import { auth } from "../Utils/firebase";
 export const useAuth = () => {
     const { currentUser } = auth;
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if(!currentUser) navigate("/signin")
+
+        auth.setPersistence(inMemoryPersistence)
+    },[currentUser, navigate])
+
     const signUp = (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)
     }
