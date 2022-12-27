@@ -10,6 +10,7 @@ import MonthRevenue from "./Pages/MonthRevenue";
 import { Profile } from "./Pages/Profile";
 import Signin from "./Pages/Signin";
 import Signup from "./Pages/Signup";
+import { Home } from "./Pages/Home";
 
 export const AppRoutes = () => {
 
@@ -18,7 +19,7 @@ export const AppRoutes = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Main />}>
-                    <Route path="/" element={<h1>HOME</h1>} />
+                    <Route path="/" element={<Home/>} />
                     <Route path="/signin" element={<Signin />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="*" element={<Navigate to="/" />} />

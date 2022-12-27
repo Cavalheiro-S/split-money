@@ -12,7 +12,7 @@ interface CardProps {
 }
 
 interface CardIconProps {
-  icon?: ReactNode,
+  children?: ReactNode,
   IconBGColor?: "yellow" | "green" | "red" | "blue",
   className?: string,
 }
@@ -20,31 +20,31 @@ interface CardIconProps {
 export const CardRoot = ({ title, subTitle, children, className }: CardProps) => {
 
   return (
-    <div className={clsx('flex rounded border justify-center items-center p-6', className)}>
-      <div className="flex w-64 items-center gap-6">
+    <div className={clsx('flex rounded border justify-center items-center p-4', className)}>
+      <div className="flex flex-col w-64 gap-2">
         {children}
         <div className="flex flex-col items-start">
           <Text size="lg" className='text-neutral-700'>{title}</Text>
-          <Text className="text-neutral-400 font-semibold">{subTitle}</Text>
+          <Text className="text-neutral-400">{subTitle}</Text>
         </div>
       </div>
     </div>
   )
 }
 
-export const CardIcon = ({ icon = <Info />, IconBGColor = "yellow", className }: CardIconProps) => {
+export const CardIcon = ({ children = <Info />, IconBGColor = "yellow", className }: CardIconProps) => {
 
   return (
     <div className={
       clsx("h-10 w-10 flex items-center justify-center rounded-full",
         {
-          "bg-yellow-500": IconBGColor === "yellow",
-          "bg-green-500": IconBGColor === "green",
-          "bg-red-500": IconBGColor === "red",
-          "bg-blue-500": IconBGColor === "blue"
+          "bg-yellow-700": IconBGColor === "yellow",
+          "bg-green-700": IconBGColor === "green",
+          "bg-red-700": IconBGColor === "red",
+          "bg-blue-700": IconBGColor === "blue"
         }, className)}>
       <Slot className="text-white w-6 h-6">
-        {icon}
+        {children}
       </Slot>
     </div>
   )

@@ -24,7 +24,15 @@ export default function DialogCustom() {
     const { registers, setRegisters, dialogOpen, setDialogOpen } = useContext(RegisterContext);
     const { currentUser, signOut } = useAuth();
     const { saveRegister, deleteRegister, loadAllRegisters, updateRegister } = useDatabase();
-    const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm<Inputs>()
+    const { register, handleSubmit, formState: { errors }, setValue, getValues, reset } = useForm<Inputs>()
+
+
+    const cleanStateForms = () => {
+        setValue("name", "");
+        setValue("type", "investiment");
+        setValue("value", 0);
+        setValue("date", new Date());
+    }
 
     useEffect(() => {
         if (dialogOpen.register) {
@@ -34,10 +42,8 @@ export default function DialogCustom() {
             setValue("date", dialogOpen.register.date);
             return;
         }
-        setValue("name", "");
-        setValue("type", "investiment");
-        setValue("value", 0);
-        setValue("date", moment().toDate());
+        cleanStateForms();
+
     }, [dialogOpen.register, setValue])
 
     const formatValues = (data: Inputs) => {
@@ -59,7 +65,7 @@ export default function DialogCustom() {
             }
 
             const formatedValues = formatValues(data);
-            
+
             if (dialogOpen.register?.id) {
                 await updateRegister(currentUser.uid, dialogOpen.register.id, formatedValues);
                 const loadedRegisters = await loadAllRegisters(currentUser.uid);
@@ -80,16 +86,24 @@ export default function DialogCustom() {
     }
 
     const handleDelete = async () => {
-        if (!currentUser) {
-            signOut();
-            return;
+        try {
+            if (!currentUser) {
+                signOut();
+                return;
+            }
+            if (dialogOpen.register?.id) {
+                await deleteRegister(currentUser.uid, dialogOpen.register.id);
+                const loadedRegisters = await loadAllRegisters(currentUser.uid);
+                setRegisters(loadedRegisters);
+            }
         }
-        if (dialogOpen.register?.id) {
-            await deleteRegister(currentUser.uid, dialogOpen.register.id);
-            const loadedRegisters = await loadAllRegisters(currentUser.uid);
-            setRegisters(loadedRegisters);
+        catch (error) {
+            console.log(error);
         }
-        setDialogOpen({ open: false });
+        finally {
+            setDialogOpen({ open: false });
+            cleanStateForms();
+        }
     }
 
     const verifyIsEditing = () => {
@@ -128,7 +142,7 @@ export default function DialogCustom() {
     return (
         <Dialog.Root open={dialogOpen.open}>
             <Dialog.Trigger className='md:ml-auto' asChild>
-                <Button.Root className='justify-center' onClick={() => setDialogOpen({ open: true })}>
+                <Button.Root className='justify-center' onClick={() => setDialogOpen({ open: true, register: {} as RegisterProps })}>
                     <Button.Icon className='text-lg' />
                     Adicionar
                 </Button.Root>
@@ -154,7 +168,7 @@ export default function DialogCustom() {
                                 <label className="text-sm" htmlFor="value">Valor</label>
                                 <Input.Root>
                                     <Input.Addorn>R$</Input.Addorn>
-                                    <Input.Input id='value' {...register("value", { required: true })} type={"text"} inputMode={"numeric"} placeholder='Valor' />
+                                    <Input.Input id='value' {...register("value", { required: true })} type={"number"} step="any" placeholder='0' />
                                 </Input.Root>
                                 {errors.value && <span className='text-xs text-red-500'>Campo obrigatório</span>}
                             </fieldset>
