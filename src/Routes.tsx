@@ -21,6 +21,7 @@ export const AppRoutes = () => {
                     <Route path="/" element={<h1>HOME</h1>} />
                     <Route path="/signin" element={<Signin />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="*" element={<Navigate to="/" />} />
                     <Route path="/monthRevenue" element={
                         <PrivateRoute>
                             <MonthRevenue />

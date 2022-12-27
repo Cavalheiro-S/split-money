@@ -15,7 +15,6 @@ export const useAuth = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if(!currentUser) navigate("/signin")
 
         auth.setPersistence(inMemoryPersistence)
     },[currentUser, navigate])
