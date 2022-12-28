@@ -24,7 +24,6 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
 
     const navigate = useNavigate();
     const { signIn } = useAuth();
-    const { saveUser } = useDatabase();
     const { register, handleSubmit, setError, formState: { errors } } = useForm<Inputs>()
     const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState<NotificationProps>({
@@ -85,7 +84,7 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
         <>
             {notification.title && <Notification title={notification.title} message={notification.message} type={notification.type} />}
             < div className="flex flex-col justify-center items-center h-full" >
-                <form className="flex flex-col w-96 gap-6" onSubmit={handleSubmit(onSubmit)}>
+                <form className="flex flex-col md:w-96 gap-6" onSubmit={handleSubmit(onSubmit)}>
                     <div className="flex flex-col w-full mb-4">
                         <Heading size="xl">Login</Heading>
                         <Text size="lg" className="text-gray-400">Informe suas credencias para logar</Text>

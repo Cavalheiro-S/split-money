@@ -3,33 +3,58 @@ import clsx from "clsx";
 import { v4 as uuid } from "uuid"
 import { CaretDown } from "phosphor-react";
 import { ReactNode } from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { Text } from "../Text";
 
 export interface DropdownMenuProps {
     options: DropdownMenuOptionProps[];
-    selected: ReactNode;
+    selected?: DropdownMenuOptionProps;
     className?: string;
 }
 
 export interface DropdownMenuOptionProps {
-    option: ReactNode;
-    onSelect: (event: Event) => void;
+    title?: string;
+    icon?: ReactNode;
+    className?: string;
+    onSelect?: (event: Event) => void;
+    children?: ReactNode;
 }
 
 export const DropdownMenu = ({ selected, options, className }: DropdownMenuProps) => {
+
+    const handleHasIcon = (option: DropdownMenuOptionProps) => {
+        if (option.icon) {
+            return (
+                <Slot>
+                    {option.icon}
+                </Slot>
+            )
+        }
+    }
+
+
 
     return (
         <DropdownMenuRadix.Root>
             <DropdownMenuRadix.Trigger className={clsx("flex items-center outline-none gap-2", className)}>
                 <>
-                    {selected}
-                    <CaretDown className="text-primary" />
+                    {selected && handleHasIcon(selected)}
+                    <Text className="select-none">{selected?.title}</Text>
+                    {selected?.title && <CaretDown className="text-primary" />}
                 </>
             </DropdownMenuRadix.Trigger>
             <DropdownMenuRadix.Content className="flex flex-col gap-2 p-2 bg-white rounded-md shadow-md z-40 mt-4 min-w-[240px] border">
                 {options.map(option => (
-                    <DropdownMenuRadix.Item className="px-8 py-2 outline-none hover:bg-primary-hover transition hover:text-white select-none" key={uuid()} onSelect={option.onSelect}>
-                        {option.option}
-                    </DropdownMenuRadix.Item>
+                    option.children ?? (
+                        <DropdownMenuRadix.Item
+                            className={
+                                clsx("px-8 py-2 flex items-center gap-2 outline-none hover:bg-primary-hover transition hover:text-white select-none", className)}
+                                key={uuid()}
+                                onSelect={option.onSelect}>
+                            {handleHasIcon(option)}
+                            <Text className="hover:text-primary transition select-none">{option.title}</Text>
+                        </DropdownMenuRadix.Item>
+                    )
                 ))}
             </DropdownMenuRadix.Content>
         </DropdownMenuRadix.Root>

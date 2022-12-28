@@ -1,29 +1,27 @@
+import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
+import * as Acordion from "@radix-ui/react-accordion";
 import clsx from "clsx";
-import { SignOut, UserCircle, UserList } from "phosphor-react";
+import { CaretDown, List, SignOut, UserCircle, UserList } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
 import { useAuth } from "../../hooks/useAuth";
 import { useDatabase, UserProps } from "../../hooks/useDatabase";
-import { DropdownMenu, DropdownMenuOptionProps } from "../DropdownMenu";
+import { useWindowDimensions } from "../../hooks/useWindowDimensions";
+import { DropdownMenu } from "../DropdownMenu";
+import { Heading } from "../Heading";
+import { Text } from "../Text";
 
 interface HeaderProps {
     className?: string,
 }
 
-type linkType = {
-    title: string,
-    url?: string,
-    dropdown?: boolean,
-    dropdownOptions?: DropdownMenuOptionProps[]
-}
-
 export default function Header({ className }: HeaderProps) {
     const navigate = useNavigate();
     const { signOut, currentUser } = useAuth();
+    const { width } = useWindowDimensions();
     const { loadUser } = useDatabase();
     const [loggedUser, setLoggedUser] = useState<UserProps | null>(null);
-
 
     useEffect(() => {
         const getLoggedUserInfo = async () => {
@@ -32,95 +30,95 @@ export default function Header({ className }: HeaderProps) {
             setLoggedUser(user);
         }
         getLoggedUserInfo();
-                
+
     }, [currentUser])
 
-    const links: linkType[] = [
-        {
-            title: "Dashboard",
-            url: "/dashboard",
-        },
-        {
-            title: "Ferramentas",
-            dropdown: true,
-            dropdownOptions: [
-                {
-                    option: "Renda Mensal",
-                    onSelect: () => navigate("/monthRevenue")
-                },
-                {
-                    option: "Histórico de Transações",
-                    onSelect: () => navigate("/record")
-                }
-            ]
-        },
-    ]
-
-    const renderLinks = (link: linkType) => {
-
-        if (link.dropdown) {
-
-            return (
-                <DropdownMenu
-                    className="flex items-center"
-                    key={uuid()}
-                    selected={
-                        <span className="rounded hover:text-primary-hover transition select-none">
-                            {link.title}
-                        </span>
-                    }
-                    options={link.dropdownOptions ?? []} />
-            )
-        }
+    const renderSubMenu = () => {
         return (
-            <li className="flex marker:text-transparent items-center text-center" key={uuid()}>
-                <Link to={link.url ?? "/"} className="px-4 py-1 rounded hover:text-primary-hover transition select-none">
-                    {link.title}
-                </Link>
-            </li>
+            <Acordion.Root className="flex flex-col gap-2" type="single" collapsible>
+                <Acordion.Item className="flex-1" value="item-1">
+                    <Acordion.Trigger className="flex flex-col gap-2 px-8 py-2">
+                        <div className="flex items-center gap-2">
+                            <Text className="flex-1">Ferramentas</Text>
+                            <CaretDown className="text-primary" />
+                        </div>
+                        <Acordion.Content className="text-start">
+                            <Acordion.Item onClick={() => navigate("/monthRevenue")} className="py-2 hover:text-primary" value="item-1-1">
+                                <Text >Renda Mensal</Text>
+                            </Acordion.Item>
+                            <Acordion.Item onClick={() => navigate("record")} className="py-2 hover:text-primary" value="item-1-2">
+                                <Text>Histórico de Transações</Text>
+                            </Acordion.Item>
+                        </Acordion.Content>
+                    </Acordion.Trigger>
+                </Acordion.Item>
+            </Acordion.Root>
         )
     }
 
-    const renderAutenticatedLinks = () => {
+    const renderHeader = () => {
+        if (width > 768) {
+            return (
+                <header className={clsx("grid grid-cols-3 gap-4 items-center", className)}>
+                    <Link to={"/"} className="flex items-center">
+                        <Heading color="primary" size="lg">Split Money</Heading>
+                    </Link>
+                    {renderLinks()}
+                </header>
+            )
+        }
 
+        const tools = {
+            title: "Ferramentas",
+            children: renderSubMenu(),
+
+        }
+
+        return (
+            <header className={clsx("flex items-center justify-between", className)} >
+                <Link to={"/"} className="flex items-center">
+                    <Heading color="primary" size="lg">Split Money</Heading>
+                </Link>
+                <DropdownMenu
+                    className="flex items-center"
+                    selected={{ icon: <List className="h-6 w-6" /> }}
+                    key={uuid()}
+                    options={[
+                        { title: "Dashboard", onSelect: () => navigate("/dashboard") },
+                        tools,
+                    ]} />
+            </header >
+        )
+    }
+
+    const renderLinks = () => {
         if (currentUser) {
-            const options = [
-                {
-                    option:
-                        <div className="flex items-center gap-2">
-                            <UserList className="h-5 w-5" />
-                            <span className="text-sm select-none">Perfil</span>
-                        </div>,
-                    onSelect: () => navigate("/profile")
-                },
-                {
-                    option:
-                        <div className="flex items-center gap-2">
-                            <SignOut className="h-5 w-5" />
-                            <span className="text-sm select-none">Sair</span>
-                        </div>,
-                    onSelect: () => {
-                        signOut();
-                    }
-                },
-            ]
             return (
                 <>
                     <nav className="flex text-sm justify-center text-neutral-800 md:col-start-2">
-                        {links.map(renderLinks)}
+                        <li className="flex marker:text-transparent items-center text-center" key={uuid()}>
+                            <Link to={"/dashboard"} className="px-4 py-1 rounded hover:text-primary-hover transition select-none">
+                                Dashboard
+                            </Link>
+                        </li>
+                        <DropdownMenu
+                            className="flex items-center"
+                            selected={{ title: "Ferramentas", onSelect: () => { } }}
+                            key={uuid()}
+                            options={[
+                                { title: "Renda Mensal", onSelect: () => navigate("/monthRevenue") },
+                                { title: "Histórico de Transações", onSelect: () => navigate("/record") }
+                            ]} />
                     </nav>
                     <DropdownMenu
                         className="md:col-start-3 justify-self-end"
-                        selected={
-                            <div className="flex items-center gap-2">
-                                <UserCircle className="text-primary h-8 w-8" />
-                                <span className="text-sm hover:text-primary transition select-none">{loggedUser?.name}</span>
-                            </div>
-                        }
-                        options={options} />
+                        selected={{ title: loggedUser?.name ?? "", icon: <UserCircle />, onSelect: () => { } }}
+                        options={[
+                            { title: "Perfil", icon: <UserList />, onSelect: () => navigate("/profile") },
+                            { title: "Sair", icon: <SignOut />, onSelect: () => signOut() }]}
+                    />
                 </>
             )
-
         }
         return (
             <li className="flex marker:text-transparent items-center justify-end text-center md:col-start-3" key={uuid()}>
@@ -132,9 +130,8 @@ export default function Header({ className }: HeaderProps) {
     }
 
     return (
-        <header className={clsx("flex py-6 md:px-10 px-4 border-b-2 md:grid items-center md:grid-cols-3", className)} >
-            <span onClick={() => navigate("/")} className="font-bold text-primary drop-shadow-lg text-sm ">Split Money</span>
-            {renderAutenticatedLinks()}
-        </header>
+        <>
+            {renderHeader()}
+        </>
     )
 }

@@ -4,22 +4,26 @@ import { ReactNode } from "react";
 
 export interface HeadingProps {
     size?: "sm" | "md" | "lg" | "xl";
+    color?: "primary" | "white" | "black";
     children: ReactNode;
     asChild?: boolean,
     className?: string,
 }
 
-export function Heading({ size = "md", children, asChild, className }: HeadingProps) {
+export function Heading({ size = "md", children, color = "black", asChild, className }: HeadingProps) {
 
     const Comp = asChild ? Slot : 'h2'
     return (
         <Comp
             className={
-                clsx("text-font font-semibold font-sans", {
+                clsx("font-semibold font-sans", {
                     "text-lg": size === "sm",
                     "text-xl": size === "md",
                     "text-2xl": size === "lg",
                     "text-3xl": size === "xl",
+                    "text-primary": color === "primary",
+                    "text-white": color === "white",
+                    "text-font": color === "black",
                 }, className)}>
             {children}
         </Comp>

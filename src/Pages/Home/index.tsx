@@ -18,19 +18,19 @@ export const Home = () => {
     }
 
     return (
-        <div className="flex flex-col h-full justify-center gap-20">
-            <section className="flex gap-20 justify-center h-100">
-                <div className="flex flex-col gap-6 max-w-sm justify-center">
-                    <Heading size="xl">Split Money</Heading>
-                    <Text size="lg" className="text-gray-500">Ut eget urna malesuada, pharetra urna ornare, volutpat est. Aenean id quam justo. Maecenas vitae nulla massa. Cras gravida </Text>
-                    <Button.Root onClick={() => handleClick()} className="self-start">Controle suas finanças</Button.Root>
+        <div className="flex flex-col justify-center gap-20">
+            <section className="flex flex-col md:flex-row gap-20 justify-center items-center h-[70vh]">
+                <div className="flex flex-col gap-6 md:max-w-sm justify-center">
+                    <Heading className="md:text-start text-center" size="xl">Split Money</Heading>
+                    <Text size="lg" className="text-gray-500 text-center md:text-start">Ut eget urna malesuada, pharetra urna ornare, volutpat est. Aenean id quam justo. Maecenas vitae nulla massa. Cras gravida </Text>
+                    <Button.Root onClick={() => handleClick()} className="md:self-start">Controle suas finanças</Button.Root>
                 </div>
-                <img src={HomeImage} alt="Home" />
+                <img className="max-w-sm" src={HomeImage} alt="Home" />
             </section>
-            <section className="flex flex-col items-center">
+            <section className="flex flex-col items-center mb-20">
                 <Heading className="text-center">Funcionalidades</Heading>
-                <Text className="text-gray-500">Algumas das funcionalidades que vão te ajudar a controlar suas finanças</Text>
-                <div className="flex gap-12 mt-12">
+                <Text className="text-gray-500 text-center">Algumas das funcionalidades que vão te ajudar a controlar suas finanças</Text>
+                <div className="flex flex-col lg:flex-row gap-4 md:gap-12 mt-4 md:mt-12">
                     <Card.Root title="Dashboard" subTitle="Insights sobre suas finanças ">
                         <Card.Icon IconBGColor="green">
                             <ChartLine/>

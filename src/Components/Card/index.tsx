@@ -20,13 +20,11 @@ interface CardIconProps {
 export const CardRoot = ({ title, subTitle, children, className }: CardProps) => {
 
   return (
-    <div className={clsx('flex rounded border justify-center items-center p-4', className)}>
-      <div className="flex flex-col w-64 gap-2">
-        {children}
-        <div className="flex flex-col items-start">
-          <Text size="lg" className='text-neutral-700'>{title}</Text>
-          <Text className="text-neutral-400">{subTitle}</Text>
-        </div>
+    <div className={clsx('flex flex-col w-72 hover:shadow-md transition gap-2 rounded border justify-center p-4', className)}>
+      {children}
+      <div className="flex flex-col items-start">
+        <Text size="lg" className='text-neutral-700'>{title}</Text>
+        <Text className="text-neutral-400">{subTitle}</Text>
       </div>
     </div>
   )
