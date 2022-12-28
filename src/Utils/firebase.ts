@@ -3,12 +3,12 @@ import { getAuth } from "firebase/auth";
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDdb4LTlvTMt_3JfW0447OFbvcx1r17MCk",
-    authDomain: "split-money-84bdf.firebaseapp.com",
-    projectId: "split-money-84bdf",
-    storageBucket: "split-money-84bdf.appspot.com",
-    messagingSenderId: "819188300370",
-    appId: "1:819188300370:web:ca6f729a4cdf949772bd8b"
+    apiKey: process.env.REACT_APP_APIKEY,
+    authDomain: process.env.REACT_APP_AUTHDOMAIN,
+    projectId: process.env.REACT_APP_PROJECTID,
+    storageBucket: process.env.REACT_APP_STORAGEBUCKET,
+    messagingSenderId: process.env.MESSAGINGSENDERID,
+    appId: process.env.REACT_APP_APPID,
 };
 
 export const app = initializeApp(firebaseConfig);
