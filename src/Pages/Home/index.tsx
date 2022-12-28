@@ -1,20 +1,21 @@
+import { ChartLine, ListPlus, MathOperations } from "phosphor-react"
+import { useNavigate } from "react-router-dom"
+import HomeImage from "../../Assets/Imgs/HomeImage.svg"
 import { Button } from "../../Components/Button"
+import { Card } from "../../Components/Card"
 import { Heading } from "../../Components/Heading"
 import { Text } from "../../Components/Text"
-import HomeImage from "../../assets/imgs/HomeImage.svg"
-import { Card } from "../../Components/Card"
-import { ChartLine, ListPlus, MathOperations } from "phosphor-react"
 import { useAuth } from "../../Hooks/useAuth"
-import { useNavigate } from "react-router-dom"
 export const Home = () => {
 
     const { currentUser } = useAuth()
     const navigate = useNavigate()
     const handleClick = () => {
-        if(currentUser)
+        if (currentUser) {
             navigate("/dashboard")
-        else
-            navigate("/signin")
+            return;
+        }
+        navigate("/signin")
     }
 
     return (
@@ -33,17 +34,17 @@ export const Home = () => {
                 <div className="flex flex-col lg:flex-row gap-4 md:gap-12 mt-4 md:mt-12">
                     <Card.Root title="Dashboard" subTitle="Insights sobre suas finanças ">
                         <Card.Icon IconBGColor="green">
-                            <ChartLine/>
+                            <ChartLine />
                         </Card.Icon>
                     </Card.Root>
                     <Card.Root title="Calculadora de Renda Mensal" subTitle="Divida seus gasto">
                         <Card.Icon IconBGColor="red">
-                            <MathOperations/>
+                            <MathOperations />
                         </Card.Icon>
                     </Card.Root>
                     <Card.Root title="Registros Financeiros" subTitle="Controle seus gastos e investimentos">
                         <Card.Icon IconBGColor="blue">
-                            <ListPlus/>
+                            <ListPlus />
                         </Card.Icon>
                     </Card.Root>
                 </div>

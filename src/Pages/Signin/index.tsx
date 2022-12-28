@@ -9,7 +9,6 @@ import { Input } from "../../Components/Input";
 import { Notification, NotificationProps } from "../../Components/Notification";
 import { Text } from "../../Components/Text";
 import { useAuth } from "../../Hooks/useAuth";
-import { useDatabase } from "../../Hooks/useDatabase";
 
 interface Inputs {
     email: string;
