@@ -4,7 +4,7 @@ import { Text } from "../../Components/Text"
 import HomeImage from "../../assets/imgs/HomeImage.svg"
 import { Card } from "../../Components/Card"
 import { ChartLine, ListPlus, MathOperations } from "phosphor-react"
-import { useAuth } from "../../hooks/useAuth"
+import { useAuth } from "../../Hooks/useAuth"
 import { useNavigate } from "react-router-dom"
 export const Home = () => {
 

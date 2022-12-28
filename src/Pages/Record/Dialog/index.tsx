@@ -8,8 +8,8 @@ import { Button } from '../../../Components/Button';
 import { Input } from '../../../Components/Input';
 import { Select } from '../../../Components/Select';
 import { RegisterContext, RegisterProps } from '../../../Context/RegisterContext';
-import { useAuth } from '../../../hooks/useAuth';
-import { useDatabase } from '../../../hooks/useDatabase';
+import { useAuth } from '../../../Hooks/useAuth';
+import { useDatabase } from '../../../Hooks/useDatabase';
 import { convertToMoneyValues, replaceCommaInDot } from '../../../Utils/util';
 
 interface Inputs {

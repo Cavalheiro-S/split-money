@@ -8,7 +8,7 @@ import { Heading } from "../../Components/Heading"
 import { Input } from "../../Components/Input"
 import { Notification } from "../../Components/Notification"
 import { Text } from "../../Components/Text"
-import { useAuth } from "../../hooks/useAuth"
+import { useAuth } from "../../Hooks/useAuth"
 
 interface Inputs {
     name: string;

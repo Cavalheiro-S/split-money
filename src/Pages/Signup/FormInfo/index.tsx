@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../../Components/Button";
 import { Input } from "../../../Components/Input";
 import { Text } from "../../../Components/Text";
-import { useAuth } from "../../../hooks/useAuth";
-import { useDatabase } from "../../../hooks/useDatabase";
+import { useAuth } from "../../../Hooks/useAuth";
+import { useDatabase } from "../../../Hooks/useDatabase";
 import { returnErrorMessage } from "../../../Utils/firebase";
 
 interface FormInfoProps {

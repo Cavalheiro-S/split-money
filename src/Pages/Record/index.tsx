@@ -3,8 +3,8 @@ import { useContext, useEffect, useState } from 'react';
 import { Heading } from '../../Components/Heading';
 import { Text } from '../../Components/Text';
 import { RegisterContext } from '../../Context/RegisterContext';
-import { useAuth } from '../../hooks/useAuth';
-import { useDatabase } from '../../hooks/useDatabase';
+import { useAuth } from '../../Hooks/useAuth';
+import { useDatabase } from '../../Hooks/useDatabase';
 import DialogCustom from './Dialog';
 import Table from './Table';
 

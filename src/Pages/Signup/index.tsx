@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useState } from "react";
 import { Heading } from "../../Components/Heading";
 import { Text } from "../../Components/Text";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../Hooks/useAuth";
 import { FormInfo } from "./FormInfo";
 import { FormLogin } from "./FormLogin";
 
