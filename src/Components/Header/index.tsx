@@ -1,7 +1,6 @@
-import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
 import * as Acordion from "@radix-ui/react-accordion";
 import clsx from "clsx";
-import { CaretDown, List, SignOut, UserCircle, UserList } from "phosphor-react";
+import { CaretDown, List, SignOut, User, UserCircle, UserList } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
@@ -27,6 +26,7 @@ export default function Header({ className }: HeaderProps) {
         const getLoggedUserInfo = async () => {
             if (!currentUser) return
             const user = await loadUser(currentUser.uid);
+
             setLoggedUser(user);
         }
         getLoggedUserInfo();
@@ -76,9 +76,12 @@ export default function Header({ className }: HeaderProps) {
 
         return (
             <header className={clsx("flex items-center justify-between", className)} >
-                <Link to={"/"} className="flex items-center">
-                    <Heading color="primary" size="lg">Split Money</Heading>
-                </Link>
+
+                <Heading asChild color="primary" size="lg">
+                    <Link to={"/"} className="flex items-center">
+                        Split Money
+                    </Link>
+                </Heading>
                 <DropdownMenu
                     className="flex items-center"
                     selected={{ icon: <List className="h-6 w-6" /> }}
@@ -97,9 +100,11 @@ export default function Header({ className }: HeaderProps) {
                 <>
                     <nav className="flex text-sm justify-center text-neutral-800 md:col-start-2">
                         <li className="flex marker:text-transparent items-center text-center" key={uuid()}>
-                            <Link to={"/dashboard"} className="px-4 py-1 rounded hover:text-primary-hover transition select-none">
-                                Dashboard
-                            </Link>
+                            <Text asChild>
+                                <Link to={"/dashboard"} className="px-4 py-1 rounded hover:text-primary-hover transition select-none">
+                                    Dashboard
+                                </Link>
+                            </Text>
                         </li>
                         <DropdownMenu
                             className="flex items-center"
@@ -112,26 +117,24 @@ export default function Header({ className }: HeaderProps) {
                     </nav>
                     <DropdownMenu
                         className="md:col-start-3 justify-self-end"
-                        selected={{ title: loggedUser?.name ?? "", icon: <UserCircle />, onSelect: () => { } }}
+                        selected={{ title: loggedUser?.name ?? "", icon: <UserCircle className="text-primary h-5 w-5" />, onSelect: () => { } }}
                         options={[
-                            { title: "Perfil", icon: <UserList />, onSelect: () => navigate("/profile") },
-                            { title: "Sair", icon: <SignOut />, onSelect: () => signOut() }]}
+                            { title: "Perfil", icon: <UserList className="h-5 w-5" />, onSelect: () => navigate("/profile") },
+                            { title: "Sair", icon: <SignOut className="h-5 w-5" />, onSelect: () => signOut() }]}
                     />
                 </>
             )
         }
         return (
             <li className="flex marker:text-transparent items-center justify-end text-center md:col-start-3" key={uuid()}>
-                <Link to="/signin" className="px-4 py-1 rounded hover:text-primary-hover transition select-none">
-                    Entrar
-                </Link>
+                <Text asChild>
+                    <Link to="/signin" className="px-4 py-1 rounded hover:text-primary-hover transition select-none">
+                        Entrar
+                    </Link>
+                </Text>
             </li>
         )
     }
 
-    return (
-        <>
-            {renderHeader()}
-        </>
-    )
+    return renderHeader();
 }

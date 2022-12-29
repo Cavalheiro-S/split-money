@@ -16,7 +16,7 @@ export function Heading({ size = "md", children, color = "black", asChild, class
     return (
         <Comp
             className={
-                clsx("font-semibold font-sans", {
+                clsx("font-semibold font-sans select-auto", {
                     "text-lg": size === "sm",
                     "text-xl": size === "md",
                     "text-2xl": size === "lg",

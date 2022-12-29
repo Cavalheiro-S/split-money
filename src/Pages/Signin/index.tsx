@@ -82,47 +82,44 @@ export const Signin = ({ notificationRedirect }: SigninProps) => {
     return (
         <>
             {notification.title && <Notification title={notification.title} message={notification.message} type={notification.type} />}
-            < div className="flex flex-col justify-center items-center h-full" >
-                <form className="flex flex-col md:w-96 gap-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex flex-col w-full mb-4">
-                        <Heading size="xl">Login</Heading>
-                        <Text size="lg" className="text-gray-400">Informe suas credencias para logar</Text>
-                    </div>
-                    <label className="flex flex-col gap-2" htmlFor="email">Email
-                        <Input.Root>
-                            <Input.Addorn>
-                                <EnvelopeSimple className="h-6 w-6" />
-                            </Input.Addorn>
-                            <Input.Input type={"email"} id="email" {...register("email", { required: "Email deve ser preenchido", minLength: 4 })} />
-                        </Input.Root>
-                        {errors.email?.type === "required" && <Text type="error">{errors.email.message}</Text>}
-                        {errors.email?.type === "minLength" && <Text type="error">Email deve ter no mínimo 3 caracteres</Text>}
-                        {errors.email?.type === "manual" && <Text type="error">{errors.email.message}</Text>}
-                    </label>
-                    <label className="flex flex-col gap-2" htmlFor="password">Senha
-                        <Input.Root>
-                            <Input.Addorn>
-                                <Lock className="h-6 w-6" />
-                            </Input.Addorn>
-                            <Input.Input id="password" type="password" {...register("password", { required: "A senha deve ser preenchida" })} />
-                        </Input.Root>
-                        {errors.password && <Text type="error">{errors.password.message}</Text>}
-                    </label>
-                    <div className="flex flex-col gap-2">
-                        <Button.Root disabled={loading} className="justify-center" id="signin" type="submit">
-                            {loading ? <SpinnerGap className="h-6 w-6 animate-spin" /> : "Entrar"}
-                        </Button.Root>
-                        <Button.Root
-                            onClick={handleClickSignUp}
-                            styleType="secondary"
-                            disabled={loading}
-                            id="signup" type="button">
-                            Criar conta
-                        </Button.Root>
-                    </div>
-                </form>
-            </div >
-
+            <form className="flex flex-col md:w-96 justify-center items-center gap-6 mx-auto h-[70vh]" onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex flex-col w-full mb-4">
+                    <Heading size="xl">Login</Heading>
+                    <Text size="lg" className="text-gray-400">Informe suas credencias para logar</Text>
+                </div>
+                <label className="flex flex-col gap-2 w-full" htmlFor="email">Email
+                    <Input.Root>
+                        <Input.Addorn>
+                            <EnvelopeSimple className="h-6 w-6" />
+                        </Input.Addorn>
+                        <Input.Input type={"email"} id="email" {...register("email", { required: "Email deve ser preenchido", minLength: 4 })} />
+                    </Input.Root>
+                    {errors.email?.type === "required" && <Text type="error">{errors.email.message}</Text>}
+                    {errors.email?.type === "minLength" && <Text type="error">Email deve ter no mínimo 3 caracteres</Text>}
+                    {errors.email?.type === "manual" && <Text type="error">{errors.email.message}</Text>}
+                </label>
+                <label className="flex flex-col gap-2 w-full" htmlFor="password">Senha
+                    <Input.Root>
+                        <Input.Addorn>
+                            <Lock className="h-6 w-6" />
+                        </Input.Addorn>
+                        <Input.Input id="password" type="password" {...register("password", { required: "A senha deve ser preenchida" })} />
+                    </Input.Root>
+                    {errors.password && <Text type="error">{errors.password.message}</Text>}
+                </label>
+                <div className="flex flex-col gap-2 w-full">
+                    <Button.Root disabled={loading} className="justify-center" id="signin" type="submit">
+                        {loading ? <SpinnerGap className="h-6 w-6 animate-spin" /> : "Entrar"}
+                    </Button.Root>
+                    <Button.Root
+                        onClick={handleClickSignUp}
+                        styleType="secondary"
+                        disabled={loading}
+                        id="signup" type="button">
+                        Criar conta
+                    </Button.Root>
+                </div>
+            </form>
         </>
     )
 }

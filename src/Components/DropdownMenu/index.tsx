@@ -39,7 +39,7 @@ export const DropdownMenu = ({ selected, options, className }: DropdownMenuProps
             <DropdownMenuRadix.Trigger className={clsx("flex items-center outline-none gap-2", className)}>
                 <>
                     {selected && handleHasIcon(selected)}
-                    <Text className="select-none">{selected?.title}</Text>
+                    <Text className="select-none hover:text-primary transition">{selected?.title}</Text>
                     {selected?.title && <CaretDown className="text-primary" />}
                 </>
             </DropdownMenuRadix.Trigger>
@@ -48,11 +48,11 @@ export const DropdownMenu = ({ selected, options, className }: DropdownMenuProps
                     option.children ?? (
                         <DropdownMenuRadix.Item
                             className={
-                                clsx("px-8 py-2 flex items-center gap-2 outline-none hover:bg-primary-hover transition hover:text-white select-none", className)}
+                                clsx("px-8 py-2 flex items-center gap-2 outline-none transition hover:bg-primary-hover hover:text-white select-none", className)}
                                 key={uuid()}
                                 onSelect={option.onSelect}>
                             {handleHasIcon(option)}
-                            <Text className="hover:text-primary transition select-none">{option.title}</Text>
+                            <Text className="select-none">{option.title}</Text>
                         </DropdownMenuRadix.Item>
                     )
                 ))}

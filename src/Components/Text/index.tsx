@@ -16,7 +16,7 @@ export function Text({ size = "md", type,  children, asChild, className }: TextP
     return (
         <Comp
             className={
-                clsx("font-sans", {
+                clsx("font-sans select-auto", {
                     "text-xs": size === "sm",
                     "text-sm": size === "md",
                     "text-md": size === "lg",

@@ -1,5 +1,6 @@
 import { onAuthStateChanged, User } from "firebase/auth";
 import { createContext, ReactNode, useEffect, useState } from "react";
+import { useDatabase } from "../Hooks/useDatabase";
 import { auth } from "../Utils/firebase";
 
 interface AuthContextData {
@@ -15,7 +16,7 @@ export const AuthContext = createContext({} as AuthContextData);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User>({} as User);
-
+    const { loadUser } = useDatabase();
     const state = {
         user,
         setUser

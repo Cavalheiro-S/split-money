@@ -113,7 +113,7 @@ export default function MonthRevenue({ className }: MonthRevenueProps) {
         )
     }
     return (
-        <div className={clsx('mx-4 md:mx-0 flex flex-col', className)}>
+        <div className={clsx('md:mx-0 flex flex-col', className)}>
             <Heading size='lg' className='md:mx-0'>Divida sua renda mensal</Heading>
             <Text size='lg' className=' md:mx-0 text-neutral-400 mb-10'>Equilibre sua renda entre investimentos, educação, despesas essenciais e lazer</Text>
             <div className="flex flex-col md:flex md:flex-row md:items-end gap-4">
