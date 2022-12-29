@@ -5,11 +5,11 @@ import { AppRoutes } from "./Routes"
 function App() {
 
   return (
-    <AuthProvider>
-      <RegisterProvider>
+    <RegisterProvider>
+      <AuthProvider>
         <AppRoutes />
-      </RegisterProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </RegisterProvider>
   )
 }
 

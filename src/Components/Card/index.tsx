@@ -7,20 +7,24 @@ import { Text } from "../Text";
 interface CardProps {
   title: string,
   subTitle?: string,
+  orientation?: "vertical" | "horizontal",
   children?: ReactNode,
   className?: string,
 }
 
 interface CardIconProps {
   children?: ReactNode,
-  IconBGColor?: "yellow" | "green" | "red" | "blue",
+  IconBGColor?: "yellow" | "green" | "red" | "blue" | "gray",
   className?: string,
 }
 
-export const CardRoot = ({ title, subTitle, children, className }: CardProps) => {
+export const CardRoot = ({ title, subTitle, children, className, orientation }: CardProps) => {
 
   return (
-    <div className={clsx('flex flex-col w-72 hover:shadow-md transition gap-2 rounded border justify-center p-4', className)}>
+    <div className={clsx('flex w-72 hover:shadow-md transition gap-2 rounded border justify-center p-4', {
+      "flex-col": orientation === "vertical",
+      "flex-row": orientation === "horizontal",
+    }, className)}>
       {children}
       <div className="flex flex-col items-start">
         <Text size="lg" className='text-neutral-700'>{title}</Text>

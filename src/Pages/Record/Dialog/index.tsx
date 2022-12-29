@@ -1,16 +1,16 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import moment from 'moment';
 import { Trash, XCircle } from 'phosphor-react';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
+import { DialogOpenProps } from '..';
 import { Button } from '../../../Components/Button';
 import { Input } from '../../../Components/Input';
 import { Select } from '../../../Components/Select';
-import { RegisterContext, RegisterProps } from '../../../Context/RegisterContext';
+import { RegisterProps } from '../../../Context/RegisterContext';
 import { useAuth } from '../../../Hooks/useAuth';
-import { useDatabase } from '../../../Hooks/useDatabase';
-import { convertToMoneyValues, replaceCommaInDot } from '../../../Utils/util';
+import { useRegister } from '../../../Hooks/useRegister';
+import { convertToMoneyValues } from '../../../Utils/util';
 
 interface Inputs {
     name: string,
@@ -19,11 +19,15 @@ interface Inputs {
     date: Date
 }
 
-export default function DialogCustom() {
 
-    const { registers, setRegisters, dialogOpen, setDialogOpen } = useContext(RegisterContext);
+interface DialogCustomProps {
+    dialogOpen: DialogOpenProps,
+    setDialogOpen: React.Dispatch<React.SetStateAction<DialogOpenProps>>
+}
+export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustomProps) {
+
     const { currentUser, signOut } = useAuth();
-    const { saveRegister, deleteRegister, loadAllRegisters, updateRegister } = useDatabase();
+    const { saveRegister, deleteRegister, updateRegister } = useRegister();
     const { register, handleSubmit, formState: { errors }, setValue, getValues, reset } = useForm<Inputs>()
 
 
@@ -68,13 +72,10 @@ export default function DialogCustom() {
 
             if (dialogOpen.register?.id) {
                 await updateRegister(currentUser.uid, dialogOpen.register.id, formatedValues);
-                const loadedRegisters = await loadAllRegisters(currentUser.uid);
-                setRegisters(loadedRegisters);
                 return
             }
 
             await saveRegister(currentUser.uid, formatedValues);
-            setRegisters([...registers, formatedValues]);
 
         }
         catch (error) {
@@ -91,11 +92,8 @@ export default function DialogCustom() {
                 signOut();
                 return;
             }
-            if (dialogOpen.register?.id) {
+            if (dialogOpen.register?.id)
                 await deleteRegister(currentUser.uid, dialogOpen.register.id);
-                const loadedRegisters = await loadAllRegisters(currentUser.uid);
-                setRegisters(loadedRegisters);
-            }
         }
         catch (error) {
             console.log(error);

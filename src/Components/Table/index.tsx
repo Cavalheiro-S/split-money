@@ -1,16 +1,30 @@
 import clsx from 'clsx';
 import moment from 'moment';
 import { Bank, CreditCard } from 'phosphor-react';
-import { useContext, useEffect } from 'react';
-import { Heading } from '../../../Components/Heading';
-import { Text } from '../../../Components/Text';
-import { RegisterProps, RegisterContext } from '../../../Context/RegisterContext';
-import { useWindowDimensions } from '../../../Hooks/useWindowDimensions';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CustomComponentProps } from '..';
+import { RegisterProps } from '../../Context/RegisterContext';
+import { useRegister } from '../../Hooks/useRegister';
+import { useWindowDimensions } from '../../Hooks/useWindowDimensions';
+import { DialogOpenProps } from '../../Pages/Record';
+import { Heading } from '../Heading';
+import { Text } from '../Text';
 
-export default function Table() {
+interface TableProps extends CustomComponentProps {
+    registers?: RegisterProps[],
+    title?: string,
+    setDialogOpen?: React.Dispatch<React.SetStateAction<DialogOpenProps>>
+}
 
-    const { registers, setDialogOpen } = useContext(RegisterContext);
+export default function Table({ title, className, setDialogOpen }: TableProps) {
+
+    const { registers } = useRegister();
     const { width } = useWindowDimensions();
+    const navigate = useNavigate();
+    useEffect(() => {
+
+    }, [registers])
 
     const renderTotal = () => {
         let total = registers.reduce((acumulator, item) => {
@@ -32,7 +46,15 @@ export default function Table() {
         return (
             <tr
                 key={item.id}
-                onClick={() => { setDialogOpen({ open: true, register: item }) }}
+                onClick={() => {
+                    if (setDialogOpen) {
+                        navigate("/record")
+                        setDialogOpen({ open: true, register: item });
+                        console.log(setDialogOpen);
+
+                    }
+
+                }}
                 className='flex items-center justify-between gap-10 transition hover:bg-gray-100 p-2 border-y border-collapse'>
                 <td className='flex gap-5 items-center'>
                     <div className={
@@ -67,11 +89,11 @@ export default function Table() {
         )
     }
     return (
-        <table className='border-collapse max-h-screen'>
+        <table className={clsx('border-collapse', className)}>
             <thead>
                 <tr>
                     <th className='flex-1 p-2 text-left text-lg'>
-                        <Heading size='sm'>Últimos registros</Heading>
+                        <Heading size='sm'>{title}</Heading>
                     </th>
                 </tr>
             </thead>

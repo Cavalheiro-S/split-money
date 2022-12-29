@@ -3,13 +3,10 @@ import {
     signOut as SignOut,
     updateEmail as UpdateEmail
 } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
 import { auth } from "../Utils/firebase";
-
 
 export const useAuth = () => {
     const { currentUser } = auth;
-    const navigate = useNavigate();
 
     const signUp = (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)
@@ -20,9 +17,7 @@ export const useAuth = () => {
     }
 
     const signOut = async () => {
-        await SignOut(auth);
-        navigate("/signin")
-        return
+        return SignOut(auth);
     }
 
     const updateEmail = async (email: string) => {

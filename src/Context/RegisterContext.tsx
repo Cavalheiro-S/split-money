@@ -1,4 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { useAuth } from "../Hooks/useAuth";
+import { useRegister } from "../Hooks/useRegister";
 
 export interface RegisterProps {
     id: string;
@@ -8,15 +10,9 @@ export interface RegisterProps {
     date: Date;
 }
 
-export interface DialogOpenProps {
-    open: boolean;
-    register?: RegisterProps;
-}
 interface RegisterContextProps {
     registers: RegisterProps[];
     setRegisters: React.Dispatch<React.SetStateAction<RegisterProps[]>>,
-    dialogOpen: DialogOpenProps;
-    setDialogOpen: React.Dispatch<React.SetStateAction<DialogOpenProps>>;
 }
 
 interface RegisterProviderProps {
@@ -27,12 +23,10 @@ export const RegisterContext = createContext<RegisterContextProps>({} as Registe
 
 export const RegisterProvider = ({ children }: RegisterProviderProps) => {
     const [registers, setRegisters] = useState<RegisterProps[]>([] as RegisterProps[]);
-    const [dialogOpen, setDialogOpen] = useState({ open: false } as DialogOpenProps);
+    
     const state = {
         registers,
         setRegisters,
-        dialogOpen,
-        setDialogOpen
     }
     return (
         <RegisterContext.Provider value={state}>
