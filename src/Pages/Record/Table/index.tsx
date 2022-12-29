@@ -1,15 +1,16 @@
 import clsx from 'clsx';
 import moment from 'moment';
 import { Bank, CreditCard } from 'phosphor-react';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Heading } from '../../../Components/Heading';
 import { Text } from '../../../Components/Text';
 import { RegisterProps, RegisterContext } from '../../../Context/RegisterContext';
+import { useWindowDimensions } from '../../../Hooks/useWindowDimensions';
 
 export default function Table() {
 
     const { registers, setDialogOpen } = useContext(RegisterContext);
-
+    const { width } = useWindowDimensions();
 
     const renderTotal = () => {
         let total = registers.reduce((acumulator, item) => {
@@ -51,7 +52,7 @@ export default function Table() {
                     </div>
                 </td>
                 <td>
-                    <Text size='lg' className={
+                    <Text size={width > 768 ? "lg" : "md"} className={
                         clsx("",
                             {
                                 "text-green-800": item.type === "investiment",

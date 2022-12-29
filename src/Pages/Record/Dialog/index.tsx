@@ -168,9 +168,11 @@ export default function DialogCustom() {
                                 <label className="text-sm" htmlFor="value">Valor</label>
                                 <Input.Root>
                                     <Input.Addorn>R$</Input.Addorn>
-                                    <Input.Input id='value' {...register("value", { required: true })} type={"number"} step="any" placeholder='0' />
+                                    <Input.Input id='value' {...register("value", { required: true, maxLength: 12 })} type={"number"} step="any" placeholder='0' />
                                 </Input.Root>
-                                {errors.value && <span className='text-xs text-red-500'>Campo obrigatório</span>}
+                                {errors.value?.type === 'required' && <span className='text-xs text-red-500'>Campo obrigatório</span>}
+                                {errors.value?.type === 'min' && <span className='text-xs text-red-500'>Valor mínimo: R$ 0,01</span>}
+                                {errors.value?.type === 'maxLength' && <span className='text-xs text-red-500'>Valor máximo: R$ 999.999.999,99</span>}
                             </fieldset>
                             <fieldset className='flex flex-col gap-2'>
                                 <label className="text-sm" htmlFor='type'>Tipo</label>

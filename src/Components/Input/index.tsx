@@ -27,7 +27,6 @@ const InputInput = React.forwardRef<HTMLInputElement, InputInputProps>(({ type, 
       type={type}
       ref={ref}
       className={clsx('bg-transparent outline-none w-full text-font placeholder:text-gray-400 px-3 font-sans', className)}
-      pattern={type === "number" ? "[0-9]+" : undefined}
     />
   )
 });
