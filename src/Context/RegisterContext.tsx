@@ -5,9 +5,14 @@ import { useRegister } from "../Hooks/useRegister";
 export interface RegisterProps {
     id: string;
     name: string;
-    type: "investiment" | "expense";
+    type: RegisterType;
     value: number;
     date: Date;
+}
+
+export enum RegisterType {
+    INVESTIMENT = "investiment",
+    EXPENSE = "expense",
 }
 
 interface RegisterContextProps {

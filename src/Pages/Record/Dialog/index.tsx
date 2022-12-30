@@ -10,7 +10,7 @@ import { Select } from '../../../Components/Select';
 import { RegisterProps } from '../../../Context/RegisterContext';
 import { useAuth } from '../../../Hooks/useAuth';
 import { useRegister } from '../../../Hooks/useRegister';
-import { convertToMoneyValues } from '../../../Utils/util';
+import { convertToMoneyString } from '../../../Utils/util';
 
 interface Inputs {
     name: string,
@@ -28,7 +28,7 @@ export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustom
 
     const { currentUser, signOut } = useAuth();
     const { saveRegister, deleteRegister, updateRegister } = useRegister();
-    const { register, handleSubmit, formState: { errors }, setValue, getValues, reset } = useForm<Inputs>()
+    const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm<Inputs>()
 
 
     const cleanStateForms = () => {
@@ -41,7 +41,7 @@ export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustom
     useEffect(() => {
         if (dialogOpen.register) {
             setValue("name", dialogOpen.register.name);
-            setValue("type", dialogOpen.register.type);
+            setValue("type", dialogOpen.register.type as "investiment" | "expense");
             setValue("value", dialogOpen.register.value);
             setValue("date", dialogOpen.register.date);
             return;
@@ -52,12 +52,13 @@ export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustom
 
     const formatValues = (data: Inputs) => {
         const { value } = data;
-        const valueFormated = convertToMoneyValues(value.toString());
+        const valueFormated = convertToMoneyString(value);
 
         return {
             ...data,
+            name: data.name.trim(),
             id: uuid(),
-            value: valueFormated
+            value: Number(valueFormated)
         } as RegisterProps
     }
 
@@ -71,11 +72,11 @@ export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustom
             const formatedValues = formatValues(data);
 
             if (dialogOpen.register?.id) {
-                await updateRegister(currentUser.uid, dialogOpen.register.id, formatedValues);
+                await updateRegister(dialogOpen.register.id, formatedValues);
                 return
             }
 
-            await saveRegister(currentUser.uid, formatedValues);
+            await saveRegister(formatedValues);
 
         }
         catch (error) {
@@ -93,7 +94,7 @@ export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustom
                 return;
             }
             if (dialogOpen.register?.id)
-                await deleteRegister(currentUser.uid, dialogOpen.register.id);
+                await deleteRegister(dialogOpen.register.id);
         }
         catch (error) {
             console.log(error);
@@ -166,7 +167,7 @@ export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustom
                                 <label className="text-sm" htmlFor="value">Valor</label>
                                 <Input.Root>
                                     <Input.Addorn>R$</Input.Addorn>
-                                    <Input.Input id='value' {...register("value", { required: true, maxLength: 12 })} type={"number"} step="any" placeholder='0' />
+                                    <Input.Input id='value' {...register("value", { required: true, maxLength: 12 })} type={"number"} step={0.01} min={0.01} placeholder='0' />
                                 </Input.Root>
                                 {errors.value?.type === 'required' && <span className='text-xs text-red-500'>Campo obrigatório</span>}
                                 {errors.value?.type === 'min' && <span className='text-xs text-red-500'>Valor mínimo: R$ 0,01</span>}

@@ -9,9 +9,6 @@ export const replaceCommaInDot = (value: string) => {
     return value.replace(regex, '$1.$2');
 }
 
-export const convertToMoneyValues = (value: string) => {
-    if(value.includes(',')) {
-        return Number(replaceCommaInDot(value));
-    }
-    return Number(value);
+export const convertToMoneyString = (value: number) => {
+    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }

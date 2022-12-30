@@ -13,7 +13,7 @@ export const Signup = () => {
 
     return (
         <div className="flex flex-col justify-center items-center h-full">
-            <div className="flex flex-col w-96 gap-6">
+            <div className="flex flex-col w-full md:w-96 gap-6">
                 <div className="flex flex-col w-full">
                     <Heading size="xl">Criando uma conta</Heading>
                     <Text size="lg" className="text-gray-400">Informe suas credencias para criar sua conta</Text>
@@ -22,16 +22,18 @@ export const Signup = () => {
                     <Tabs.List className="flex mb-2">
                         <Tabs.Trigger
                             disabled={currentUser !== null}
-                            className={clsx("w-full p-2 disabled:text-gray-500",
-                                { "text-primary border-b border-b-primary": activeTab === "login", })}
+                            className={
+                                clsx("w-full p-2 disabled:text-gray-500",
+                                    { "text-primary border-b border-b-primary": activeTab === "login", })}
                             onClick={() => setActiveTab("login")}
                             value="login">
                             Login
                         </Tabs.Trigger>
                         <Tabs.Trigger
                             disabled={!currentUser}
-                            className={clsx("w-full p-2 disabled:text-gray-500",
-                                { "text-primary border-b border-b-primary": activeTab === "info", })}
+                            className={
+                                clsx("w-full p-2 disabled:text-gray-500",
+                                    { "text-primary border-b border-b-primary": activeTab === "info", })}
                             onClick={() => setActiveTab("info")}
                             value="info">
                             Informações relevantes

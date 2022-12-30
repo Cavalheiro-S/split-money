@@ -85,10 +85,10 @@ export const FormLogin = ({ activeTab, setActiveTab }: FormLoginProps) => {
                 {errors.confirmPassword && <span className="text-red-500 text-sm">Senha deve ser igual a anterior</span>}
             </label>
             <div className="flex flex-col gap-2">
-                <Button.Root id="signup" className="justify-center" type="submit">
+                <Button.Root id="signup" className="justify-center" type="submit" disabled={loading}>
                     {loading ? <SpinnerGap className="h-6 w-6 animate-spin" /> : "Continuar"}
                 </Button.Root>
-                <Button.Root id="signin-redirect" styleType="secondary" type="button" onClick={() => navigate("/signin")}>
+                <Button.Root id="signin-redirect" styleType="secondary" type="button" disabled={loading} onClick={() => navigate("/signin")}>
                     Já tem uma conta?
                 </Button.Root>
             </div>

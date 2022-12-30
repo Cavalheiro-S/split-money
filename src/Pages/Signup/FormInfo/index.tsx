@@ -7,7 +7,7 @@ import { Button } from "../../../Components/Button";
 import { Input } from "../../../Components/Input";
 import { Text } from "../../../Components/Text";
 import { useAuth } from "../../../Hooks/useAuth";
-import { useDatabase } from "../../../Hooks/useDatabase";
+import { useUser } from "../../../Hooks/useUser";
 import { returnErrorMessage } from "../../../Utils/firebase";
 
 interface FormInfoProps {
@@ -23,7 +23,7 @@ interface Inputs {
 export const FormInfo = ({ activeTab, setActiveTab }: FormInfoProps) => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { saveUser } = useDatabase();
+    const { saveUser } = useUser();
     const { currentUser } = useAuth();
 
     const { register, handleSubmit, setError, formState: { errors }, getValues } = useForm<Inputs>()

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
 import { useAuth } from "../../Hooks/useAuth";
-import { useDatabase, UserProps } from "../../Hooks/useDatabase";
+import { UserProps } from "../../Hooks/useUser";
+import { useUser } from "../../Hooks/useUser";
 import { useWindowDimensions } from "../../Hooks/useWindowDimensions";
 import { DropdownMenu } from "../DropdownMenu";
 import { Heading } from "../Heading";
@@ -18,16 +19,16 @@ export default function Header({ className }: HeaderProps) {
     const navigate = useNavigate();
     const { signOut, currentUser } = useAuth();
     const { width } = useWindowDimensions();
-    const { loadUser } = useDatabase();
+    const { loadUser } = useUser();
     const [loggedUser, setLoggedUser] = useState<UserProps | null>(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     useEffect(() => {
-        const getLoggedUserInfo = async () => {
+        const loadUserInfo = async () => {
             if (!currentUser) return
-            const user = await loadUser(currentUser.uid);
+            const user = await loadUser();
             setLoggedUser(user);
         }
-        getLoggedUserInfo();
+        loadUserInfo();
     }, [currentUser])
 
     const renderItemsNavMenu = () => {

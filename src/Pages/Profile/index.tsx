@@ -9,6 +9,8 @@ import { Input } from "../../Components/Input"
 import { Notification } from "../../Components/Notification"
 import { Text } from "../../Components/Text"
 import { useAuth } from "../../Hooks/useAuth"
+import { UserProps } from "../../Hooks/useUser"
+import { useUser } from "../../Hooks/useUser"
 
 interface Inputs {
     name: string;
@@ -22,9 +24,20 @@ export const Profile = () => {
     const { register, formState: { errors }, setError, setValue, setFocus, handleSubmit } = useForm<Inputs>()
     const [disabled, setDisabled] = useState(true)
     const { currentUser } = useAuth();
+    const { loadUser } = useUser();
     const [notification, setNotification] = useState(false)
     const [loading, setLoading] = useState(false)
     const { updateEmail } = useAuth();
+
+
+    useEffect(() => {
+        const loadUserInfo = async () => {
+            const user = await loadUser() as UserProps
+            setValue("email", currentUser?.email ?? "")
+            setValue("name", user.name ?? "")
+        }
+        loadUserInfo();
+    }, [])
 
     const handleSubmitForm = async (data: Inputs) => {
         setNotification(false)
@@ -56,10 +69,6 @@ export const Profile = () => {
 
     const onSubmit = handleSubmit(handleSubmitForm)
 
-    useEffect(() => {
-        setValue("email", currentUser?.email ?? "")
-    }, [])
-
     return (
         <>
             <div className="mb-10">
@@ -70,8 +79,17 @@ export const Profile = () => {
             </div>
             <div className="flex">
                 <form onSubmit={onSubmit} className="flex flex-col gap-6">
-                    <Text size="md" asChild className="text-md text-font">
-                        <label htmlFor="email">Email
+                    <Text asChild className="text-font">
+                        <label htmlFor="name">
+                            Nome
+                            <Input.Root>
+                                <Input.Input className="disabled:text-gray-400" disabled={disabled} {...register("name")} id="name" />
+                            </Input.Root>
+                        </label>
+                    </Text>
+                    <Text asChild className="text-font">
+                        <label htmlFor="email">
+                            Email
                             <Input.Root>
                                 <Input.Input className="disabled:text-gray-400" disabled={disabled} {...register("email")} id="email" />
                             </Input.Root>
@@ -79,14 +97,10 @@ export const Profile = () => {
                     </Text>
                     <Button.Root
                         disabled={loading}
-                        className={
-                            clsx("flex justify-center",
-                                {
-                                    "bg-transparent border border-primary text-primary hover:bg-primary-hover hover:text-white": disabled,
-                                })}>
+                        styleType="secondary"
+                        className={clsx("flex justify-center")}>
                         <Button.Icon>
                             {loading ? <SpinnerGap className="h-5 w-5 animate-spin" /> : <Pencil className="h-5 w-5" />}
-
                         </Button.Icon>
                         {disabled ? "Editar" : "Salvar"}
                     </Button.Root>

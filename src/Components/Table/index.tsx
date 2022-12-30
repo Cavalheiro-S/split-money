@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 import moment from 'moment';
 import { Bank, CreditCard } from 'phosphor-react';
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CustomComponentProps } from '..';
 import { RegisterProps } from '../../Context/RegisterContext';
 import { useRegister } from '../../Hooks/useRegister';
 import { useWindowDimensions } from '../../Hooks/useWindowDimensions';
 import { DialogOpenProps } from '../../Pages/Record';
+import { convertToMoneyString } from '../../Utils/util';
 import { Heading } from '../Heading';
 import { Text } from '../Text';
 
@@ -21,7 +21,7 @@ export default function Table({ title, className, setDialogOpen, registersData }
 
     const { registers } = useRegister();
     const { width } = useWindowDimensions();
-    const navigate = useNavigate();''
+    const navigate = useNavigate(); ''
 
     const renderTableData = () => {
         if (registersData) {
@@ -44,9 +44,9 @@ export default function Table({ title, className, setDialogOpen, registersData }
         }, 0);
         if (total < 0) {
             total = total * -1;
-            return <Text className='text-red-800' size='lg'>- R$ {total.toFixed(2)}</Text>;
+            return <Text className='text-red-800' size='lg'>- {convertToMoneyString(total)}</Text>;
         }
-        return <Text className='text-green-800'>R$ {total.toFixed(2)}</Text>
+        return <Text className='text-green-800'>{convertToMoneyString(total)}</Text>
     }
 
     const renderList = (item: RegisterProps) => {
@@ -90,7 +90,7 @@ export default function Table({ title, className, setDialogOpen, registersData }
                             }
                         )}>
                         {item.type == "investiment" ? "+\t" : "-\t"}
-                        R$ {Number(item.value).toFixed(2)}
+                        {convertToMoneyString(item.value)}
                     </Text>
                 </td>
             </tr>
