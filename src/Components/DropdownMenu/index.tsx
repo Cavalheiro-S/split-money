@@ -10,6 +10,8 @@ export interface DropdownMenuProps {
     options: DropdownMenuOptionProps[];
     selected?: DropdownMenuOptionProps;
     className?: string;
+    open?: boolean;
+    setIsMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface DropdownMenuOptionProps {
@@ -20,7 +22,7 @@ export interface DropdownMenuOptionProps {
     children?: ReactNode;
 }
 
-export const DropdownMenu = ({ selected, options, className }: DropdownMenuProps) => {
+export const DropdownMenu = ({ selected, options, className, open, setIsMenuOpen }: DropdownMenuProps) => {
 
     const handleHasIcon = (option: DropdownMenuOptionProps) => {
         if (option.icon) {
@@ -32,10 +34,8 @@ export const DropdownMenu = ({ selected, options, className }: DropdownMenuProps
         }
     }
 
-
-
     return (
-        <DropdownMenuRadix.Root>
+        <DropdownMenuRadix.Root open={open ?? undefined} onOpenChange={setIsMenuOpen ?? undefined}>
             <DropdownMenuRadix.Trigger className={clsx("flex items-center outline-none gap-2", className)}>
                 <>
                     {selected && handleHasIcon(selected)}
@@ -49,8 +49,8 @@ export const DropdownMenu = ({ selected, options, className }: DropdownMenuProps
                         <DropdownMenuRadix.Item
                             className={
                                 clsx("px-8 py-2 flex items-center gap-2 outline-none transition hover:bg-primary-hover hover:text-white select-none", className)}
-                                key={uuid()}
-                                onSelect={option.onSelect}>
+                            key={uuid()}
+                            onSelect={option.onSelect}>
                             {handleHasIcon(option)}
                             <Text className="select-none">{option.title}</Text>
                         </DropdownMenuRadix.Item>

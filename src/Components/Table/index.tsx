@@ -12,22 +12,30 @@ import { Heading } from '../Heading';
 import { Text } from '../Text';
 
 interface TableProps extends CustomComponentProps {
-    registers?: RegisterProps[],
+    registersData?: RegisterProps[],
     title?: string,
     setDialogOpen?: React.Dispatch<React.SetStateAction<DialogOpenProps>>
 }
 
-export default function Table({ title, className, setDialogOpen }: TableProps) {
+export default function Table({ title, className, setDialogOpen, registersData }: TableProps) {
 
     const { registers } = useRegister();
     const { width } = useWindowDimensions();
-    const navigate = useNavigate();
-    useEffect(() => {
+    const navigate = useNavigate();''
 
-    }, [registers])
-
+    const renderTableData = () => {
+        if (registersData) {
+            return registersData.map((item) => {
+                return renderList(item)
+            })
+        }
+        return registers.map((item) => {
+            return renderList(item)
+        })
+    }
     const renderTotal = () => {
-        let total = registers.reduce((acumulator, item) => {
+        const registersValue = registersData ?? registers;
+        let total = registersValue.reduce((acumulator, item) => {
             if (item.type === "investiment") {
                 return acumulator + Number(item.value);
             } else {
@@ -98,7 +106,7 @@ export default function Table({ title, className, setDialogOpen }: TableProps) {
                 </tr>
             </thead>
             <tbody>
-                {registers.length > 0 ? registers.map(renderList) : (
+                {registers.length > 0 ? renderTableData() : (
                     <tr className='flex justify-between border-b-2'>
                         <td className='flex-1 p-2 text-center'>
                             <Text size='lg'>Nenhum registro encontrado</Text>

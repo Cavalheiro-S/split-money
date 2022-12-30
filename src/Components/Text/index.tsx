@@ -2,7 +2,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { clsx } from "clsx"
 import { ReactNode } from "react";
 
-export interface TextProps {
+export interface TextProps extends React.HTMLAttributes<HTMLSpanElement> {
     size?: "sm" | "md" | "lg",
     type?: "error"
     children: ReactNode,

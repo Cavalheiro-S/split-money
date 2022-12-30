@@ -17,7 +17,6 @@ export const AuthContext = createContext({} as AuthContextData);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User>({} as User);
-    const {loadAllRegisters} = useRegister();
     
     const state = {
         user,
@@ -28,7 +27,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const unsubscribe = onAuthStateChanged(auth, user => {
             if (user) {
                 setUser(user)
-                loadAllRegisters(user.uid);
             }
             else {
                 setUser({} as User)

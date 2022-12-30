@@ -1,6 +1,5 @@
-import * as Acordion from "@radix-ui/react-accordion";
 import clsx from "clsx";
-import { CaretDown, List, SignOut, User, UserCircle, UserList } from "phosphor-react";
+import { SignOut, UserCircle, UserList } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
@@ -10,7 +9,7 @@ import { useWindowDimensions } from "../../Hooks/useWindowDimensions";
 import { DropdownMenu } from "../DropdownMenu";
 import { Heading } from "../Heading";
 import { Text } from "../Text";
-
+import { NavMenuBurguer } from "./NavMenuBurguer";
 interface HeaderProps {
     className?: string,
 }
@@ -21,80 +20,17 @@ export default function Header({ className }: HeaderProps) {
     const { width } = useWindowDimensions();
     const { loadUser } = useDatabase();
     const [loggedUser, setLoggedUser] = useState<UserProps | null>(null);
-
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     useEffect(() => {
         const getLoggedUserInfo = async () => {
             if (!currentUser) return
             const user = await loadUser(currentUser.uid);
-
             setLoggedUser(user);
         }
         getLoggedUserInfo();
-
     }, [currentUser])
 
-    const renderSubMenu = () => {
-        return (
-            <Acordion.Root className="flex flex-col gap-2" type="single" collapsible>
-                <Acordion.Item className="flex-1" value="item-1">
-                    <Acordion.Trigger className="flex flex-col gap-2 px-8 py-2">
-                        <div className="flex items-center gap-2">
-                            <Text className="flex-1">Ferramentas</Text>
-                            <CaretDown className="text-primary" />
-                        </div>
-                        <Acordion.Content className="text-start">
-                            <Acordion.Item onClick={() => navigate("/monthRevenue")} className="py-2 hover:text-primary" value="item-1-1">
-                                <Text >Renda Mensal</Text>
-                            </Acordion.Item>
-                            <Acordion.Item onClick={() => navigate("record")} className="py-2 hover:text-primary" value="item-1-2">
-                                <Text>Histórico de Transações</Text>
-                            </Acordion.Item>
-                        </Acordion.Content>
-                    </Acordion.Trigger>
-                </Acordion.Item>
-            </Acordion.Root>
-        )
-    }
-
-    const renderHeader = () => {
-        if (width > 768) {
-            return (
-                <header className={clsx("grid grid-cols-3 gap-4 items-center", className)}>
-                    <Link to={"/"} className="flex items-center">
-                        <Heading color="primary" size="lg">Split Money</Heading>
-                    </Link>
-                    {renderLinks()}
-                </header>
-            )
-        }
-
-        const tools = {
-            title: "Ferramentas",
-            children: renderSubMenu(),
-
-        }
-
-        return (
-            <header className={clsx("flex items-center justify-between", className)} >
-
-                <Heading asChild color="primary" size="lg">
-                    <Link to={"/"} className="flex items-center">
-                        Split Money
-                    </Link>
-                </Heading>
-                <DropdownMenu
-                    className="flex items-center"
-                    selected={{ icon: <List className="h-6 w-6" /> }}
-                    key={uuid()}
-                    options={[
-                        { title: "Dashboard", onSelect: () => navigate("/dashboard") },
-                        tools,
-                    ]} />
-            </header >
-        )
-    }
-
-    const renderLinks = () => {
+    const renderItemsNavMenu = () => {
         if (currentUser) {
             return (
                 <>
@@ -117,10 +53,18 @@ export default function Header({ className }: HeaderProps) {
                     </nav>
                     <DropdownMenu
                         className="md:col-start-3 justify-self-end"
-                        selected={{ title: loggedUser?.name ?? "", icon: <UserCircle className="text-primary h-5 w-5" />, onSelect: () => { } }}
+                        open={isMenuOpen}
+                        setIsMenuOpen={setIsMenuOpen}
+                        selected={{ title: "Perfil", icon: <UserCircle className="text-primary h-5 w-5" />, onSelect: () => { } }}
                         options={[
-                            { title: "Perfil", icon: <UserList className="h-5 w-5" />, onSelect: () => navigate("/profile") },
-                            { title: "Sair", icon: <SignOut className="h-5 w-5" />, onSelect: () => signOut() }]}
+                            { title: "Informações", icon: <UserList className="h-5 w-5" />, onSelect: () => navigate("/profile") },
+                            {
+                                title: "Sair", icon: <SignOut className="h-5 w-5" />, onSelect: async () => {
+                                    await signOut()
+                                    navigate("/signin")
+                                }
+                            }
+                        ]}
                     />
                 </>
             )
@@ -136,5 +80,14 @@ export default function Header({ className }: HeaderProps) {
         )
     }
 
-    return renderHeader();
+    return (
+        <header className={clsx("flex items-center justify-between md:grid md:grid-cols-3 md:gap-4 ", className)}>
+            <Heading asChild color="primary" size="lg">
+                <Link to={"/"} className="flex items-center">
+                    Split Money
+                </Link>
+            </Heading>
+            {width > 768 ? renderItemsNavMenu() : <NavMenuBurguer />}
+        </header>
+    )
 }
