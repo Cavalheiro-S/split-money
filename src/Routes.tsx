@@ -1,16 +1,13 @@
-import { ReactElement, useContext } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { PrivateRoute } from "./Components/PrivateRoute";
-import { AuthContext } from "./Context/AuthContext";
-import { useAuth } from "./Hooks/useAuth";
 import { Dashboard } from "./Pages/Dashboard";
-import Record from "./Pages/Record";
+import { Home } from "./Pages/Home";
 import Main from "./Pages/Main";
-import MonthRevenue from "./Pages/MonthRevenue";
 import { Profile } from "./Pages/Profile";
+import Record from "./Pages/Record";
+import RevenueCalculator from "./Pages/RevenueCalculator";
 import Signin from "./Pages/Signin";
 import Signup from "./Pages/Signup";
-import { Home } from "./Pages/Home";
 
 export const AppRoutes = () => {
 
@@ -19,13 +16,13 @@ export const AppRoutes = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Main />}>
-                    <Route path="/" element={<Home/>} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/signin" element={<Signin />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="*" element={<Navigate to="/" />} />
-                    <Route path="/monthRevenue" element={
+                    <Route path="/revenueCalculator" element={
                         <PrivateRoute>
-                            <MonthRevenue />
+                            <RevenueCalculator />
                         </PrivateRoute>
                     } />
                     <Route path="/record" element={

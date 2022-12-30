@@ -44,8 +44,8 @@ export const Dashboard = () => {
         <div className="">
             <Heading size="lg">Dashboard</Heading>
             <Text className="text-gray-500" size="md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</Text>
-            <div id="dashboard" className="grid grid-cols-3 pt-6">
-                <div id="cards-main-dashboard" className="flex col-span-3 h-24">
+            <div id="dashboard" className="md:grid md:grid-cols-3 md:pt-6">
+                <div id="cards-main-dashboard" className="flex flex-col md:flex-row md:col-span-3 md:h-24">
                     <CardInfo title={convertToMoneyString(user.salary ?? 0)} subTitle="Salário Atual" percentage={-8} />
                     <CardInfo title={dashboardContent.totalInvestiments} subTitle="Investimentos" percentage={23} />
                     <CardInfo type="negative" title={dashboardContent.totalExpenses} subTitle="Despesas" percentage={8} />

@@ -26,6 +26,8 @@ const InputInput = React.forwardRef<HTMLInputElement, InputInputProps>(({ type, 
       {...props}
       type={type}
       ref={ref}
+      step={type === "number" ? 0.01 :"any"} 
+      min={type === "number" ? 0.01 : undefined}
       className={clsx('bg-transparent outline-none w-full text-font placeholder:text-gray-400 px-3 font-sans', className)}
     />
   )

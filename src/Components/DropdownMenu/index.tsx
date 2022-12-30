@@ -48,7 +48,7 @@ export const DropdownMenu = ({ selected, options, className, open, setIsMenuOpen
                     option.children ?? (
                         <DropdownMenuRadix.Item
                             className={
-                                clsx("px-8 py-2 flex items-center gap-2 outline-none transition hover:bg-primary-hover hover:text-white select-none", className)}
+                                clsx("px-8 py-2 flex items-center gap-2 outline-none transition hover:text-primary", className)}
                             key={uuid()}
                             onSelect={option.onSelect}>
                             {handleHasIcon(option)}

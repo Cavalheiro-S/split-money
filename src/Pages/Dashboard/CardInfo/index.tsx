@@ -27,8 +27,8 @@ export const CardInfo = ({ title, subTitle = "", percentage = 0, type = "positiv
     }
 
     return (
-        <div id="card-1" className={clsx("flex border-r border-r-gray-300 gap-4 w-fit py-4 px-10", { className })}>
-            <div className="flex items-center">
+        <div id="card-1" className={clsx("flex border-b md:border-b-0 md:border-r md:border-r-gray-300 gap-4 md:w-fit py-4 px-10", { className })}>
+            <div className="flex items-center w-14">
                 <ArrowDown className={clsx("w-6 h-6", {
                     "transform rotate-180": percentage > 0,
                     "transform rotate-0": percentage < 0,
@@ -40,7 +40,7 @@ export const CardInfo = ({ title, subTitle = "", percentage = 0, type = "positiv
                     "text-green-700": logicalTextGreen()
                 })}>{percentage < 0 ? percentage * -1 : percentage}%</Text>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-">
                 <Text className="font-semibold text-font" size="lg">{title}</Text>
                 <Text className="text-gray-500">{subTitle}</Text>
             </div>

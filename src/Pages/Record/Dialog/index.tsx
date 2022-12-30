@@ -167,7 +167,7 @@ export default function DialogCustom({ dialogOpen, setDialogOpen }: DialogCustom
                                 <label className="text-sm" htmlFor="value">Valor</label>
                                 <Input.Root>
                                     <Input.Addorn>R$</Input.Addorn>
-                                    <Input.Input id='value' {...register("value", { required: true, maxLength: 12 })} type={"number"} step={0.01} min={0.01} placeholder='0' />
+                                    <Input.Input id='value' {...register("value", { required: true, maxLength: 12 })} type={"number"} placeholder='0' />
                                 </Input.Root>
                                 {errors.value?.type === 'required' && <span className='text-xs text-red-500'>Campo obrigatório</span>}
                                 {errors.value?.type === 'min' && <span className='text-xs text-red-500'>Valor mínimo: R$ 0,01</span>}

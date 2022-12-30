@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { FirebaseError } from "firebase/app"
-import { Pencil, SpinnerGap } from "phosphor-react"
+import { Pencil, SpinnerGap, User } from "phosphor-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "../../Components/Button"
@@ -11,6 +11,7 @@ import { Text } from "../../Components/Text"
 import { useAuth } from "../../Hooks/useAuth"
 import { UserProps } from "../../Hooks/useUser"
 import { useUser } from "../../Hooks/useUser"
+import { convertToMoneyString } from "../../Utils/util"
 
 interface Inputs {
     name: string;
@@ -24,7 +25,7 @@ export const Profile = () => {
     const { register, formState: { errors }, setError, setValue, setFocus, handleSubmit } = useForm<Inputs>()
     const [disabled, setDisabled] = useState(true)
     const { currentUser } = useAuth();
-    const { loadUser } = useUser();
+    const { user, loadUser, updateUser } = useUser();
     const [notification, setNotification] = useState(false)
     const [loading, setLoading] = useState(false)
     const { updateEmail } = useAuth();
@@ -35,9 +36,21 @@ export const Profile = () => {
             const user = await loadUser() as UserProps
             setValue("email", currentUser?.email ?? "")
             setValue("name", user.name ?? "")
+            setValue("salary", user.salary ?? 0)
         }
         loadUserInfo();
     }, [])
+
+    const verifyIsEdit = (data: Inputs) => {
+        if (data.email !== currentUser?.email)
+            return true
+        if (data.name !== user.name)
+            return true
+        if (data.salary !== user.salary)
+            return true
+        return false
+    }
+
 
     const handleSubmitForm = async (data: Inputs) => {
         setNotification(false)
@@ -45,11 +58,16 @@ export const Profile = () => {
         setFocus("email")
         try {
 
-            if (!disabled && data.email !== currentUser?.email) {
+            if (!disabled && verifyIsEdit(data)) {
                 setLoading(true)
-                await updateEmail(data.email)
                 setNotification(true)
-                setLoading(false)
+                await updateEmail(data.email)
+                const userUpdate = {
+                    ...data,
+                    uid: currentUser?.uid
+                } as UserProps
+                await updateUser(userUpdate)
+
             }
         }
         catch (error) {
@@ -95,6 +113,14 @@ export const Profile = () => {
                             </Input.Root>
                         </label>
                     </Text>
+                    <Text asChild className="text-font">
+                        <label htmlFor="salary">
+                            Salário
+                            <Input.Root>
+                                <Input.Input className="disabled:text-gray-400" disabled={disabled} {...register("salary")} id="salary" />
+                            </Input.Root>
+                        </label>
+                    </Text>
                     <Button.Root
                         disabled={loading}
                         styleType="secondary"
@@ -108,7 +134,6 @@ export const Profile = () => {
             </div>
             {notification && <Notification title="Sucesso" message="Email alterado com sucesso" type="success" />}
             {errors.email && <Notification title="Erro" message="Email inválido" type="error" />}
-            {loading && <Notification title="Carregando" message="Aguarde um momento" type="success" />}
         </>
     )
 }

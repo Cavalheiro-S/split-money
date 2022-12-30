@@ -25,7 +25,7 @@ export const NavMenuBurguer = ({ className }: HeaderProps) => {
                         </div>
                         <Acordion.Content className="flex-1 text-start">
                             <DropdownMenuRadix.Item className="w-full">
-                                <Acordion.Item onClick={() => navigate("/monthRevenue")} className="py-2 hover:text-primary flex-1" value="item-1-1">
+                                <Acordion.Item onClick={() => navigate("/revenueCalculator")} className="py-2 hover:text-primary flex-1" value="item-1-1">
                                     <Text>Renda Mensal</Text>
                                 </Acordion.Item>
                             </DropdownMenuRadix.Item>

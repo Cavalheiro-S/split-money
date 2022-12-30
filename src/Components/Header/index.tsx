@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
 import { useAuth } from "../../Hooks/useAuth";
-import { UserProps } from "../../Hooks/useUser";
-import { useUser } from "../../Hooks/useUser";
+import { UserProps, useUser } from "../../Hooks/useUser";
 import { useWindowDimensions } from "../../Hooks/useWindowDimensions";
 import { DropdownMenu } from "../DropdownMenu";
 import { Heading } from "../Heading";
@@ -20,7 +19,7 @@ export default function Header({ className }: HeaderProps) {
     const { signOut, currentUser } = useAuth();
     const { width } = useWindowDimensions();
     const { loadUser } = useUser();
-    const [loggedUser, setLoggedUser] = useState<UserProps | null>(null);
+    const [, setLoggedUser] = useState<UserProps | null>(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     useEffect(() => {
         const loadUserInfo = async () => {
@@ -45,10 +44,10 @@ export default function Header({ className }: HeaderProps) {
                         </li>
                         <DropdownMenu
                             className="flex items-center"
-                            selected={{ title: "Ferramentas", onSelect: () => { } }}
+                            selected={{ title: "Ferramentas" }}
                             key={uuid()}
                             options={[
-                                { title: "Renda Mensal", onSelect: () => navigate("/monthRevenue") },
+                                { title: "Renda Mensal", onSelect: () => navigate("/revenueCalculator") },
                                 { title: "Histórico de Transações", onSelect: () => navigate("/record") }
                             ]} />
                     </nav>
