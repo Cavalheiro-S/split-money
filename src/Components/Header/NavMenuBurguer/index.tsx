@@ -26,16 +26,12 @@ export const NavMenuBurguer = ({ className }: HeaderProps) => {
                         <Acordion.Content className="flex-1 text-start">
                             <DropdownMenuRadix.Item className="w-full">
                                 <Acordion.Item onClick={() => navigate("/monthRevenue")} className="py-2 hover:text-primary flex-1" value="item-1-1">
-                                    <Text >
-                                        Renda Mensal
-                                    </Text>
+                                    <Text>Renda Mensal</Text>
                                 </Acordion.Item>
                             </DropdownMenuRadix.Item>
                             <DropdownMenuRadix.Item className="w-full">
                                 <Acordion.Item onClick={() => navigate("/record")} className="py-2 hover:text-primary" value="item-1-2">
-                                    <Text>
-                                        Histórico de Transações
-                                    </Text>
+                                    <Text>Histórico de Transações</Text>
                                 </Acordion.Item>
                             </DropdownMenuRadix.Item>
                         </Acordion.Content>
@@ -59,20 +55,16 @@ export const NavMenuBurguer = ({ className }: HeaderProps) => {
                                 <Acordion.Item
                                     onClick={() => navigate("/profile")}
                                     className="py-2 hover:text-primary w-full" value="item-1-1">
-                                    <Text >
-                                        Informações
-                                    </Text>
+                                    <Text>Informações</Text>
                                 </Acordion.Item>
                             </DropdownMenuRadix.Item>
-                            <DropdownMenuRadix.Item onClick={() => {
+                            <DropdownMenuRadix.Item onClick={async () => {
+                                await signOut()
                                 navigate("/signin")
-                                signOut()
                             }}>
                                 <Acordion.Item
                                     className="py-2 hover:text-primary" value="item-1-2">
-                                    <Text>
-                                        Sair
-                                    </Text>
+                                    <Text>Sair</Text>
                                 </Acordion.Item>
                             </DropdownMenuRadix.Item>
                         </Acordion.Content>
