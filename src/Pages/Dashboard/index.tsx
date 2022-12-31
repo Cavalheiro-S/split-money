@@ -9,7 +9,7 @@ import { UserProps, useUser } from "../../Hooks/useUser"
 import { convertToMoneyString } from "../../Utils/util"
 
 interface DashboardContentProps {
-    user: UserProps;
+    salary: string;
     investiments: RegisterProps[];
     expenses: RegisterProps[];
     totalInvestiments: string;
@@ -28,17 +28,19 @@ export const Dashboard = () => {
             const expenses = await getRegisterByType(RegisterType.EXPENSE);
             const totalInvestiments = await getValueTotalRegisters(RegisterType.INVESTIMENT);
             const totalExpenses = await getValueTotalRegisters(RegisterType.EXPENSE);
-
+            const salary = convertToMoneyString(Number(user?.salary) || 0);
             const dashboardContentLoad = {
+                salary: salary,
                 investiments,
                 expenses,
                 totalInvestiments,
                 totalExpenses
             } as DashboardContentProps;
             setDashboardContent(dashboardContentLoad);
+            
         }
         loadRegisters();
-    }, [])
+    }, [user])
 
     return (
         <div className="">
@@ -46,7 +48,7 @@ export const Dashboard = () => {
             <Text className="text-gray-500" size="md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</Text>
             <div id="dashboard" className="md:grid md:grid-cols-3 md:pt-6">
                 <div id="cards-main-dashboard" className="flex flex-col md:flex-row md:col-span-3 md:h-24">
-                    <CardInfo title={convertToMoneyString(user.salary ?? 0)} subTitle="Salário Atual" percentage={-8} />
+                    <CardInfo title={dashboardContent.salary} subTitle="Salário Atual" percentage={-8} />
                     <CardInfo title={dashboardContent.totalInvestiments} subTitle="Investimentos" percentage={23} />
                     <CardInfo type="negative" title={dashboardContent.totalExpenses} subTitle="Despesas" percentage={8} />
                 </div>
