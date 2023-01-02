@@ -14,6 +14,7 @@ export interface UserProps {
 export const useUser = () => {
     const { currentUser } = useAuth();
     const [user, setUser] = useState<UserProps>({} as UserProps);
+
     useEffect(() => {
         if (!currentUser) return;
         const userRef = ref(db, `users/${currentUser.uid}`)
@@ -24,7 +25,8 @@ export const useUser = () => {
         return () => {
             off(userRef, 'value', onValueChange);
         }
-    }, [])
+    }, [currentUser])
+
     const db = getDatabase(app);
     const saveUser = async (user: UserProps) => {
         await set(ref(db, `users/${currentUser?.uid}`), user);

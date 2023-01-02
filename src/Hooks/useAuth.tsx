@@ -3,10 +3,13 @@ import {
     signOut as SignOut,
     updateEmail as UpdateEmail
 } from "firebase/auth";
+import { useContext } from "react";
+import { AuthContext } from "../Context/AuthContext";
 import { auth } from "../Utils/firebase";
 
 export const useAuth = () => {
     const { currentUser } = auth;
+    const { user } = useContext(AuthContext)
 
     const signUp = (email: string, password: string) => {
         return createUserWithEmailAndPassword(auth, email, password)

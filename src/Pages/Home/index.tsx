@@ -1,4 +1,5 @@
 import { ChartLine, ListPlus, MathOperations } from "phosphor-react"
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import HomeImage from "../../Assets/Imgs/HomeImage.svg"
 import { Button } from "../../Components/Button"
@@ -6,11 +7,20 @@ import { Card } from "../../Components/Card"
 import { Heading } from "../../Components/Heading"
 import { Text } from "../../Components/Text"
 import { useAuth } from "../../Hooks/useAuth"
+
 export const Home = () => {
 
     const { currentUser } = useAuth()
     const navigate = useNavigate()
+
+    useEffect(() => {
+        console.log(currentUser);
+        
+    }, [currentUser])
+
     const handleClick = () => {
+        console.log(currentUser);
+
         if (currentUser) {
             navigate("/dashboard")
             return;

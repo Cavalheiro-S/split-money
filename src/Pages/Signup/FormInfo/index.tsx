@@ -74,9 +74,8 @@ export const FormInfo = ({ activeTab, setActiveTab }: FormInfoProps) => {
                     <Input.Addorn>
                         R$
                     </Input.Addorn>
-                    <Input.Input id="salary" type="number" {...register("salary", { required: true, valueAsNumber: true })} />
+                    <Input.Input id="salary" type="number" {...register("salary")} />
                 </Input.Root>
-                {errors.name?.type == "required" && <Text type="error">Campo não pode ser vazio</Text>}
             </label>
             <Button.Root id="signup" disabled={loading} type="submit">
                 {loading ? <SpinnerGap className="h-6 w-6 animate-spin" /> : "Finalizar Cadastro"}

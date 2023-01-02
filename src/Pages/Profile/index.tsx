@@ -117,6 +117,7 @@ export const Profile = () => {
                         <label htmlFor="salary">
                             Salário
                             <Input.Root>
+                                <Input.Addorn>R$</Input.Addorn>
                                 <Input.Input className="disabled:text-gray-400" disabled={disabled} {...register("salary")} id="salary" />
                             </Input.Root>
                         </label>

@@ -11,7 +11,6 @@ import Signup from "./Pages/Signup";
 
 export const AppRoutes = () => {
 
-
     return (
         <BrowserRouter>
             <Routes>

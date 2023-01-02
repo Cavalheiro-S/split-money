@@ -1,10 +1,9 @@
 import clsx from "clsx";
 import { SignOut, UserCircle, UserList } from "phosphor-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from 'uuid';
 import { useAuth } from "../../Hooks/useAuth";
-import { UserProps, useUser } from "../../Hooks/useUser";
 import { useWindowDimensions } from "../../Hooks/useWindowDimensions";
 import { DropdownMenu } from "../DropdownMenu";
 import { Heading } from "../Heading";
@@ -18,17 +17,7 @@ export default function Header({ className }: HeaderProps) {
     const navigate = useNavigate();
     const { signOut, currentUser } = useAuth();
     const { width } = useWindowDimensions();
-    const { loadUser } = useUser();
-    const [, setLoggedUser] = useState<UserProps | null>(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    useEffect(() => {
-        const loadUserInfo = async () => {
-            if (!currentUser) return
-            const user = await loadUser();
-            setLoggedUser(user);
-        }
-        loadUserInfo();
-    }, [currentUser])
 
     const renderItemsNavMenu = () => {
         if (currentUser) {
