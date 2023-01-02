@@ -21,7 +21,7 @@ export const Dashboard = () => {
 
     const [loading, setLoading] = useState(true);
     const { getRegisterByType, getValueTotalRegisters } = useRegister();
-    const { user } = useUser();
+    const { user, loadUser } = useUser();
     const [dashboardContent, setDashboardContent] = useState<DashboardContentProps>({} as DashboardContentProps);
 
     useEffect(() => {
@@ -31,6 +31,7 @@ export const Dashboard = () => {
             const expenses = await getRegisterByType(RegisterType.EXPENSE);
             const totalInvestiments = await getValueTotalRegisters(RegisterType.INVESTIMENT);
             const totalExpenses = await getValueTotalRegisters(RegisterType.EXPENSE);
+            await loadUser();
             const salary = convertToMoneyString(Number(user?.salary) || 0);
             const dashboardContentLoad = {
                 salary: salary,
