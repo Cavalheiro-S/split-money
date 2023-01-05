@@ -14,12 +14,9 @@ export const Home = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        console.log(currentUser);
-        
     }, [currentUser])
 
     const handleClick = () => {
-        console.log(currentUser);
 
         if (currentUser) {
             navigate("/dashboard")

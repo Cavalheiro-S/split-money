@@ -1,9 +1,8 @@
-import { createContext, useEffect, useState } from "react";
-import { useAuth } from "../Hooks/useAuth";
-import { useRegister } from "../Hooks/useRegister";
+import { createContext, useState } from "react";
 
 export interface RegisterProps {
     id: string;
+    userId: string;
     name: string;
     type: RegisterType;
     value: number;
@@ -28,7 +27,7 @@ export const RegisterContext = createContext<RegisterContextProps>({} as Registe
 
 export const RegisterProvider = ({ children }: RegisterProviderProps) => {
     const [registers, setRegisters] = useState<RegisterProps[]>([] as RegisterProps[]);
-    
+
     const state = {
         registers,
         setRegisters,

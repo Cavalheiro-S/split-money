@@ -7,9 +7,9 @@ import { RegisterProps, RegisterType } from "../../Context/RegisterContext"
 import { useRegister } from "../../Hooks/useRegister"
 import { useUser } from "../../Hooks/useUser"
 import { convertToMoneyString } from "../../Utils/util"
-import { CardInfo } from "./CardInfo"
+import { InfoLastMounth } from "./InfoLastMounth"
 
-interface DashboardContentProps {
+export interface DashboardContentProps {
     salary: string;
     investiments: RegisterProps[];
     expenses: RegisterProps[];
@@ -20,15 +20,16 @@ interface DashboardContentProps {
 export const Dashboard = () => {
 
     const [loading, setLoading] = useState(true);
-    const { getRegisterByType, getValueTotalRegisters } = useRegister();
+    const { getValueTotalRegisters, getRegisterByTypeFirestore } = useRegister();
     const { user, loadUser } = useUser();
     const [dashboardContent, setDashboardContent] = useState<DashboardContentProps>({} as DashboardContentProps);
 
     useEffect(() => {
         const loadRegisters = async () => {
             setLoading(true);
-            const investiments = await getRegisterByType(RegisterType.INVESTIMENT);
-            const expenses = await getRegisterByType(RegisterType.EXPENSE);
+
+            const investiments = await getRegisterByTypeFirestore(RegisterType.INVESTIMENT);
+            const expenses = await getRegisterByTypeFirestore(RegisterType.EXPENSE);
             const totalInvestiments = await getValueTotalRegisters(RegisterType.INVESTIMENT);
             const totalExpenses = await getValueTotalRegisters(RegisterType.EXPENSE);
             await loadUser();
@@ -47,11 +48,10 @@ export const Dashboard = () => {
     }, [user])
 
     const handleLoading = () => {
-
         if (loading) {
             return (
                 <div className="flex justify-center items-center h-screen gap-2">
-                    <SpinnerGap className="w-10 h-10 animate-spin text-primary"/>
+                    <SpinnerGap className="w-10 h-10 animate-spin text-primary" />
                     <Text size="lg">Carregando</Text>
                 </div>
             )
@@ -61,11 +61,7 @@ export const Dashboard = () => {
                 <Heading size="lg">Dashboard</Heading>
                 <Text className="text-gray-500" size="md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</Text>
                 <div id="dashboard" className="md:grid md:grid-cols-3 md:pt-6">
-                    <div id="cards-main-dashboard" className="flex flex-col md:flex-row md:col-span-3 md:h-24">
-                        <CardInfo title={dashboardContent.salary} subTitle="Salário Atual" percentage={-8} />
-                        <CardInfo title={dashboardContent.totalInvestiments} subTitle="Investimentos" percentage={23} />
-                        <CardInfo type="negative" title={dashboardContent.totalExpenses} subTitle="Despesas" percentage={8} />
-                    </div>
+                    <InfoLastMounth dashboardContent={dashboardContent} />
                     <div className="col-start-1 mt-10" id="investiments">
                         <Text size="lg" className="pb-2">Investimentos</Text>
                         <div className="max-h-72 overflow-y-scroll">

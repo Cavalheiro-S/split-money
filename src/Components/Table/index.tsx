@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import moment from 'moment';
 import { Bank, CreditCard } from 'phosphor-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CustomComponentProps } from '..';
 import { RegisterProps } from '../../Context/RegisterContext';
@@ -23,24 +24,18 @@ export default function Table({ title, className, setDialogOpen, registersData }
     const { width } = useWindowDimensions();
     const navigate = useNavigate(); ''
 
+
     const renderTableData = () => {
-        if (registersData) {
-            return registersData.map((item) => {
-                return renderList(item)
-            })
-        }
-        return registers.map((item) => {
-            return renderList(item)
-        })
+        if (registersData)
+            return registersData.map((item) => renderList(item))
+        return registers.map((item) => renderList(item))
     }
     const renderTotal = () => {
         const registersValue = registersData ?? registers;
         let total = registersValue.reduce((acumulator, item) => {
-            if (item.type === "investiment") {
+            if (item.type === "investiment")
                 return acumulator + Number(item.value);
-            } else {
-                return acumulator - Number(item.value);
-            }
+            return acumulator - Number(item.value);
         }, 0);
         if (total < 0) {
             total = total * -1;
@@ -58,10 +53,7 @@ export default function Table({ title, className, setDialogOpen, registersData }
                     if (setDialogOpen) {
                         navigate("/record")
                         setDialogOpen({ open: true, register: item });
-                        console.log(setDialogOpen);
-
                     }
-
                 }}
                 className='flex items-center justify-between gap-10 transition hover:bg-gray-100 p-2 border-y border-collapse'>
                 <td className='flex gap-5 items-center'>

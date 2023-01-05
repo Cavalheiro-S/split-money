@@ -12,3 +12,7 @@ export const replaceCommaInDot = (value: string) => {
 export const convertToMoneyString = (value: number) => {
     return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
+
+export const convertToMoneyNumber = (value: string) => {
+    return Number(value.replace("R$", "").replace(",", ".").replace(".","").trim());
+}   
