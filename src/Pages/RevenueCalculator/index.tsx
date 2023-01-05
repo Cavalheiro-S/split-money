@@ -52,28 +52,28 @@ export default function RevenueCalculator({ className }: RevenueCalculatorProps)
         {
             value: "R$ " + revenueCalculatorValues.investiments.toFixed(2),
             name: "Investimentos",
-            iconBGColor: CardColor.green,
+            iconBGColor: "green",
             icon: <Bank />,
             description: "Dinheiro alocado em renda fixa , renda variável , ou guardado em bancos digitais."
         },
         {
             value: "R$ " + revenueCalculatorValues.expenses.toFixed(2),
             name: "Despesas Essenciais",
-            iconBGColor: CardColor.red,
+            iconBGColor: "red",
             icon: <CreditCard />,
             description: "Dinheiro necessário para despesas que não podem ser substituídas ou cortadas."
         },
         {
             value: "R$ " + revenueCalculatorValues.leisure.toFixed(2),
             name: "Lazer",
-            iconBGColor: CardColor.blue,
+            iconBGColor: "blue",
             icon: <Sunglasses />,
             description: "Quantia reservada para gastos relacionados a diversão."
         },
         {
             value: "R$ " + revenueCalculatorValues.education.toFixed(2),
             name: "Educação",
-            iconBGColor: CardColor.yellow,
+            iconBGColor: "yellow",
             icon: <Book />,
             description: "Destinado a compra de cursos, livros, palestras e outras coisas relacionadas a desenvolvimento pessoal."
         },

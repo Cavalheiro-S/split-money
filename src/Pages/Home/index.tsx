@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import HomeImage from "../../Assets/Imgs/HomeImage.svg"
 import { Button } from "../../Components/Button"
-import { Card, CardColor } from "../../Components/Card"
+import { Card } from "../../Components/Card"
 import { Heading } from "../../Components/Heading"
 import { Text } from "../../Components/Text"
 import { useAuth } from "../../Hooks/useAuth"
@@ -39,18 +39,18 @@ export const Home = () => {
                 <Heading className="text-center">Funcionalidades</Heading>
                 <Text className="text-gray-500 text-center">Algumas das funcionalidades que vão te ajudar a controlar suas finanças</Text>
                 <div className="flex flex-col lg:flex-row gap-4 w-full md:gap-12 mt-4 md:mt-12 justify-center">
-                    <Card.Root titleColor={CardColor.green} className="flex flex-col" title="Dashboard" subTitle="Insights sobre suas finanças ">
-                        <Card.Icon IconBgColor={CardColor.green}>
+                    <Card.Root titleColor={"green"} className="flex flex-col" title="Dashboard" subTitle="Insights sobre suas finanças ">
+                        <Card.Icon IconBgColor={"green"}>
                             <ChartLine />
                         </Card.Icon>
                     </Card.Root>
-                    <Card.Root titleColor={CardColor.red} className="flex flex-col " title="Calculadora de Renda Mensal" subTitle="Divida seus gasto">
-                        <Card.Icon IconBgColor={CardColor.red}>
+                    <Card.Root titleColor={"red"} className="flex flex-col " title="Calculadora de Renda Mensal" subTitle="Divida seus gasto">
+                        <Card.Icon IconBgColor={"red"}>
                             <MathOperations />
                         </Card.Icon>
                     </Card.Root>
-                    <Card.Root titleColor={CardColor.blue} className="flex flex-col " title="Registros Financeiros" subTitle="Controle seus gastos e investimentos">
-                        <Card.Icon IconBgColor={CardColor.blue}>
+                    <Card.Root titleColor={"blue"} className="flex flex-col " title="Registros Financeiros" subTitle="Controle seus gastos e investimentos">
+                        <Card.Icon IconBgColor={"blue"}>
                             <ListPlus />
                         </Card.Icon>
                     </Card.Root>

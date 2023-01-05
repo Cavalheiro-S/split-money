@@ -4,13 +4,7 @@ import { Info } from "phosphor-react";
 import { ReactNode } from "react";
 import { Text } from "../Text";
 
-export enum CardColor {
-  yellow = "yellow-700",
-  green = "green-700",
-  red = "red-700",
-  blue = "blue-700",
-  gray = "neutral-700"
-}
+export type CardColor = "yellow" | "green" | "red" | "gray" | "blue";
 
 interface CardProps {
   title: string,
@@ -28,7 +22,7 @@ interface CardIconProps {
   className?: string,
 }
 
-export const CardRoot = ({ title, titleColor = CardColor.gray, subTitle, children, className, orientation }: CardProps) => {
+export const CardRoot = ({ title, titleColor = "gray", subTitle, children, className, orientation }: CardProps) => {
 
   return (
     <div className={clsx('flex hover:shadow-md transition gap-2 rounded border py-4 md:w-72 pl-4 md:p-4', {
@@ -37,18 +31,31 @@ export const CardRoot = ({ title, titleColor = CardColor.gray, subTitle, childre
     }, className)}>
       {children}
       <div className="flex flex-col items-start">
-        <Text size="lg" className={"text-" + titleColor}>{title}</Text>
+        <Text size="lg" className={clsx("", {
+          "text-yellow-700": titleColor === "yellow",
+          "text-green-700": titleColor === "green",
+          "text-red-700": titleColor === "red",
+          "text-gray-700": titleColor === "gray",
+          "text-blue-700": titleColor === "blue",
+        }
+        )}>{title}</Text>
         <Text className="text-neutral-400">{subTitle}</Text>
       </div>
-    </div>
+    </div >
   )
 }
 
-export const CardIcon = ({ children = <Info />, IconBgColor = CardColor.yellow, className }: CardIconProps) => {
+export const CardIcon = ({ children = <Info />, IconBgColor = "yellow", className }: CardIconProps) => {
 
   return (
     <div className={
-      clsx("h-10 w-10 flex items-center justify-center rounded-full", `bg-${IconBgColor}`, className)}>
+      clsx("h-10 w-10 flex items-center justify-center rounded-full",{
+        "bg-yellow-700": IconBgColor === "yellow",
+        "bg-green-700": IconBgColor === "green",
+        "bg-red-700": IconBgColor === "red",
+        "bg-gray-700": IconBgColor === "gray",
+        "bg-blue-700": IconBgColor === "blue",
+      }, className)}>
       <Slot className="text-white w-6 h-6">
         {children}
       </Slot>
