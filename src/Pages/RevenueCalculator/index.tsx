@@ -5,7 +5,7 @@ import { FormEvent, ReactNode, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import { Button } from "../../Components/Button";
-import { Card } from '../../Components/Card';
+import { Card, CardColor } from '../../Components/Card';
 import { Heading } from '../../Components/Heading';
 import { Input } from '../../Components/Input';
 import { Text } from '../../Components/Text';
@@ -16,7 +16,7 @@ interface RevenueCalculatorProps {
 interface CardValueProps {
     value: string,
     name: string,
-    iconBGColor?: "yellow" | "green" | "red" | "blue",
+    iconBGColor?: CardColor,
     icon?: ReactNode,
     description: string,
 }
@@ -52,28 +52,28 @@ export default function RevenueCalculator({ className }: RevenueCalculatorProps)
         {
             value: "R$ " + revenueCalculatorValues.investiments.toFixed(2),
             name: "Investimentos",
-            iconBGColor: "green",
+            iconBGColor: CardColor.green,
             icon: <Bank />,
             description: "Dinheiro alocado em renda fixa , renda variável , ou guardado em bancos digitais."
         },
         {
             value: "R$ " + revenueCalculatorValues.expenses.toFixed(2),
             name: "Despesas Essenciais",
-            iconBGColor: "red",
+            iconBGColor: CardColor.red,
             icon: <CreditCard />,
             description: "Dinheiro necessário para despesas que não podem ser substituídas ou cortadas."
         },
         {
             value: "R$ " + revenueCalculatorValues.leisure.toFixed(2),
             name: "Lazer",
-            iconBGColor: "blue",
+            iconBGColor: CardColor.blue,
             icon: <Sunglasses />,
             description: "Quantia reservada para gastos relacionados a diversão."
         },
         {
             value: "R$ " + revenueCalculatorValues.education.toFixed(2),
             name: "Educação",
-            iconBGColor: "yellow",
+            iconBGColor: CardColor.yellow,
             icon: <Book />,
             description: "Destinado a compra de cursos, livros, palestras e outras coisas relacionadas a desenvolvimento pessoal."
         },
@@ -101,7 +101,7 @@ export default function RevenueCalculator({ className }: RevenueCalculatorProps)
                     <Accordion.Header>
                         <Accordion.Trigger className="w-full">
                             <Card.Root className='w-full md:w-72 gap-4' title={card.value} subTitle={card.name}>
-                                <Card.Icon IconBGColor={card.iconBGColor}>
+                                <Card.Icon IconBgColor={card.iconBGColor}>
                                     {card.icon}
                                 </Card.Icon>
                             </Card.Root>

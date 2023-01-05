@@ -1,12 +1,14 @@
 import * as Acordion from "@radix-ui/react-accordion"
+import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu"
 import clsx from "clsx"
 import { CaretDown, List } from "phosphor-react"
 import { Link, useNavigate } from "react-router-dom"
 import { CustomComponentProps } from "../.."
 import { useAuth } from "../../../Hooks/useAuth"
 import { DropdownMenu } from "../../DropdownMenu"
-import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu"
 import { Text } from "../../Text"
+import {v4 as uuid} from "uuid"
+
 interface HeaderProps extends CustomComponentProps { }
 
 export const NavMenuBurguer = ({ className }: HeaderProps) => {
@@ -70,7 +72,7 @@ export const NavMenuBurguer = ({ className }: HeaderProps) => {
                         </Acordion.Content>
                     </Acordion.Trigger>
                 </Acordion.Item>
-            </Acordion.Root >
+        </Acordion.Root >
         )
     }
 
@@ -89,7 +91,7 @@ export const NavMenuBurguer = ({ className }: HeaderProps) => {
             )
         }
         return (
-            <li className="flex marker:text-transparent items-center justify-end text-center md:col-start-3" >
+            <li key={uuid()} className="flex marker:text-transparent items-center justify-end text-center md:col-start-3" >
                 <Text asChild>
                     <Link to="/signin" className="px-4 py-1 rounded hover:text-primary-hover transition select-none">
                         Entrar
