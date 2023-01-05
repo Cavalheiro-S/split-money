@@ -21,7 +21,7 @@ interface CardIconProps {
 export const CardRoot = ({ title, subTitle, children, className, orientation }: CardProps) => {
 
   return (
-    <div className={clsx('flex hover:shadow-md transition gap-2 rounded border py-4 px-20 md:p-4', {
+    <div className={clsx('flex hover:shadow-md transition gap-2 rounded border w-screen py-4 md:w-full pl-4 md:p-4', {
       "flex-col": orientation === "vertical",
       "flex-row": orientation === "horizontal",
     }, className)}>

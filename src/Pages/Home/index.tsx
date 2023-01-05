@@ -33,7 +33,7 @@ export const Home = () => {
                     <Text size="lg" className="text-gray-500 text-center md:text-start">Ut eget urna malesuada, pharetra urna ornare, volutpat est. Aenean id quam justo. Maecenas vitae nulla massa. Cras gravida </Text>
                     <Button.Root onClick={() => handleClick()} className="md:self-start">Controle suas finanças</Button.Root>
                 </div>
-                <img className="max-w-sm" src={HomeImage} alt="Home" />
+                <img className="w-screen md:max-w-sm" src={HomeImage} alt="Home" />
             </section>
             <section className="flex flex-col items-center mb-20">
                 <Heading className="text-center">Funcionalidades</Heading>
