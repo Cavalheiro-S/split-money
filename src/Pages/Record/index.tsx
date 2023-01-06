@@ -22,7 +22,6 @@ export default function Register() {
                 <DialogCustom dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
             </div>
             <Table setDialogOpen={setDialogOpen} className='max-h-screen' />
-
         </div>
     )
 }

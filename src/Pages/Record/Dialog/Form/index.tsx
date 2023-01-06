@@ -27,7 +27,7 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
 
     const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<Inputs>()
     const { currentUser, signOut } = useAuth();
-    const { saveRegisterFirestore, deleteRegisterFirestore, updateRegisterFirestore } = useRegister();
+    const { firestore: { saveRegister, deleteRegister, updateRegister, get } } = useRegister();
 
     const cleanStateForms = () => {
         setValue("name", "");
@@ -77,7 +77,7 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
         try {
             if (dialogOpen.register?.id) {
                 registerValues.id = dialogOpen.register.id;
-                await updateRegisterFirestore(registerValues)
+                await updateRegister(registerValues)
             }
         }
         catch (error) {
@@ -88,7 +88,7 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
     const handleSave = async (registerValues: RegisterProps) => {
         try {
             registerValues.id = uuid();
-            await saveRegisterFirestore(registerValues)
+            await saveRegister(registerValues)
         }
         catch (error) {
             console.log(error);
@@ -101,7 +101,7 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
                 signOut();
                 return;
             }
-            dialogOpen.register?.id && await deleteRegisterFirestore(dialogOpen.register.id)
+            dialogOpen.register?.id && await deleteRegister(dialogOpen.register.id)
         }
         catch (error) {
             console.log(error);
@@ -172,7 +172,7 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
             <fieldset className='flex flex-col gap-2'>
                 <label className="text-sm" htmlFor='type'>Tipo</label>
                 <Select.Root>
-                    <Select.Input defaultValue="investiment" id='type' {...register("type",{required: true})}>
+                    <Select.Input defaultValue="investiment" id='type' {...register("type", { required: true })}>
                         <Select.Options value="investiment">Investimento</Select.Options>
                         <Select.Options value="expense">Despesa</Select.Options>
                     </Select.Input>

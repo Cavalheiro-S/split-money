@@ -10,13 +10,14 @@ import { CardInfo } from "../CardInfo"
 
 interface InfoLastMounthProps {
     dashboardContent: DashboardContentProps;
+    children?: React.ReactNode;
 }
 
 export const InfoLastMounth = ({ dashboardContent }: InfoLastMounthProps) => {
 
     const [percentageInvestiments, setPercentageInvestiments] = useState(0);
     const [percentageExpenses, setPercentageExpenses] = useState(0);
-    const { getValueTotalRegisters } = useRegister();
+    const { firestore: { get } } = useRegister();
 
     useEffect(() => {
         const loadInfoLastMounth = async () => await calculatePercentUseSalary();
@@ -30,7 +31,7 @@ export const InfoLastMounth = ({ dashboardContent }: InfoLastMounthProps) => {
     }
 
     const calculatePercentUse = async (setValue: React.Dispatch<React.SetStateAction<number>>, type: RegisterType) => {
-        const totalRegister = Number(await getValueTotalRegisters(type, false));
+        const totalRegister = Number(await get.RegistersTotalValue(type, false));
         const salary = convertToMoneyNumber(dashboardContent.salary ?? "0");
         const percent = (totalRegister / salary) * 100;
         setValue(percent);

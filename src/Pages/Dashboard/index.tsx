@@ -20,7 +20,7 @@ export interface DashboardContentProps {
 export const Dashboard = () => {
 
     const [loading, setLoading] = useState(true);
-    const { getValueTotalRegisters, getRegisterByTypeFirestore } = useRegister();
+    const { firestore: { get } } = useRegister();
     const { user, loadUser } = useUser();
     const [dashboardContent, setDashboardContent] = useState<DashboardContentProps>({} as DashboardContentProps);
 
@@ -28,10 +28,10 @@ export const Dashboard = () => {
         const loadRegisters = async () => {
             setLoading(true);
 
-            const investiments = await getRegisterByTypeFirestore(RegisterType.INVESTIMENT);
-            const expenses = await getRegisterByTypeFirestore(RegisterType.EXPENSE);
-            const totalInvestiments = await getValueTotalRegisters(RegisterType.INVESTIMENT);
-            const totalExpenses = await getValueTotalRegisters(RegisterType.EXPENSE);
+            const investiments = await get.RegisterByType(RegisterType.INVESTIMENT);
+            const expenses = await get.RegisterByType(RegisterType.EXPENSE);
+            const totalInvestiments = await get.RegistersTotalValue(RegisterType.INVESTIMENT);
+            const totalExpenses = await get.RegistersTotalValue(RegisterType.EXPENSE);
             await loadUser();
             const salary = convertToMoneyString(Number(user?.salary) || 0);
             const dashboardContentLoad = {
@@ -64,14 +64,14 @@ export const Dashboard = () => {
                     <InfoLastMounth dashboardContent={dashboardContent} />
                     <div className="col-start-1 mt-10" id="investiments">
                         <Text size="lg" className="pb-2">Investimentos</Text>
-                        <div className="max-h-72 overflow-y-scroll">
-                            <Table registersData={dashboardContent.investiments} className="w-full" />
+                        <div className="max-h-72 overflow-y-scroll scroll">
+                            <Table className="w-full" />
                         </div>
                     </div>
                     <div className="col-start-3 mt-10" id="investiments">
                         <Text size="lg" className="pb-2">Despesas</Text>
                         <div className="max-h-72 overflow-y-scroll">
-                            <Table registersData={dashboardContent.expenses} className="w-full" />
+                            <Table className="w-full" />
                         </div>
                     </div>
                 </div>

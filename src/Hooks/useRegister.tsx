@@ -1,8 +1,6 @@
-import { get, off, onValue, push, ref, remove, update } from "firebase/database";
-import { collection, deleteDoc, doc, query, where, setDoc, getDocs, onSnapshot, updateDoc, PartialWithFieldValue, QueryDocumentSnapshot, SnapshotOptions, addDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, endAt, getDocs, limit, onSnapshot, orderBy, query, QueryDocumentSnapshot, setDoc, SnapshotOptions, startAt, updateDoc, where } from "firebase/firestore";
 import { useContext, useEffect } from "react";
 import { RegisterContext, RegisterProps, RegisterType } from "../Context/RegisterContext";
-import { convertSnapshotToRegister, convertSnapshotToRegisterArray } from "../Utils/database";
 import { convertToMoneyString } from "../Utils/util";
 import { useAuth } from "./useAuth";
 import { useDatabase } from "./useDatabase";
@@ -10,9 +8,10 @@ import { useDatabase } from "./useDatabase";
 export const useRegister = () => {
 
     const { registers, setRegisters } = useContext(RegisterContext);
-    const { db, dbFirestore } = useDatabase();
+    const { dbFirestore } = useDatabase();
     const { currentUser } = useAuth();
 
+    //#region Converter
     const registerConverter = {
         toFirestore: (register: RegisterProps) => {
             return {
@@ -36,10 +35,14 @@ export const useRegister = () => {
             } as RegisterProps
         }
     }
-
+    //#endregion
+    //#region useEffect
     useEffect(() => {
 
-        const collectionQuery = query(collection(dbFirestore, "register"), where("userId", "==", currentUser?.uid));
+        const collectionQuery = query(collection(dbFirestore, "register"),
+            where("userId", "==", currentUser?.uid),
+            orderBy("date", "asc"),
+            limit(10));
         const unsubscribe = onSnapshot(collectionQuery, (snapshot) => {
             const registersChanged = snapshot.docs.map((doc) => {
                 return {
@@ -52,7 +55,8 @@ export const useRegister = () => {
 
         return unsubscribe;
     }, [])
-
+    //#endregion
+    //#region set, update, delete
     const saveRegisterFirestore = async (register: RegisterProps) => {
         const registerRef = doc(dbFirestore, "register", register.id).withConverter(registerConverter);
         await setDoc(registerRef, register);
@@ -66,7 +70,8 @@ export const useRegister = () => {
     const deleteRegisterFirestore = async (registerId: string) => {
         await deleteDoc(doc(dbFirestore, "register", registerId));
     }
-
+    //#endregion
+    //#region get
     const getRegisterByTypeFirestore = async (type: RegisterType) => {
 
         try {
@@ -79,6 +84,7 @@ export const useRegister = () => {
                     ...item.data()
                 }
             }) as RegisterProps[];
+            setRegisters(registersQuery);
             return registersQuery;
         }
         catch (error) {
@@ -101,13 +107,38 @@ export const useRegister = () => {
         }
     }
 
-    const getRegisterByMonth = async (month: number) => {
-        const snapshot = await get(ref(db, `users/${currentUser?.uid}/register`));
-        const registers = convertSnapshotToRegisterArray(snapshot);
-        return registers.filter(item => {
-            const date = new Date(item.date);
-            return date.getMonth() === month;
-        });
+    const getRegistersLimit = async (limitResult = 10) => {
+        try {
+            const registerRef = collection(dbFirestore, "register");
+            const q = query(registerRef,
+                where("userId", "==", currentUser?.uid),
+                orderBy("date", "asc"),
+                limit(limitResult));
+            const data = await getDocs(q)
+            const registersQuery = data.docs.map(item => ({ id: item.id, ...item.data() })) as RegisterProps[];
+            setRegisters(registersQuery);
+            return registersQuery;
+        }
+        catch (error) {
+            console.log(error)
+            return [] as RegisterProps[];
+        }
+    }
+
+    const getRegistersByMonth = async (month: string) => {
+        const registerRef = collection(dbFirestore, "register");
+        const startDate = new Date(`2023-${month}-01`).toISOString();
+        const endDate = new Date(`2023-${month}-31`).toISOString();
+        const q = query(registerRef,
+            where("userId", "==", currentUser?.uid),
+            orderBy("date", "asc"),
+            startAt(startDate),
+            endAt(endDate)
+        );
+        const data = await getDocs(q);
+        const registersQuery = data.docs.map(item => ({ id: item.id, ...item.data() })) as RegisterProps[];
+        setRegisters(registersQuery);
+        return registersQuery;
     }
 
     const getValueTotalRegisters = async (type: RegisterType, formated = true) => {
@@ -123,14 +154,37 @@ export const useRegister = () => {
             console.log(error)
         }
     }
+
+    const getRegistersLength = async () => {
+        try {
+            const registerRef = collection(dbFirestore, "register");
+            const q = query(registerRef, where("userId", "==", currentUser?.uid));
+            const data = await getDocs(q)
+            const registersQuery = data.docs.map(item => ({ id: item.id, ...item.data() })) as RegisterProps[];
+            return registersQuery.length;
+        }
+        catch (error) {
+            console.log(error)
+            return 0;
+        }
+    }
+    //#endregion 
+    //#region export
     return {
         registers,
-        saveRegisterFirestore,
-        getAllRegistersFirestore,
-        deleteRegisterFirestore,
-        getRegisterByTypeFirestore,
-        getValueTotalRegisters,
-        getRegisterByMonth,
-        updateRegisterFirestore
+        setRegisters,
+        firestore: {
+            saveRegister: saveRegisterFirestore,
+            deleteRegister: deleteRegisterFirestore,
+            updateRegister: updateRegisterFirestore,
+            get: {
+                RegisterByType: getRegisterByTypeFirestore,
+                RegistersTotalValue: getValueTotalRegisters,
+                RegistersByMonth: getRegistersByMonth,
+                RegistersLimit: getRegistersLimit,
+                RegistersLength: getRegistersLength,
+            }
+        }
     };
+    //#endregion
 }
