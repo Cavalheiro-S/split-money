@@ -11,6 +11,7 @@ import { useWindowDimensions } from '../../Hooks/useWindowDimensions';
 import { DialogOpenProps } from '../../Pages/Record';
 import { convertToMoneyString } from '../../Utils/util';
 import { Text } from '../Text';
+import { DataGrid } from '@mui/x-data-grid';
 
 interface TableProps extends CustomComponentProps {
     title?: string,
@@ -74,17 +75,17 @@ export default function TableStyled({ title, className, setDialogOpen }: TablePr
                 }}
                 className='gap-10 transition hover:bg-gray-100 border-y border-collapse'>
                 <TableCell sx={{ display: "flex", padding: "0px 8px" }} className='gap-5 items-center h-20'>
-                    <div className={
-                        clsx('flex rounded-full w-10 h-10 items-center justify-center',
+                    <TableCell sx={{padding:"0px", display: "flex"}} className={
+                        clsx('rounded-full w-10 h-10 items-center justify-center',
                             { "bg-green-100": item.type === "investiment", "bg-red-100": item.type === "expense" })}>
                         {item.type == "investiment" ?
                             <Bank className='text-green-800 h-6 w-6' size={24} /> :
                             <CreditCard className='text-red-800 h-6 w-6' size={24} />}
-                    </div>
-                    <div className='flex flex-col gap-2'>
+                    </TableCell>
+                    <TableCell sx={{padding: "0px", display: "flex"}} className='flex-col gap-2'>
                         <Text>{item.name}</Text>
                         <Text className='text-neutral-500'>{moment(item.date ?? new Date()).format("DD/MM/YYYY")}</Text>
-                    </div>
+                    </TableCell>
                 </TableCell>
                 <TableCell sx={{ padding: "0px 4px" }} align="right">
                     <Text size={width > 768 ? "lg" : "md"} className={

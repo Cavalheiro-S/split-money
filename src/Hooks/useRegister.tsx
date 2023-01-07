@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, endAt, getDocs, limit, onSnapshot, orderBy, query, QueryDocumentSnapshot, setDoc, SnapshotOptions, startAt, updateDoc, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, endAt, getDocs, limit, onSnapshot, orderBy, Query, query, QueryConstraint, QueryDocumentSnapshot, QueryFieldFilterConstraint, setDoc, SnapshotOptions, startAt, updateDoc, where } from "firebase/firestore";
 import { useContext, useEffect } from "react";
 import { RegisterContext, RegisterProps, RegisterType } from "../Context/RegisterContext";
 import { convertToMoneyString } from "../Utils/util";
@@ -72,11 +72,12 @@ export const useRegister = () => {
     }
     //#endregion
     //#region get
-    const getRegisterByTypeFirestore = async (type: RegisterType) => {
 
+    const getRegisterBase = async (condition?: QueryConstraint[]) => {
         try {
             const registerRef = collection(dbFirestore, "register");
-            const q = query(registerRef, where("type", "==", type as string), where("userId", "==", currentUser?.uid));
+            let q = query(registerRef, where("userId", "==", currentUser?.uid));
+            q = condition ? query(registerRef, where("userId", "==", currentUser?.uid), ...condition) : q;
             const data = await getDocs(q);
             const registersQuery = data.docs.map(item => {
                 return {
@@ -93,51 +94,25 @@ export const useRegister = () => {
         }
     }
 
-    const getAllRegistersFirestore = async () => {
-        try {
-            const registerRef = collection(dbFirestore, "register");
-            const q = query(registerRef, where("userId", "==", currentUser?.uid));
-            const data = await getDocs(q)
-            const registersQuery = data.docs.map(item => ({ id: item.id, ...item.data() })) as RegisterProps[];
-            return registersQuery;
-        }
-        catch (error) {
-            console.log(error)
-            return []
-        }
+    const getRegisterByTypeFirestore = async (type: RegisterType) => {
+        const registersQuery = await getRegisterBase([where("type", "==", type as string)]);
+        return registersQuery;
     }
 
     const getRegistersLimit = async (limitResult = 10) => {
-        try {
-            const registerRef = collection(dbFirestore, "register");
-            const q = query(registerRef,
-                where("userId", "==", currentUser?.uid),
-                orderBy("date", "asc"),
-                limit(limitResult));
-            const data = await getDocs(q)
-            const registersQuery = data.docs.map(item => ({ id: item.id, ...item.data() })) as RegisterProps[];
-            setRegisters(registersQuery);
-            return registersQuery;
-        }
-        catch (error) {
-            console.log(error)
-            return [] as RegisterProps[];
-        }
+        const registersQuery = await getRegisterBase([
+            orderBy("date", "asc"),
+            limit(limitResult)]);
+        return registersQuery;
     }
 
     const getRegistersByMonth = async (month: string) => {
-        const registerRef = collection(dbFirestore, "register");
         const startDate = new Date(`2023-${month}-01`).toISOString();
         const endDate = new Date(`2023-${month}-31`).toISOString();
-        const q = query(registerRef,
-            where("userId", "==", currentUser?.uid),
+        const registersQuery = await getRegisterBase([
             orderBy("date", "asc"),
             startAt(startDate),
-            endAt(endDate)
-        );
-        const data = await getDocs(q);
-        const registersQuery = data.docs.map(item => ({ id: item.id, ...item.data() })) as RegisterProps[];
-        setRegisters(registersQuery);
+            endAt(endDate)]);
         return registersQuery;
     }
 
@@ -157,10 +132,7 @@ export const useRegister = () => {
 
     const getRegistersLength = async () => {
         try {
-            const registerRef = collection(dbFirestore, "register");
-            const q = query(registerRef, where("userId", "==", currentUser?.uid));
-            const data = await getDocs(q)
-            const registersQuery = data.docs.map(item => ({ id: item.id, ...item.data() })) as RegisterProps[];
+            const registersQuery = await getRegisterBase();
             return registersQuery.length;
         }
         catch (error) {
