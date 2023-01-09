@@ -20,9 +20,10 @@ interface TableProps extends CustomComponentProps {
 
 export default function TableStyled({ title, className, setDialogOpen }: TableProps) {
 
-    const { firestore: { get }, registers, setRegisters } = useRegister();
+    const { firestore: { get }, registers } = useRegister();
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [monthFilter, setMonthFilter] = useState(moment().format("MM"));
+    const [registersByMonth, setRegistersByMonth] = useState<RegisterProps[]>([]);
     const [totalRegisters, setTotalRegisters] = useState(0);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
@@ -32,23 +33,30 @@ export default function TableStyled({ title, className, setDialogOpen }: TablePr
     useEffect(() => {
         const loadRegisters = async () => {
             setLoading(true);
-            const registersLength = await get.RegistersLength();
-            await get.RegistersByMonth(monthFilter)
-            setTotalRegisters(registersLength);
+            const registersResult = await get.RegistersByMonth(monthFilter)
+
+            setRegistersByMonth(registersResult);
+            setTotalRegisters(registersResult.length);
             setLoading(false);
         }
         loadRegisters();
-    }, [])
+    }, [registers])
+
+    const renderOptionPerPage = () => {
+        const options = [];
+        for (let i = 5; i <= 25; i += 5) totalRegisters >= i && options.push(i)
+        return options;
+    }
 
     const renderTableData = () => {
-        const registersValue = registers ?? [];
+        const registersValue = registersByMonth ?? [];
         return registersValue.map((item, index) => {
             if (index >= rowsPerPage) return;
             return renderList(item);
         })
     }
     const renderTotal = () => {
-        const registersValue = registers ?? [];
+        const registersValue = registersByMonth ?? [];
         let total = registersValue.reduce((acumulator, item) => {
             if (item.type === "investiment")
                 return acumulator + Number(item.value);
@@ -75,14 +83,14 @@ export default function TableStyled({ title, className, setDialogOpen }: TablePr
                 }}
                 className='gap-10 transition hover:bg-gray-100 border-y border-collapse'>
                 <TableCell sx={{ display: "flex", padding: "0px 8px" }} className='gap-5 items-center h-20'>
-                    <TableCell sx={{padding:"0px", display: "flex"}} className={
+                    <TableCell sx={{ padding: "0px", display: "flex" }} className={
                         clsx('rounded-full w-10 h-10 items-center justify-center',
                             { "bg-green-100": item.type === "investiment", "bg-red-100": item.type === "expense" })}>
                         {item.type == "investiment" ?
                             <Bank className='text-green-800 h-6 w-6' size={24} /> :
                             <CreditCard className='text-red-800 h-6 w-6' size={24} />}
                     </TableCell>
-                    <TableCell sx={{padding: "0px", display: "flex"}} className='flex-col gap-2'>
+                    <TableCell sx={{ padding: "0px", display: "flex" }} className='flex-col gap-2'>
                         <Text>{item.name}</Text>
                         <Text className='text-neutral-500'>{moment(item.date ?? new Date()).format("DD/MM/YYYY")}</Text>
                     </TableCell>
@@ -105,7 +113,9 @@ export default function TableStyled({ title, className, setDialogOpen }: TablePr
                         value={monthFilter}
                         onChange={async (e) => {
                             setMonthFilter(e.target.value)
-                            await get.RegistersByMonth(e.target.value);
+                            const registersResult = await get.RegistersByMonth(e.target.value);
+                            setRegistersByMonth(registersResult);
+                            setTotalRegisters(registersResult.length);
                         }}
                         variant="standard"
                     >
@@ -119,7 +129,7 @@ export default function TableStyled({ title, className, setDialogOpen }: TablePr
                 </TableRow>
             </TableHead>
             <TableBody>
-                {registers.length > 0 ? renderTableData() : (
+                {registersByMonth.length > 0 ? renderTableData() : (
                     <TableRow className='flex justify-between border-b-2'>
                         <TableCell className='flex-1 p-2 text-center'>
                             <Text size='lg'>Nenhum registro encontrado</Text>
@@ -138,11 +148,13 @@ export default function TableStyled({ title, className, setDialogOpen }: TablePr
                 <TableRow>
                     <TablePagination
                         labelRowsPerPage='Registros por página'
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[5,10,25]}
                         count={totalRegisters}
                         rowsPerPage={rowsPerPage}
                         page={page}
-                        onPageChange={(event, number) => {
+                        onPageChange={async (event, number) => {
+                            const registersTemp = await get.RegistersByMonth(monthFilter);
+                            setRegistersByMonth([...registersTemp.slice(number * rowsPerPage, (number + 1) * rowsPerPage)])
                             setPage(number);
                         }}
                         onRowsPerPageChange={(event) => {

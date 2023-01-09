@@ -30,7 +30,6 @@ export const Dashboard = () => {
 
             const investiments = await get.RegisterByType(RegisterType.INVESTIMENT);
             const expenses = await get.RegisterByType(RegisterType.EXPENSE);
-            console.log(investiments);
             
             const totalInvestiments = await get.RegistersTotalValue(RegisterType.INVESTIMENT);
             const totalExpenses = await get.RegistersTotalValue(RegisterType.EXPENSE);
