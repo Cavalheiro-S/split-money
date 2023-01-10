@@ -1,21 +1,22 @@
-import { DialogTitle } from '@radix-ui/react-dialog';
+import { FormControl, MenuItem, TextField } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
+import moment from 'moment';
 import { Trash } from 'phosphor-react';
 import { useEffect } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import { DialogOpenProps } from '../..';
 import { Button } from '../../../../Components/Button';
-import { RegisterProps } from '../../../../Context/RegisterContext';
+import { Input } from '../../../../Components/Input';
+import { Text } from '../../../../Components/Text';
+import { RegisterProps, RegisterType } from '../../../../Context/RegisterContext';
 import { useAuth } from '../../../../Hooks/useAuth';
 import { useRegister } from '../../../../Hooks/useRegister';
-import { Input } from '../../../../Components/Input';
-import { Select } from '../../../../Components/Select';
-
 interface Inputs {
     name: string,
-    type: "investiment" | "expense",
+    type: RegisterType,
     value: number,
-    date: Date
+    date: string
 }
 
 interface FormProps {
@@ -25,26 +26,26 @@ interface FormProps {
 
 export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
 
-    const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<Inputs>()
+    const { register, handleSubmit, formState: { errors }, setValue, watch, control, reset } = useForm<Inputs>({
+        defaultValues: {
+            name: "",
+            type: RegisterType.INCOMING,
+            value: 0,
+            date: moment().toString()
+        }
+    })
     const { currentUser, signOut } = useAuth();
     const { firestore: { saveRegister, deleteRegister, updateRegister, get } } = useRegister();
-
-    const cleanStateForms = () => {
-        setValue("name", "");
-        setValue("type", "investiment");
-        setValue("value", 0);
-        setValue("date", new Date());
-    }
 
     useEffect(() => {
         if (dialogOpen.register) {
             setValue("name", dialogOpen.register.name);
-            setValue("type", dialogOpen.register.type as "investiment" | "expense");
+            setValue("type", dialogOpen.register.type);
             setValue("value", dialogOpen.register.value);
             setValue("date", dialogOpen.register.date);
             return;
         }
-        cleanStateForms();
+        reset();
 
     }, [dialogOpen.register])
 
@@ -61,6 +62,8 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
                 name: data.name.trim(),
                 userId: currentUser?.uid as string,
                 value: Number(data.value),
+                type: data.type,
+                date: moment(data.date).utc().toString()
             } as RegisterProps;
 
             dialogOpen.register?.id ? await handleUpdate(registerValues) : await handleSave(registerValues);
@@ -108,7 +111,7 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
         }
         finally {
             setDialogOpen({ open: false });
-            cleanStateForms();
+            reset();
         }
     }
 
@@ -125,18 +128,18 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
         if (dialogOpen.register?.id) {
             const editButtonActive = verifyIsEditing();
             return (
-                <>
+                <div className="flex flex-col md:flex gap-2 w-full">
+                    <Button.Root disabled={editButtonActive} className='justify-center w-full' type="submit">
+                        <Button.Icon className='text-xl' />
+                        Editar
+                    </Button.Root>
                     <Button.Root styleType='secondary' className='w-full' onClick={() => handleDelete()} type='button'>
                         <Button.Icon className='text-xl'>
                             <Trash />
                         </Button.Icon>
                         Remover
                     </Button.Root>
-                    <Button.Root disabled={editButtonActive} className='justify-center w-full' type="submit">
-                        <Button.Icon className='text-xl' />
-                        Editar
-                    </Button.Root>
-                </>
+                </div>
             )
         }
         return (
@@ -149,9 +152,7 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-            <DialogTitle className='text-md font-bold'>
-                {dialogOpen.register?.id ? 'Editar registro' : 'Adicionar registro'}
-            </DialogTitle>
+
             <fieldset className='flex flex-col gap-2'>
                 <label className="text-sm" htmlFor='name'>Nome</label>
                 <Input.Root>
@@ -170,22 +171,31 @@ export const Form = ({ dialogOpen, setDialogOpen }: FormProps) => {
                 {errors.value?.type === 'maxLength' && <span className='text-xs text-red-500'>Valor máximo: R$ 999.999.999,99</span>}
             </fieldset>
             <fieldset className='flex flex-col gap-2'>
-                <label className="text-sm" htmlFor='type'>Tipo</label>
-                <Select.Root>
-                    <Select.Input defaultValue="investiment" id='type' {...register("type", { required: true })}>
-                        <Select.Options value="investiment">Investimento</Select.Options>
-                        <Select.Options value="expense">Despesa</Select.Options>
-                    </Select.Input>
-                </Select.Root>
+                <label htmlFor="type">
+                    <Text>Tipo</Text>
+                </label>
+                <TextField
+                    select
+                    SelectProps={{ sx: { height: "40px" } }}
+                    inputRef={register("type").ref}
+                    {...register("type")}
+                    defaultValue="incoming">
+                    <MenuItem value="incoming">Receita</MenuItem>
+                    <MenuItem value="expense">Despesa</MenuItem>
+                </TextField>
                 {errors.type?.type === 'required' && <span className='text-xs text-red-500'>Campo obrigatório</span>}
             </fieldset>
-            <fieldset className='flex flex-col gap-2'>
+            <FormControl className='flex flex-col gap-2'>
                 <label className="text-sm" htmlFor="date">Data</label>
-                <Input.Root>
-                    <Input.Input id='date' {...register("date", { required: true, })} type="date" placeholder='Valor' />
-                </Input.Root>
+                <DatePicker
+                    value={watch("date")}
+                    inputFormat='DD/MM/yyyy'
+                    onChange={(date) => setValue("date", date ?? new Date().toLocaleDateString())}
+                    InputProps={{ className: "h-10" }}
+                    renderInput={(params) => <TextField {...params} />}
+                />
                 {errors.date && <span className='text-xs text-red-500'>Campo obrigatório</span>}
-            </fieldset>
+            </FormControl>
             <div className='flex justify-between gap-3'>
                 {renderActionButtons()}
             </div>

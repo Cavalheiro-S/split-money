@@ -6,11 +6,11 @@ export interface RegisterProps {
     name: string;
     type: RegisterType;
     value: number;
-    date: Date;
+    date: string;
 }
 
 export enum RegisterType {
-    INVESTIMENT = "investiment",
+    INCOMING = "incoming",
     EXPENSE = "expense",
 }
 

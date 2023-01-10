@@ -49,7 +49,7 @@ export const Home = () => {
                             <MathOperations />
                         </Card.Icon>
                     </Card.Root>
-                    <Card.Root titleColor={"blue"} className="flex flex-col " title="Registros Financeiros" subTitle="Controle seus gastos e investimentos">
+                    <Card.Root titleColor={"blue"} className="flex flex-col " title="Registros Financeiros" subTitle="Controle seus gastos e incomingos">
                         <Card.Icon IconBgColor={"blue"}>
                             <ListPlus />
                         </Card.Icon>

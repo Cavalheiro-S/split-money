@@ -17,11 +17,11 @@ export default function Register() {
             <div className='flex flex-col gap-2 md:flex-row md:items-end mb-10 md:px-0'>
                 <div>
                     <Heading size='lg' className='text-start'>Registros</Heading>
-                    <Text size='lg' className='md:mx-0 text-neutral-400'>Adicione aqui seus registros de investimentos e despesas para um melhor controle</Text>
+                    <Text size='lg' className='md:mx-0 text-neutral-400'>Adicione aqui seus registros de receitas e despesas para um melhor controle</Text>
                 </div>
                 <DialogCustom dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
             </div>
-            <Table setDialogOpen={setDialogOpen} className='max-h-screen' />
+            <Table setDialogOpen={setDialogOpen} className='md:max-h-screen' />
         </div>
     )
 }

@@ -9,6 +9,7 @@ import { Card, CardColor } from '../../Components/Card';
 import { Heading } from '../../Components/Heading';
 import { Input } from '../../Components/Input';
 import { Text } from '../../Components/Text';
+import { convertToMoneyString } from '../../Utils/util';
 interface RevenueCalculatorProps {
     className?: string
 }
@@ -22,7 +23,7 @@ interface CardValueProps {
 }
 
 interface RevenueCalculatorValues {
-    investiments: number,
+    incomings: number,
     expenses: number,
     leisure: number,
     education: number,
@@ -36,7 +37,7 @@ export default function RevenueCalculator({ className }: RevenueCalculatorProps)
 
     const [revenue, setRevenue] = useState<number>(0);
     const [revenueCalculatorValues, setRevenueCalculatorValues] = useState<RevenueCalculatorValues>({
-        investiments: 0,
+        incomings: 0,
         expenses: 0,
         leisure: 0,
         education: 0,
@@ -50,28 +51,28 @@ export default function RevenueCalculator({ className }: RevenueCalculatorProps)
     }
     const cardsInfo: CardValueProps[] = [
         {
-            value: "R$ " + revenueCalculatorValues.investiments.toFixed(2),
+            value: convertToMoneyString(revenueCalculatorValues.incomings),
             name: "Investimentos",
             iconBGColor: "green",
             icon: <Bank />,
             description: "Dinheiro alocado em renda fixa , renda variável , ou guardado em bancos digitais."
         },
         {
-            value: "R$ " + revenueCalculatorValues.expenses.toFixed(2),
+            value: convertToMoneyString(revenueCalculatorValues.expenses),
             name: "Despesas Essenciais",
             iconBGColor: "red",
             icon: <CreditCard />,
             description: "Dinheiro necessário para despesas que não podem ser substituídas ou cortadas."
         },
         {
-            value: "R$ " + revenueCalculatorValues.leisure.toFixed(2),
+            value: convertToMoneyString(revenueCalculatorValues.leisure),
             name: "Lazer",
             iconBGColor: "blue",
             icon: <Sunglasses />,
             description: "Quantia reservada para gastos relacionados a diversão."
         },
         {
-            value: "R$ " + revenueCalculatorValues.education.toFixed(2),
+            value: convertToMoneyString(revenueCalculatorValues.education),
             name: "Educação",
             iconBGColor: "yellow",
             icon: <Book />,
@@ -80,13 +81,13 @@ export default function RevenueCalculator({ className }: RevenueCalculatorProps)
     ]
 
     const calculatePercentage = () => {
-        const INVESTIMENTS_PERCENTAGE = 0.30;
+        const INCOMINGS_PERCENTAGE = 0.30;
         const ESSENTIALS_EXPENSES_PERCENTAGE = 0.55;
         const LEISURE_PERCENTAGE = 0.10;
         const EDUCATION_PERCENTAGE = 0.05;
 
         setRevenueCalculatorValues({
-            investiments: getValues("revenue") * INVESTIMENTS_PERCENTAGE,
+            incomings: getValues("revenue") * INCOMINGS_PERCENTAGE,
             expenses: getValues("revenue") * ESSENTIALS_EXPENSES_PERCENTAGE,
             leisure: getValues("revenue") * LEISURE_PERCENTAGE,
             education: getValues("revenue") * EDUCATION_PERCENTAGE
@@ -119,7 +120,7 @@ export default function RevenueCalculator({ className }: RevenueCalculatorProps)
     return (
         <div className={clsx('md:mx-0 flex flex-col', className)}>
             <Heading size='lg' className='md:mx-0'>Divida sua renda mensal</Heading>
-            <Text size='lg' className=' md:mx-0 text-neutral-400 mb-10'>Equilibre sua renda entre investimentos, educação, despesas essenciais e lazer</Text>
+            <Text size='lg' className=' md:mx-0 text-neutral-400 mb-10'>Equilibre sua renda entre incomingos, educação, despesas essenciais e lazer</Text>
             <div className="flex flex-col md:flex md:flex-row md:items-end gap-4">
                 <form onSubmit={handleSubmit(onSubmit)} className='flex items-end gap-4 md:m-0'>
                     <Text className='flex flex-col gap-2' size='lg' asChild>

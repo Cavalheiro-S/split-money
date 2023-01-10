@@ -15,7 +15,7 @@ interface InfoLastMounthProps {
 
 export const InfoLastMounth = ({ dashboardContent }: InfoLastMounthProps) => {
 
-    const [percentageInvestiments, setPercentageInvestiments] = useState(0);
+    const [percentageIncomings, setPercentageIncomings] = useState(0);
     const [percentageExpenses, setPercentageExpenses] = useState(0);
     const { firestore: { get } } = useRegister();
 
@@ -26,7 +26,7 @@ export const InfoLastMounth = ({ dashboardContent }: InfoLastMounthProps) => {
     }, [dashboardContent])
 
     const calculatePercentUseSalary = async () => {
-        await calculatePercentUse(setPercentageInvestiments, RegisterType.INVESTIMENT);
+        await calculatePercentUse(setPercentageIncomings, RegisterType.INCOMING);
         await calculatePercentUse(setPercentageExpenses, RegisterType.EXPENSE);
     }
 
@@ -42,7 +42,7 @@ export const InfoLastMounth = ({ dashboardContent }: InfoLastMounthProps) => {
             return (
                 <>
                     <CardInfo title={dashboardContent.salary} subTitle="Salário Atual" />
-                    <CardInfo title={dashboardContent.totalInvestiments} subTitle="Investimentos" percentage={percentageInvestiments} />
+                    <CardInfo title={dashboardContent.totalIncomings} subTitle="Receitas" percentage={percentageIncomings} />
                     <CardInfo type="negative" title={dashboardContent.totalExpenses} subTitle="Despesas" percentage={percentageExpenses} />
                 </>
             )
