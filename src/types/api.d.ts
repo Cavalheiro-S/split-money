@@ -6,6 +6,11 @@ interface ApiBase<T> {
     codeError?: string
 }
 
+interface Pagination{
+    count: number,
+    page: number
+}
+
 interface User {
     id: string,
     name?: string,
@@ -18,10 +23,10 @@ interface User {
 interface Transaction {
     id?: string,
     amount: number,
-    category: string,
-    date: Date,
     description: string,
+    date: Date,
     type: "income" | "outcome",
+    category: string,
     userId?: string
 }
 

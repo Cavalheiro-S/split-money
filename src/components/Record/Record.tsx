@@ -15,7 +15,7 @@ import { twMerge } from 'tailwind-merge'
 import { RecordModal } from "./Modal"
 interface RecordProps {
   title: string,
-  data: Transaction[],
+  data: Transaction[] | undefined,
   hasActions?: boolean,
   className?: string,
 }
