@@ -7,7 +7,7 @@ export const useTransaction = (pagination?: Pagination) => {
         queryKey: ["transactions", { count: pagination?.count }, { page: pagination?.page }],
         queryFn: async ({ queryKey }) => {
             console.log(queryKey);
-            return await getTransactions({ userId: "6c21f4ee-57ef-44a3-b7fc-bb2b871855d8", page: 1, count: 10 })
+            return await getTransactions({ userId: "a82529a0-819b-4485-99d2-ec9a4f5bce0a", page: 1, count: 10 })
         },
     })
 

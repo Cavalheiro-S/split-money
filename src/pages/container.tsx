@@ -1,13 +1,9 @@
 import { Header } from "@/components/Header"
-import { Layout } from "@/components/Layout"
-import { Loading } from "@/components/Loading/Loading"
 import { NavBar } from "@/components/NavBar/NavBar"
-import { RootState } from "@/store"
-import { NextComponentType, NextPageContext } from "next"
-import { useRouter } from "next/router"
-import { useEffect } from "react"
-import { useSelector } from "react-redux"
+import { NextComponentType } from "next"
 import { ToastContainer } from "react-toastify"
+import { useMemo } from "react"
+import { parseCookies } from "nookies"
 
 interface Props {
     Component: NextComponentType,
@@ -15,18 +11,14 @@ interface Props {
 }
 
 export default function Page({ Component, pageProps }: Props) {
-    const userState = useSelector((state: RootState) => state.userState)
-    const router = useRouter()
-    useEffect(() => {
-        if (!userState.isAuthenticated && !router.asPath.includes("session/signup")) {
-            router.replace("/session/login")
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userState.isAuthenticated])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const cookies = parseCookies()
+    
+    const isAuthenticated = useMemo(() => !!cookies["split.money.token"], [cookies])
     return (
         <>
             <Header />
-            <NavBar />
+            <NavBar isAuthenticated={isAuthenticated} />
             <Component {...pageProps} />
             <ToastContainer limit={1} />
         </>

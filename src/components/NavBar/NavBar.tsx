@@ -1,13 +1,14 @@
-import { RootState } from '@/store';
 import { HomeOutlined, LogoutOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { Menu, MenuProps, Typography } from 'antd';
+import { Menu, MenuProps } from 'antd';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 
-export const NavBar = () => {
+type NavBarProps = {
+    isAuthenticated: boolean
+}
+
+export const NavBar = ({ isAuthenticated }: NavBarProps) => {
     const router = useRouter()
-    const userState = useSelector((state: RootState) => state.userState)
     const [current, setCurrent] = useState('dashboard');
 
     const items: MenuProps['items'] = [
@@ -15,21 +16,21 @@ export const NavBar = () => {
             label: (<span>Visão Geral</span>),
             key: 'dashboard',
             icon: <HomeOutlined />,
-            disabled: !userState.isAuthenticated,
+            disabled: !isAuthenticated,
             onClick: () => { router.push("/dashboard") }
         },
         {
             label: (<span>Transações</span>),
             key: 'transaction',
             icon: <PlusCircleOutlined />,
-            disabled: !userState.isAuthenticated,
+            disabled: !isAuthenticated,
             onClick: () => { router.push("/transaction") }
         },
         {
             label: (<span>Sair</span>),
             key: 'signout',
             icon: <LogoutOutlined />,
-            disabled: !userState.isAuthenticated,
+            disabled: !isAuthenticated,
             onClick: () => { router.push("/session/logout") }
         },
     ];
@@ -39,9 +40,9 @@ export const NavBar = () => {
     };
 
     return (
-        userState.isAuthenticated
+        isAuthenticated
             ? <Menu
-                className='top-0 left-0 w-48 h-full border-2 border-green-500 col-start-1 row-span-2'
+                className='top-0 left-0 w-48 h-full col-start-1 row-span-2 border-2 border-green-500'
                 onClick={onClick}
                 selectedKeys={[current]}
                 mode="vertical"
