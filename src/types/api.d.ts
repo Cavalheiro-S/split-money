@@ -33,3 +33,8 @@ interface Transaction {
 interface TransactionWithUserId extends Transaction {
     userId: string,
 }
+
+interface AccessToken {
+    access_token: string,
+    expiresIn: number
+}

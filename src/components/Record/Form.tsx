@@ -1,8 +1,5 @@
 import TransactionCategoryTranslate from '@/assets/translate/TransactionCategory.json'
 import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
-import { AppDispatch, RootState } from '@/store'
-import { closeModal } from '@/store/features/modal/ModalSlice'
-import { addTransactionAsync, cleanTransactionActive, updateTransactionAsync } from '@/store/features/transaction/TransactionSlice'
 import { capitalizeFirstLetter } from '@/utils'
 import { Button, Form, Input, Select } from 'antd'
 import moment from 'moment'
@@ -44,14 +41,11 @@ export const RecordForm = () => {
         defaultValues: initialValues,
         resolver: zodResolver(schema)
     })
-    const transactionState = useSelector((state: RootState) => state.transactionState)
-    const userState = useSelector((state: RootState) => state.userState)
-    const dispatch = useDispatch<AppDispatch>()
     const [form] = Form.useForm();
 
     useEffect(() => {
-        if (transactionState.transactionActive.id) {
-            const { description, amount, date, type, category } = transactionState.transactionActive
+        if (true) {
+            const { description, amount, date, type, category } = { ...initialValues }
             setValue('description', description)
             setValue('amount', Number(amount))
             setValue('date', moment(date).format('YYYY-MM-DD'))
@@ -69,8 +63,6 @@ export const RecordForm = () => {
             setIsNewTransaction(false)
         }
         else {
-            setIsNewTransaction(true)
-            form.setFieldsValue(initialValues)
         }
 
         return () => {
@@ -79,24 +71,18 @@ export const RecordForm = () => {
             reset()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [transactionState.transactionActive])
+    }, [])
 
     const onSubmit = async (data: Inputs) => {
-        
-        const { id } = transactionState.transactionActive
+
         const transactionData: TransactionWithUserId = {
             amount: Number(data.amount),
             category: data.category,
             date: moment(data.date).toDate(),
             description: data.description,
             type: data.type,
-            userId: userState.user.id
+            userId: ""
         }
-        dispatch(id
-            ? updateTransactionAsync({ id, ...transactionData })
-            : addTransactionAsync(transactionData))
-        dispatch(closeModal())
-        dispatch(cleanTransactionActive())
     }
 
 
@@ -128,7 +114,7 @@ export const RecordForm = () => {
                 name="date"
                 shouldUpdate
                 control={control}>
-                <Input placeholder='Data' type="date"/>
+                <Input placeholder='Data' type="date" />
             </FormItem>
             <FormItem
                 label="Valor"

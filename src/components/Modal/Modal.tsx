@@ -1,40 +1,25 @@
 'use client'
 
-import { AppDispatch, RootState } from '@/store';
-import { cleanTransactionActive } from '@/store/features/transaction/TransactionSlice';
-import { closeModal, handleModalChange, openModal } from '@/store/features/modal/ModalSlice';
-import { X } from '@phosphor-icons/react';
-import * as Dialog from '@radix-ui/react-dialog';
+import { Button, Modal as ModalAnt } from "antd";
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button, Modal as ModalAnt } from "antd"
 
 interface ModalProps {
-    trigger?: React.ReactNode
     content: React.ReactNode
+    openModal: () => void
+    closeModal: () => void
+    open?: boolean
+    trigger?: React.ReactNode
     title?: string
 }
 
-export const Modal = ({ trigger, content, title }: ModalProps) => {
-    const { isOpen } = useSelector((state: RootState) => state.modalState)
-    const dispatch = useDispatch<AppDispatch>()
-
-    const handleModal = () => {
-        if (!isOpen) {
-            dispatch(openModal())
-        }
-        else {
-            dispatch(closeModal())
-            dispatch(cleanTransactionActive())
-        }
-    }
+export const Modal = ({ content, openModal, closeModal, open }: ModalProps) => {
 
     return (
         <div className='flex justify-end'>
-            <Button onClick={handleModal}>
+            <Button onClick={openModal}>
                 Adicionar
             </Button>
-            <ModalAnt open={isOpen} onCancel={handleModal} footer={[]}>
+            <ModalAnt open={open} onCancel={closeModal} footer={[]}>
                 {content}
             </ModalAnt>
         </div>

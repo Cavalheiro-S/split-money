@@ -1,8 +1,5 @@
 import transactionCategory from "@/assets/translate/TransactionCategory.json"
 import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
-import { AppDispatch } from '@/store'
-import { openModal } from '@/store/features/modal/ModalSlice'
-import { deleteTransactionAsync, setTransactionActive } from '@/store/features/transaction/TransactionSlice'
 import { capitalizeFirstLetter } from '@/utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import { CreditCard, Money } from '@phosphor-icons/react'
@@ -21,10 +18,7 @@ interface RecordProps {
 }
 
 export const TableRecord = ({ className, data, hasActions, title }: RecordProps) => {
-
   const router = useRouter()
-  const dispatch = useDispatch<AppDispatch>()
-
   const columns: ColumnsType<Transaction> = [
     {
       render: (_, record) => {
@@ -84,22 +78,11 @@ export const TableRecord = ({ className, data, hasActions, title }: RecordProps)
     })
 
 
-  const handleDelete = async (id: string) => dispatch(deleteTransactionAsync(id))
+  const handleDelete = async (id: string) => {}
 
-  const handleEdit = async (transaction: Transaction) => {
-    if (transaction.id) {
-      dispatch(setTransactionActive(transaction))
-      dispatch(openModal())
-    }
-  }
+  const handleEdit = async (transaction: Transaction) => {}
 
-  const handleRowClick = (record: Transaction) => {
-    if (!hasActions) {
-      router.push(`/transaction/`)
-      dispatch(openModal())
-      dispatch(setTransactionActive(record))
-    }
-  }
+  const handleRowClick = (record: Transaction) => {}
 
   return (
     <Table
