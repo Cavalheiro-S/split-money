@@ -3,11 +3,7 @@ import { Menu, MenuProps } from 'antd';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-type NavBarProps = {
-    isAuthenticated: boolean
-}
-
-export const NavBar = ({ isAuthenticated }: NavBarProps) => {
+export const NavBar = () => {
     const router = useRouter()
     const [current, setCurrent] = useState('dashboard');
 
@@ -16,21 +12,18 @@ export const NavBar = ({ isAuthenticated }: NavBarProps) => {
             label: (<span>Visão Geral</span>),
             key: 'dashboard',
             icon: <HomeOutlined />,
-            disabled: !isAuthenticated,
             onClick: () => { router.push("/dashboard") }
         },
         {
             label: (<span>Transações</span>),
             key: 'transaction',
             icon: <PlusCircleOutlined />,
-            disabled: !isAuthenticated,
             onClick: () => { router.push("/transaction") }
         },
         {
             label: (<span>Sair</span>),
             key: 'signout',
             icon: <LogoutOutlined />,
-            disabled: !isAuthenticated,
             onClick: () => { router.push("/session/logout") }
         },
     ];
@@ -40,13 +33,12 @@ export const NavBar = ({ isAuthenticated }: NavBarProps) => {
     };
 
     return (
-        isAuthenticated
-            ? <Menu
-                className='top-0 left-0 w-48 h-full col-start-1 row-span-2 border-2 border-green-500'
-                onClick={onClick}
-                selectedKeys={[current]}
-                mode="vertical"
-                items={items} />
-            : null
+    <Menu
+        className='top-0 left-0 w-48 h-full col-start-1 row-span-2 row-start-2 border-2 border-green-500'
+        onClick={onClick}
+        selectedKeys={[current]}
+        mode="vertical"
+        items={items} />
+
     )
 }

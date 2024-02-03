@@ -1,6 +1,5 @@
-import { QueryClientProvider } from "@tanstack/react-query";
 import { AntDesignProvider } from "./AntDesignProvider";
-import { queryClient } from "@/data/query-client";
+import { QueryClientProvider } from "./QueryClientProvider";
 
 interface Props {
     children: React.ReactNode
@@ -9,7 +8,7 @@ interface Props {
 export const Providers = ({ children }: Props) => {
     return (
         <AntDesignProvider>
-            <QueryClientProvider client={queryClient}>
+            <QueryClientProvider>
                 {children}
             </QueryClientProvider>
         </AntDesignProvider>

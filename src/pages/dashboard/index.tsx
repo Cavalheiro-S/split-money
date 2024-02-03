@@ -1,5 +1,7 @@
+'use client'
+
 import { Loading } from "@/components/Loading/Loading";
-import { TableRecord } from "@/components/Record/Record";
+import { TableRecord } from "@/pages/transaction/_components/Record/Record";
 import { useTransaction } from "@/hooks/use-transaction";
 import { Space } from "antd";
 

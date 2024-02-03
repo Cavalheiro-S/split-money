@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import * as z from 'zod'
@@ -18,7 +19,7 @@ const schema = z.object({
 })
 
 export default function Page() {
-  
+
 
   const isAuthenticated = true
   const { handleSubmit, control, setError } = useForm<Inputs>({
@@ -32,9 +33,9 @@ export default function Page() {
   const { signInMutate } = useAuth()
 
   const OnSubmit: SubmitHandler<Inputs> = async data => {
-    const mutate = await signInMutate.mutateAsync({ email: data.email, password: data.password })
-    if(mutate.statusCode === 200)
-      router.push("/dashboard")
+    await signInMutate.mutateAsync({ email: data.email, password: data.password }, {
+      onSuccess: () => router.push("/dashboard")
+    })
   }
 
   return signInMutate.isPending ? <Loading /> : (

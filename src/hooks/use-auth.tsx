@@ -1,6 +1,6 @@
 import { signIn } from "@/services/auth"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import Cookies from "js-cookie"
+import { useMutation } from "@tanstack/react-query"
+import { setCookie } from "nookies"
 import { toast } from "react-toastify"
 
 export const useAuth = () => {
@@ -9,8 +9,10 @@ export const useAuth = () => {
         mutationFn: ({ email, password }: { email: string, password: string }) => signIn(email, password),
         onSuccess: ({ data }) => {
             if (data) {
-                Cookies.set("split.money.token", data.access_token, { expires: new Date(data.expiresIn * 1000) })
-                Cookies.set("split.money.expiresAt", new Date(data.expiresIn * 1000).toISOString())
+                setCookie(null, "split.money.token", data.access_token, {
+                    maxAge: data.expiresIn,
+                    path: "/"
+                })
                 toast.success("Login realizado com sucesso!")
             }
         },

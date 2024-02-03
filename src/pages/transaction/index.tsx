@@ -1,10 +1,8 @@
 'use client'
 
 import { Loading } from '@/components/Loading/Loading';
-import { TableRecord } from '@/components/Record/Record';
 import { useTransaction } from '@/hooks/use-transaction';
-import { useUser } from '@/hooks/use-user';
-import { useSelector } from 'react-redux';
+import { TableRecord } from '@/pages/transaction/_components/Record/Record';
 
 export default function Page() {
     const { transactionsQuery } = useTransaction()
