@@ -1,3 +1,4 @@
+"use client"
 import { HomeOutlined, LogoutOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Menu, MenuProps } from 'antd';
 import { useRouter } from 'next/router';
@@ -33,12 +34,12 @@ export const NavBar = () => {
     };
 
     return (
-    <Menu
-        className='top-0 left-0 w-48 h-full col-start-1 row-span-2 row-start-2 border-2 border-green-500'
-        onClick={onClick}
-        selectedKeys={[current]}
-        mode="vertical"
-        items={items} />
+        <Menu
+            className='top-0 left-0 w-48 h-full col-start-1 row-span-2 row-start-2 border-2 border-green-500'
+            onClick={onClick}
+            selectedKeys={[current]}
+            mode="vertical"
+            items={items} />
 
     )
 }

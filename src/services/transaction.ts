@@ -11,3 +11,9 @@ export const getTransactions = async (querys: RequestGetTransactions) => {
     })
     return response.data.data
 }
+
+export const createTransaction = async (data: RequestCreateTransaction) => {
+    const url = "/transaction"
+    const response = await api.post<ApiBase<ResponseCreateTransaction>>(url, data)
+    return response.data.data
+}

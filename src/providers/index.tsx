@@ -8,7 +8,7 @@ interface Props {
 export const Providers = ({ children }: Props) => {
     return (
         <AntDesignProvider>
-            <QueryClientProvider>
+            <QueryClientProvider >
                 {children}
             </QueryClientProvider>
         </AntDesignProvider>

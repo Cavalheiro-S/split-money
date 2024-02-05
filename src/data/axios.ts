@@ -6,7 +6,6 @@ export const api = axios.create({
     validateStatus: (status) => status <= 500,
 });
 
-
 api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${Cookies.get("split.money.token")}`;
     return config

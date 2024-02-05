@@ -1,11 +1,14 @@
 import { Loading } from '@/components/Loading/Loading'
 import { useAuth } from '@/hooks/use-auth'
+import { useUser } from '@/hooks/use-user'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
 import { useRouter } from 'next/navigation'
+import { parseCookies } from 'nookies'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
+import { toast } from 'react-toastify'
 import * as z from 'zod'
 
 interface Inputs {
@@ -19,9 +22,13 @@ const schema = z.object({
 })
 
 export default function Page() {
+  const { signInMutate } = useAuth()
+  const { mutateGetUser } = useUser()
+  const router = useRouter()
 
+  const data = parseCookies()
+  const isAuthenticated = !!data["split.money.token"]
 
-  const isAuthenticated = true
   const { handleSubmit, control, setError } = useForm<Inputs>({
     defaultValues: {
       email: "",
@@ -29,8 +36,6 @@ export default function Page() {
     },
     resolver: zodResolver(schema)
   })
-  const router = useRouter()
-  const { signInMutate } = useAuth()
 
   const OnSubmit: SubmitHandler<Inputs> = async data => {
     await signInMutate.mutateAsync({ email: data.email, password: data.password }, {

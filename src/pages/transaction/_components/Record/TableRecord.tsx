@@ -1,5 +1,6 @@
 import transactionCategory from "@/assets/translate/TransactionCategory.json"
 import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
+import { useTransaction } from "@/hooks/use-transaction"
 import { capitalizeFirstLetter } from '@/utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import { CreditCard, Money } from '@phosphor-icons/react'
@@ -7,18 +8,19 @@ import { Popconfirm, Space, Table } from "antd"
 import { ColumnsType } from "antd/es/table"
 import moment from "moment"
 import { useRouter } from "next/router"
-import { useDispatch } from 'react-redux'
 import { twMerge } from 'tailwind-merge'
 import { RecordModal } from "./Modal"
 interface RecordProps {
   title: string,
   data: Transaction[] | undefined,
+  onCreate?: (transaction: Transaction) => void,
   hasActions?: boolean,
   className?: string,
 }
 
-export const TableRecord = ({ className, data, hasActions, title }: RecordProps) => {
+export const TableRecord = ({ className, data, onCreate, hasActions, title }: RecordProps) => {
   const router = useRouter()
+  
   const columns: ColumnsType<Transaction> = [
     {
       render: (_, record) => {
@@ -78,11 +80,9 @@ export const TableRecord = ({ className, data, hasActions, title }: RecordProps)
     })
 
 
-  const handleDelete = async (id: string) => {}
+  const handleDelete = async (id: string) => { }
 
-  const handleEdit = async (transaction: Transaction) => {}
-
-  const handleRowClick = (record: Transaction) => {}
+  const handleEdit = async (transaction: Transaction) => { }
 
   return (
     <Table
@@ -98,7 +98,7 @@ export const TableRecord = ({ className, data, hasActions, title }: RecordProps)
       )}
       onRow={record => {
         return {
-          onClick: () => handleRowClick(record)
+          ...(onCreate && {onClick: () => onCreate(record)})
         }
       }} />
 

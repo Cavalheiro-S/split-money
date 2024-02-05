@@ -9,7 +9,7 @@ export const AntDesignProvider = ({ children }: Props) => {
     return (
         <ConfigProvider theme={{
             token: {
-                colorPrimary: "#00B528"
+                colorPrimary: "#00B528",
             },
             
         }}>

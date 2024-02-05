@@ -27,7 +27,6 @@ interface Transaction {
     date: Date,
     type: "income" | "outcome",
     category: string,
-    userId?: string
 }
 
 interface TransactionWithUserId extends Transaction {

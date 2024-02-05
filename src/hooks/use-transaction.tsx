@@ -1,17 +1,34 @@
-import { getTransactions } from "@/services/transaction"
-import { useQuery } from "@tanstack/react-query"
+import { createTransaction, getTransactions } from "@/services/transaction"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useTransaction = (pagination?: Pagination) => {
 
-    const transactionsQuery = useQuery({
-        queryKey: ["transactions", { count: pagination?.count }, { page: pagination?.page }],
-        queryFn: async ({ queryKey }) => {
+    const queryClient = useQueryClient()
+
+    const { data: transactions, isLoading: transactionsLoading } = useQuery({
+        queryKey: ["transactions", pagination],
+        queryFn: ({ queryKey }) => {
+            const userId = localStorage.getItem("userId")
             console.log(queryKey);
-            return await getTransactions({ userId: "a82529a0-819b-4485-99d2-ec9a4f5bce0a", page: 1, count: 10 })
+            if (!userId) return
+            return getTransactions({ userId, page: 1, count: 10 })
         },
     })
 
+    const { mutate: transactionCreateMutate, isPending: transactionCreateLoading } = useMutation({
+        mutationKey: ['createTransaction'],
+        mutationFn: (data: RequestCreateTransaction) => {
+            return createTransaction(data)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["transactions"] })
+        }
+    })
+
     return {
-        transactionsQuery
+        transactions,
+        transactionsLoading,
+        transactionCreateMutate,
+        transactionCreateLoading
     }
 }
