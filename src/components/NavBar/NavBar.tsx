@@ -4,11 +4,8 @@ import { Menu, MenuProps } from 'antd';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-type Props = {
-    isVisible: boolean
-}
 
-export const NavBar = ({ isVisible }: Props) => {
+export const NavBar = () => {
     const router = useRouter()
     const [current, setCurrent] = useState('dashboard');
 
@@ -37,14 +34,12 @@ export const NavBar = ({ isVisible }: Props) => {
         setCurrent(e.key);
     };
 
-    return isVisible 
-    ? (
+    return (
         <Menu
-            className='top-0 left-0 w-48 h-full col-start-1 row-span-2 row-start-2 border-2 border-green-500'
+            className='top-0 left-0 w-48 h-full col-start-1 row-span-3 row-start-2 border-2 border-green-500'
             onClick={onClick}
             selectedKeys={[current]}
             mode="vertical"
             items={items} />
     )
-    : null
 }

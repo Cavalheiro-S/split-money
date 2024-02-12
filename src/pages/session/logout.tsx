@@ -1,13 +1,17 @@
+import { AuthContext } from "@/context/auth-context";
 import { Button, Typography } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie"
+import { destroyCookie } from "nookies"
+import { useContext } from "react";
 
 export default function Page() {
     const router = useRouter()
-    const handleSignOut = async () => {
-        Cookies.remove("split.money.token")
-        Cookies.remove("split.money.expiresAt")
+    const { setIsAuthenticated } = useContext(AuthContext)
+
+    const handleSignOut = () => {
+        destroyCookie(null, "split.money.token")
+        setIsAuthenticated(false)
         router.push("/")
     }
 

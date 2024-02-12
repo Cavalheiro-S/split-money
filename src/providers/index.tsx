@@ -1,3 +1,4 @@
+import { AuthContextProvider } from "@/context/auth-context";
 import { AntDesignProvider } from "./AntDesignProvider";
 import { QueryClientProvider } from "./QueryClientProvider";
 
@@ -9,7 +10,9 @@ export const Providers = ({ children }: Props) => {
     return (
         <AntDesignProvider>
             <QueryClientProvider >
-                {children}
+                <AuthContextProvider>
+                    {children}
+                </AuthContextProvider>
             </QueryClientProvider>
         </AntDesignProvider>
     )

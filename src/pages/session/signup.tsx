@@ -1,5 +1,3 @@
-import { AppDispatch, RootState } from '@/store'
-import { setUserError, signUpUserAsync } from '@/store/features/user/UserSlice'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
 import { useRouter } from 'next/navigation'
@@ -44,31 +42,10 @@ export default function Page() {
         },
         resolver: zodResolver(schema)
     })
-    const { error, isAuthenticated } = useSelector((state: RootState) => state.userState)
     const router = useRouter()
-    const dispatch = useDispatch<AppDispatch>()
-
-    useEffect(() => {
-        isAuthenticated && router.push('/dashboard')
-        return () => {
-            dispatch(setUserError(""))
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, router])
-
-    useEffect(() => {
-        error && setError("email", { message: error })
-        return () => {
-            dispatch(setUserError(""))
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error])
 
     const OnSubmit: SubmitHandler<Inputs> = async data => {
         try {
-            const response = await dispatch(signUpUserAsync(data))
-            if (response.payload)
-                router.replace("/dashboard")
 
         }
         catch (err) {

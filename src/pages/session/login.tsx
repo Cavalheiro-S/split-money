@@ -1,14 +1,14 @@
 import { Loading } from '@/components/Loading/Loading'
+import { AuthContext } from '@/context/auth-context'
 import { useAuth } from '@/hooks/use-auth'
 import { useUser } from '@/hooks/use-user'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
 import { useRouter } from 'next/navigation'
 import { parseCookies } from 'nookies'
-import { useEffect } from 'react'
+import { useContext } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
-import { toast } from 'react-toastify'
 import * as z from 'zod'
 
 interface Inputs {
@@ -22,12 +22,10 @@ const schema = z.object({
 })
 
 export default function Page() {
+  const { isAuthenticated } = useContext(AuthContext)
   const { signInMutate } = useAuth()
   const { mutateGetUser } = useUser()
   const router = useRouter()
-
-  const data = parseCookies()
-  const isAuthenticated = !!data["split.money.token"]
 
   const { handleSubmit, control, setError } = useForm<Inputs>({
     defaultValues: {
@@ -44,7 +42,7 @@ export default function Page() {
   }
 
   return signInMutate.isPending ? <Loading /> : (
-    <div className={`flex flex-col gap-5 p-8 m-auto bg-white rounded ${isAuthenticated ? "col-start-2" : "col-start-1 col-span-2"}`}>
+    <div className={`flex flex-col gap-5 p-8 m-auto bg-white rounded row-start-2 ${isAuthenticated ? "col-start-2" : "col-span-2"}`}>
       <div>
         <h3 className='text-2xl font-semibold'>Acesse sua conta</h3>
         <span className='text-gray-500'>Informe seus dados para acessar , ou acesse com outra forma de login</span>
