@@ -1,23 +1,35 @@
 import { parseCookies } from "nookies";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 
 type Props = {
     isAuthenticated: boolean;
     setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>
+    user: AccessTokenPayload | null
+    setUser: React.Dispatch<React.SetStateAction<AccessTokenPayload | null>>
 }
 
 export const AuthContext = createContext<Props>({} as Props)
 
 export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    useEffect(() => {
+    const [user, setUser] = useState<AccessTokenPayload | null>(null)
+
+    const initialize = useCallback(() => {
         const cookies = parseCookies()
-        setIsAuthenticated(!!cookies['split.money.token'])
+        if (cookies["split.money.token"]) {
+            setIsAuthenticated(true)
+        }
     }, [])
+
+    useEffect(() => {
+        initialize();
+      }, [initialize]);
 
     const value = {
         isAuthenticated,
-        setIsAuthenticated
+        setIsAuthenticated,
+        user,
+        setUser
     }
 
     return (

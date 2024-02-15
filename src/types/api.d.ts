@@ -37,3 +37,9 @@ interface AccessToken {
     access_token: string,
     expiresIn: number
 }
+
+interface AccessTokenPayload{
+    id: string,
+    email: string
+    exp: number
+}
