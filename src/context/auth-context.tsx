@@ -14,17 +14,6 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [user, setUser] = useState<AccessTokenPayload | null>(null)
 
-    const initialize = useCallback(() => {
-        const cookies = parseCookies()
-        if (cookies["split.money.token"]) {
-            setIsAuthenticated(true)
-        }
-    }, [])
-
-    useEffect(() => {
-        initialize();
-      }, [initialize]);
-
     const value = {
         isAuthenticated,
         setIsAuthenticated,

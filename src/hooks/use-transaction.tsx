@@ -1,18 +1,22 @@
-import { AuthContext } from "@/context/auth-context"
 import { createTransaction, getTransactions } from "@/services/transaction"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useContext } from "react"
+import { useEffect, useState } from "react"
 
 export const useTransaction = (pagination?: Pagination) => {
-
     const queryClient = useQueryClient()
-    const { user } = useContext(AuthContext)
+    const [userId, setUserId] = useState("")
+
+    useEffect(() => {
+        const id = localStorage.getItem("userId")
+        if (id)
+            setUserId(id)
+    }, [])
+
 
     const { data: transactions, isLoading: transactionsLoading } = useQuery({
-        queryKey: ["transactions", pagination],
+        queryKey: ["transactions", pagination, userId],
         queryFn: ({ queryKey }) => {
-            if (!user?.id) return null
-            return getTransactions({ userId: user.id, page: 1, count: 10 })
+            return getTransactions({ userId, page: 1, count: 10 })
         },
     })
 

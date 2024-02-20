@@ -1,5 +1,6 @@
 import { Loading } from '@/components/Loading/Loading'
 import { AuthContext } from '@/context/auth-context'
+import { api } from '@/data/axios'
 import { useAuth } from '@/hooks/use-auth'
 import { useUser } from '@/hooks/use-user'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -27,7 +28,7 @@ export default function Page() {
   const { mutateGetUser } = useUser()
   const router = useRouter()
 
-  const { handleSubmit, control, setError } = useForm<Inputs>({
+  const { handleSubmit, control, } = useForm<Inputs>({
     defaultValues: {
       email: "",
       password: ""
@@ -37,7 +38,13 @@ export default function Page() {
 
   const OnSubmit: SubmitHandler<Inputs> = async data => {
     await signInMutate.mutateAsync({ email: data.email, password: data.password }, {
-      onSuccess: () => router.push("/dashboard")
+      onSuccess: async () => {
+        await mutateGetUser.mutateAsync(data.email, {
+          onSuccess: () => {
+            router.push("/dashboard")
+          }
+        })
+      }
     })
   }
 

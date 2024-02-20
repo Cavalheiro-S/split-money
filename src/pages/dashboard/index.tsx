@@ -1,5 +1,3 @@
-'use client'
-
 import { Loading } from "@/components/Loading/Loading";
 import { useTransaction } from "@/hooks/use-transaction";
 import { TableRecord } from "@/pages/transaction/_components/Record/TableRecord";
