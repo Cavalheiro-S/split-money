@@ -9,7 +9,7 @@ import { useContext, useState } from 'react';
 
 export const NavBar = () => {
     const [current, setCurrent] = useState('dashboard');
-    const { isAuthenticated } = useContext(AuthContext)
+    const { token } = useContext(AuthContext)
 
     const items: MenuProps['items'] = [
         {
@@ -33,7 +33,7 @@ export const NavBar = () => {
         setCurrent(e.key);
     };
 
-    return isAuthenticated ? (
+    return token ? (
         <Menu
             className='top-0 left-0 w-48 h-full col-start-1 row-span-3 row-start-2 border-2 border-green-500'
             onClick={onClick}

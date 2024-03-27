@@ -5,11 +5,7 @@ import { useTransaction } from '@/hooks/use-transaction';
 import { TableRecord } from '@/pages/transaction/_components/Record/TableRecord';
 
 export default function Page() {
-    const { transactions, transactionsLoading, transactionCreateMutate } = useTransaction()
-
-    const handleAddTransaction = () => {
-        
-    }
+    const { transactions, transactionsLoading } = useTransaction()
 
     return transactionsLoading ? <Loading /> : (
         <div className='flex justify-center min-h-screen px-10 pt-10'>

@@ -12,6 +12,6 @@ export const RecordModal = () => {
             openModal={() => setOpen(true)}
             open={open}
             trigger={<Button>Adicionar</Button>}
-            content={<RecordForm />}
+            content={<RecordForm setOpen={setOpen} />}
         />)
 }

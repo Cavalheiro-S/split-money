@@ -1,14 +1,15 @@
 import TransactionCategoryTranslate from '@/assets/translate/TransactionCategory.json'
 import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
+import { useTransaction } from '@/hooks/use-transaction'
 import { capitalizeFirstLetter } from '@/utils'
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input, Select } from 'antd'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
-import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import * as z from 'zod'
-import { zodResolver } from "@hookform/resolvers/zod"
 
 interface Inputs {
     description: string,
@@ -18,15 +19,20 @@ interface Inputs {
     category: string
 }
 
-const schema = z.object({
-    description: z.string().nonempty({ message: "Descrição deve ter entre 3 e 50 caracteres" }),
-    amount: z.coerce.number().min(0, { message: "Valor deve ser maior que 0" }),
-    date: z.string(),
-    type: z.enum(["income", "outcome"]),
-    category: z.string().nonempty({ message: "Categoria é obrigatória" })
-})
+interface RecordFormProps {
+    transaction?: Transaction
+    setOpen: (value: boolean) => void
+}
 
-export const RecordForm = () => {
+export const RecordForm = ({ transaction, setOpen }: RecordFormProps) => {
+
+    const schema = z.object({
+        description: z.string().nonempty({ message: "Descrição deve ter entre 3 e 50 caracteres" }),
+        amount: z.coerce.number().min(0, { message: "Valor deve ser maior que 0" }),
+        date: z.string(),
+        type: z.enum(["income", "outcome"]),
+        category: z.string().nonempty({ message: "Categoria é obrigatória" })
+    })
 
     const initialValues = {
         description: "",
@@ -36,12 +42,12 @@ export const RecordForm = () => {
         category: TransactionCategoryEnum.Others
     } as Inputs
 
-    const [isNewTransaction, setIsNewTransaction] = useState(false)
     const { handleSubmit, setValue, control, reset } = useForm<Inputs>({
         defaultValues: initialValues,
         resolver: zodResolver(schema)
     })
     const [form] = Form.useForm();
+    const { transactionCreateMutate } = useTransaction()
 
     useEffect(() => {
         if (true) {
@@ -60,7 +66,6 @@ export const RecordForm = () => {
                 category: capitalizeFirstLetter(category),
             }
             form.setFieldsValue(transactionToUpdate)
-            setIsNewTransaction(false)
         }
         else {
         }
@@ -74,15 +79,27 @@ export const RecordForm = () => {
     }, [])
 
     const onSubmit = async (data: Inputs) => {
-
-        const transactionData: TransactionWithUserId = {
-            amount: Number(data.amount),
-            category: data.category,
-            date: moment(data.date).toDate(),
-            description: data.description,
-            type: data.type,
-            userId: ""
+        try {
+            const dataMap: RequestCreateTransaction = {
+                amount: data.amount,
+                category: data.category,
+                date: moment(data.date).format('YYYY-MM-DD'),
+                description: data.description,
+                type: data.type,
+                userId: localStorage.getItem("userId") || ""
+            }
+            await transactionCreateMutate.mutateAsync(dataMap, {
+                onSuccess: () => {
+                    toast.success("Lançamento adicionado com sucesso")
+                    
+                    setOpen(false)
+                }
+            })
         }
+        catch (error) {
+            console.log(error)
+        }
+
     }
 
 
@@ -143,6 +160,6 @@ export const RecordForm = () => {
                 control={control}>
                 <Select placeholder='Categoria' options={renderCategories()} />
             </FormItem>
-            <Button className='w-full' size='large' htmlType='submit'>{isNewTransaction ? "Adicionar" : "Atualizar"}</Button>
+            <Button className='w-full' size='large' htmlType='submit'>{transaction ? "Atualizar" : "Adicionar"}</Button>
         </Form>)
 }

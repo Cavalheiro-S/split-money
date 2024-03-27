@@ -10,17 +10,17 @@ import moment from "moment"
 import { useRouter } from "next/router"
 import { twMerge } from 'tailwind-merge'
 import { RecordModal } from "./Modal"
+import { toast } from "react-toastify"
 interface RecordProps {
   title: string,
   data: Transaction[] | undefined,
-  onCreate?: (transaction: Transaction) => void,
+  onCreate?: (transaction: Transaction) => Promise<void>,
   hasActions?: boolean,
   className?: string,
 }
 
 export const TableRecord = ({ className, data, onCreate, hasActions, title }: RecordProps) => {
-  const router = useRouter()
-  
+  const { transactionDeleteMutate } = useTransaction()
   const columns: ColumnsType<Transaction> = [
     {
       render: (_, record) => {
@@ -80,7 +80,16 @@ export const TableRecord = ({ className, data, onCreate, hasActions, title }: Re
     })
 
 
-  const handleDelete = async (id: string) => { }
+  const handleDelete = async (id: string) => {
+    try {
+      await transactionDeleteMutate.mutateAsync(id)
+      toast.success("Transação deletada com sucesso")
+    }
+    catch (error) {
+      console.log(error)
+      toast.error("Erro ao deletar a transação")
+    }
+  }
 
   const handleEdit = async (transaction: Transaction) => { }
 
@@ -98,7 +107,7 @@ export const TableRecord = ({ className, data, onCreate, hasActions, title }: Re
       )}
       onRow={record => {
         return {
-          ...(onCreate && {onClick: () => onCreate(record)})
+          ...(onCreate && { onClick: () => onCreate(record) })
         }
       }} />
 

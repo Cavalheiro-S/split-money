@@ -1,4 +1,5 @@
 import { AuthContext } from "@/context/auth-context";
+import { JWT_TOKEN_COOKIE } from "@/global.config";
 import { Button, Typography } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,11 +8,11 @@ import { useContext } from "react";
 
 export default function Page() {
     const router = useRouter()
-    const { setIsAuthenticated } = useContext(AuthContext)
+    const { setToken } = useContext(AuthContext)
 
     const handleSignOut = () => {
-        destroyCookie(null, "split.money.token")
-        setIsAuthenticated(false)
+        destroyCookie(null, JWT_TOKEN_COOKIE, {path: "/"})
+        setToken(null)
         router.push("/")
     }
 

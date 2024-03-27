@@ -1,4 +1,4 @@
-import { createTransaction, getTransactions } from "@/services/transaction"
+import { createTransaction, deleteTransaction, getTransactions } from "@/services/transaction"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 
@@ -12,7 +12,6 @@ export const useTransaction = (pagination?: Pagination) => {
             setUserId(id)
     }, [])
 
-
     const { data: transactions, isLoading: transactionsLoading } = useQuery({
         queryKey: ["transactions", pagination, userId],
         queryFn: ({ queryKey }) => {
@@ -20,7 +19,7 @@ export const useTransaction = (pagination?: Pagination) => {
         },
     })
 
-    const { mutate: transactionCreateMutate, isPending: transactionCreateLoading } = useMutation({
+    const transactionCreateMutate = useMutation({
         mutationKey: ['createTransaction'],
         mutationFn: (data: RequestCreateTransaction) => {
             return createTransaction(data)
@@ -30,10 +29,18 @@ export const useTransaction = (pagination?: Pagination) => {
         }
     })
 
+    const transactionDeleteMutate = useMutation({
+        mutationKey: ['deleteTransaction'],
+        mutationFn: (id: string) => deleteTransaction(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["transactions"] })
+        }
+    })
+
     return {
         transactions,
         transactionsLoading,
         transactionCreateMutate,
-        transactionCreateLoading
+        transactionDeleteMutate
     }
 }

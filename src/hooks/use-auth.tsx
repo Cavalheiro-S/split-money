@@ -1,4 +1,5 @@
 import { AuthContext } from "@/context/auth-context"
+import { JWT_TOKEN_COOKIE } from "@/global.config"
 import { signIn } from "@/services/auth"
 import { useMutation } from "@tanstack/react-query"
 import { jwtDecode } from "jwt-decode"
@@ -7,7 +8,7 @@ import { useContext } from "react"
 import { toast } from "react-toastify"
 
 export const useAuth = () => {
-    const { setIsAuthenticated, setUser } = useContext(AuthContext)
+    const { setToken, setUser } = useContext(AuthContext)
 
     const signInMutate = useMutation({
         mutationKey: ["auth"],
@@ -15,12 +16,12 @@ export const useAuth = () => {
         onSuccess: async ({ data }) => {
             if (data) {
                 const dataDecode = jwtDecode<AccessTokenPayload>(data.access_token)
-                setCookie(null, "split.money.token", data.access_token, {
+                setCookie(null, JWT_TOKEN_COOKIE, data.access_token, {
                     expires: new Date(dataDecode.exp * 1000),
                     path: "/"
                 })
                 localStorage.setItem('userId', dataDecode.id)
-                setIsAuthenticated(true)
+                setToken(data.access_token)
                 setUser(dataDecode)
                 toast.success("Login realizado com sucesso!")
             }

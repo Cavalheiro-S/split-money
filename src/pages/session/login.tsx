@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
 import { useRouter } from 'next/navigation'
 import { parseCookies } from 'nookies'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import * as z from 'zod'
@@ -23,10 +23,16 @@ const schema = z.object({
 })
 
 export default function Page() {
-  const { isAuthenticated } = useContext(AuthContext)
+  const { token } = useContext(AuthContext)
   const { signInMutate } = useAuth()
   const { mutateGetUser } = useUser()
   const router = useRouter()
+
+  useEffect(() => {
+    if(token)
+      router.push("/dashboard")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   const { handleSubmit, control, } = useForm<Inputs>({
     defaultValues: {
@@ -49,7 +55,7 @@ export default function Page() {
   }
 
   return signInMutate.isPending ? <Loading /> : (
-    <div className={`flex flex-col gap-5 p-8 m-auto bg-white rounded row-start-2 ${isAuthenticated ? "col-start-2" : "col-span-2"}`}>
+    <div className={`flex flex-col gap-5 p-8 m-auto bg-white rounded row-start-2 ${token ? "col-start-2" : "col-span-2"}`}>
       <div>
         <h3 className='text-2xl font-semibold'>Acesse sua conta</h3>
         <span className='text-gray-500'>Informe seus dados para acessar , ou acesse com outra forma de login</span>

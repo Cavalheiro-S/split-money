@@ -1,0 +1,1 @@
+export const JWT_TOKEN_COOKIE= "split_money_token"

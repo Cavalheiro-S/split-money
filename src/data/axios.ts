@@ -1,5 +1,6 @@
+import { JWT_TOKEN_COOKIE } from "@/global.config";
 import axios from "axios";
-import Cookies from "js-cookie";
+import { parseCookies } from "nookies";
 
 export const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -7,6 +8,8 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-    config.headers.Authorization = `Bearer ${Cookies.get("split.money.token")}`;
+    const cookies = parseCookies()
+    const cookieToken = cookies[JWT_TOKEN_COOKIE]
+    config.headers.Authorization = `Bearer ${cookieToken}`;
     return config
 })
