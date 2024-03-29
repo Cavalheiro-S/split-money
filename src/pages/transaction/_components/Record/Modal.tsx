@@ -1,9 +1,9 @@
 import { Modal } from '@/components/Modal/Modal'
 import { Button } from 'antd'
 import { useState } from 'react'
-import { RecordForm } from './Form'
+import RecordForm from './Form'
 
-export const RecordModal = () => {
+const RecordModal = () => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -15,3 +15,5 @@ export const RecordModal = () => {
             content={<RecordForm setOpen={setOpen} />}
         />)
 }
+
+export default RecordModal

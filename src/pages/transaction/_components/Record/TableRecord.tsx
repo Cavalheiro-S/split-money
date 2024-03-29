@@ -9,7 +9,7 @@ import { ColumnsType } from "antd/es/table"
 import moment from "moment"
 import { useRouter } from "next/router"
 import { twMerge } from 'tailwind-merge'
-import { RecordModal } from "./Modal"
+import RecordModal from "./Modal"
 import { toast } from "react-toastify"
 interface RecordProps {
   title: string,
@@ -19,7 +19,7 @@ interface RecordProps {
   className?: string,
 }
 
-export const TableRecord = ({ className, data, onCreate, hasActions, title }: RecordProps) => {
+const TableRecord = ({ className, data, onCreate, hasActions, title }: RecordProps) => {
   const { transactionDeleteMutate } = useTransaction()
   const columns: ColumnsType<Transaction> = [
     {
@@ -114,3 +114,5 @@ export const TableRecord = ({ className, data, onCreate, hasActions, title }: Re
 
   )
 }
+
+export default TableRecord

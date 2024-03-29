@@ -24,7 +24,7 @@ interface RecordFormProps {
     setOpen: (value: boolean) => void
 }
 
-export const RecordForm = ({ transaction, setOpen }: RecordFormProps) => {
+const RecordForm = ({ transaction, setOpen }: RecordFormProps) => {
 
     const schema = z.object({
         description: z.string().nonempty({ message: "Descrição deve ter entre 3 e 50 caracteres" }),
@@ -163,3 +163,4 @@ export const RecordForm = ({ transaction, setOpen }: RecordFormProps) => {
             <Button className='w-full' size='large' htmlType='submit'>{transaction ? "Atualizar" : "Adicionar"}</Button>
         </Form>)
 }
+export default RecordForm
