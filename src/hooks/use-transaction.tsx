@@ -1,22 +1,12 @@
 import { createTransaction, deleteTransaction, getTransactions } from "@/services/transaction"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
 
-export const useTransaction = (pagination?: Pagination) => {
+export const useTransaction = (filter?: FilterTransaction) => {
     const queryClient = useQueryClient()
-    const [userId, setUserId] = useState("")
-
-    useEffect(() => {
-        const id = localStorage.getItem("userId")
-        if (id)
-            setUserId(id)
-    }, [])
 
     const { data: transactions, isLoading: transactionsLoading } = useQuery({
-        queryKey: ["transactions", pagination, userId],
-        queryFn: ({ queryKey }) => {
-            return getTransactions({ userId, page: 1, count: 10 })
-        },
+        queryKey: ["transactions", filter],
+        queryFn: () => getTransactions(filter ?? {} as FilterTransaction),
     })
 
     const transactionCreateMutate = useMutation({

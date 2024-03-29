@@ -1,9 +1,3 @@
-type RequestGetTransactions = {
-    userId: string
-    page: number
-    count: number
-}
-
 type ResponseGetTransactions = {
     id: string;
     amount: number;
@@ -34,3 +28,7 @@ type ResponseCreateTransaction = {
 }
 
 type TransactionType = "income" | "outcome"
+
+type FilterTransaction = Pagination & {
+    type?: TransactionType
+}

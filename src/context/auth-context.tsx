@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { parseCookies, setCookie, destroyCookie } from "nookies"
 import { JWT_TOKEN_COOKIE } from "@/global.config";
@@ -21,34 +21,26 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     const setToken = (newToken: string | null) => {
         setToken_(newToken)
     }
+    const verifyCookieExists = useCallback(() => {
+        const cookies = parseCookies()
+        const cookieToken = cookies[JWT_TOKEN_COOKIE]
+        if (!cookieToken) {
+            setToken(null)
+            if (!window.location.pathname.includes("session/login"))
+                router.replace("/session/login")
+        }
+        else
+            setToken(cookieToken)
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token])
 
     useEffect(() => {
-        const verifyCookieExists = () => {
-            const cookies = parseCookies()
-            const cookieToken = cookies[JWT_TOKEN_COOKIE]
-            if (!cookieToken) {
-                setToken(null)
-            }
 
-        }
-        const intervalId = setInterval(verifyCookieExists)
+        const intervalId = setInterval(verifyCookieExists, 1000)
 
         return () => clearInterval(intervalId)
     }, [])
-
-    useEffect(() => {
-        if (token) {
-            setCookie(null, JWT_TOKEN_COOKIE, token, {
-                expires: new Date(Date.now() + 1000 * 60 * 60),// 1 hour
-                path: "/",
-            })
-        } else {
-            delete axios.defaults.headers.common["Authorization"];
-            destroyCookie(null, JWT_TOKEN_COOKIE, { path: "/" })
-            router.replace("/session/login")
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token]);
 
     const contextValue = useMemo(
         () => ({

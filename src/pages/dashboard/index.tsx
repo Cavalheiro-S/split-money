@@ -1,15 +1,15 @@
-import { Loading } from "@/components/Loading/Loading";
 import { useTransaction } from "@/hooks/use-transaction";
 import { TableRecord } from "@/pages/transaction/_components/Record/TableRecord";
 import { Space } from "antd";
 
 export default function Page() {
-    const { transactions, transactionsLoading } = useTransaction()
+    const { transactions: transactionsIncome } = useTransaction({ page: 1, count: 10, type: "income" })
+    const { transactions: transactionsOutcome } = useTransaction({ page: 1, count: 10, type: "outcome" })
 
-    return transactionsLoading ? <Loading /> : (
+    return (
         <Space direction="vertical" className="col-start-2 px-10 mt-10">
-            <TableRecord data={transactions ?? []} title="Últimos Lançamentos" />
-            <TableRecord data={transactions ?? []} title="Últimas Despesas" />
+            <TableRecord data={transactionsIncome ?? []} title="Últimos Lançamentos" />
+            <TableRecord data={transactionsOutcome ?? []} title="Últimas Despesas" />
         </Space>
     )
 }

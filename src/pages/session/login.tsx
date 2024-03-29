@@ -1,12 +1,10 @@
 import { Loading } from '@/components/Loading/Loading'
 import { AuthContext } from '@/context/auth-context'
-import { api } from '@/data/axios'
 import { useAuth } from '@/hooks/use-auth'
 import { useUser } from '@/hooks/use-user'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
-import { useRouter } from 'next/navigation'
-import { parseCookies } from 'nookies'
+import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
@@ -28,12 +26,6 @@ export default function Page() {
   const { mutateGetUser } = useUser()
   const router = useRouter()
 
-  useEffect(() => {
-    if(token)
-      router.push("/dashboard")
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token])
-
   const { handleSubmit, control, } = useForm<Inputs>({
     defaultValues: {
       email: "",
@@ -54,7 +46,7 @@ export default function Page() {
     })
   }
 
-  return signInMutate.isPending ? <Loading /> : (
+  return (
     <div className={`flex flex-col gap-5 p-8 m-auto bg-white rounded row-start-2 ${token ? "col-start-2" : "col-span-2"}`}>
       <div>
         <h3 className='text-2xl font-semibold'>Acesse sua conta</h3>

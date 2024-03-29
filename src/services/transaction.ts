@@ -1,14 +1,8 @@
 import { api } from "@/data/axios";
 
-export const getTransactions = async (querys: RequestGetTransactions) => {
+export const getTransactions = async (filter: FilterTransaction) => {
     const url = "/transaction"
-    const response = await api.get<ApiBase<ResponseGetTransactions>>(url, {
-        params: {
-            userId: querys.userId,
-            page: querys.page,
-            count: querys.count
-        }
-    })
+    const response = await api.get<ApiBase<ResponseGetTransactions>>(url, { params: filter })
     return response.data.data
 }
 

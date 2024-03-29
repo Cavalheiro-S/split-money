@@ -1,5 +1,5 @@
 import { Button, Space } from "antd";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 export default function Page() {
 
