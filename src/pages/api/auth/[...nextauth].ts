@@ -1,4 +1,3 @@
-import { api } from "@/data/axios";
 import { AuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";

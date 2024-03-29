@@ -1,5 +1,5 @@
 import { useTransaction } from '@/hooks/use-transaction';
-import { TableRecord } from '@/pages/transaction/_components/Record/TableRecord';
+import TableRecord from '@/pages/transaction/_components/Record/TableRecord';
 
 export default function Page() {
     const { transactions } = useTransaction({ page: 1, count: 10 })

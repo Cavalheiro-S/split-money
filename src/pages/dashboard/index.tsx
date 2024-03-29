@@ -1,5 +1,5 @@
 import { useTransaction } from "@/hooks/use-transaction";
-import { TableRecord } from "@/pages/transaction/_components/Record/TableRecord";
+import TableRecord from "@/pages/transaction/_components/Record/TableRecord";
 import { Space } from "antd";
 
 export default function Page() {
