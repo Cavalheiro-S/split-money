@@ -1,8 +1,7 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import { parseCookies, setCookie, destroyCookie } from "nookies"
 import { JWT_TOKEN_COOKIE } from "@/global.config";
 import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 
 type Props = {
     token: string | null;
@@ -40,6 +39,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
         const intervalId = setInterval(verifyCookieExists, 1000)
 
         return () => clearInterval(intervalId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const contextValue = useMemo(
