@@ -5,7 +5,6 @@ type ResponseGetTransactions = {
     date: Date;
     type: TransactionType;
     category: string;
-    userId: string;
 }[]
 
 type RequestCreateTransaction = {
@@ -14,7 +13,10 @@ type RequestCreateTransaction = {
     description: string;
     date: string;
     type: TransactionType;
-    userId: string;
+}
+
+type RequestUpdateTransaction = RequestCreateTransaction & {
+    id: string
 }
 
 type ResponseCreateTransaction = {

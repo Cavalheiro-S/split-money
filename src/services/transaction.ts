@@ -12,6 +12,12 @@ export const createTransaction = async (data: RequestCreateTransaction) => {
     return response.data.data
 }
 
+export const updateTransaction = async (data: RequestUpdateTransaction) => {
+    const url = `/transaction?id=${data.id}`
+    const response = await api.patch(url, data)
+    return response.data.data
+}
+
 export const deleteTransaction = async (id: string) => {
     const url = `/transaction?id=${id}`
     const response = await api.delete(url)

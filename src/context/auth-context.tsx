@@ -26,7 +26,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
         if (!cookieToken) {
             setToken(null)
             if (!window.location.pathname.includes("session/login"))
-                router.replace("/session/login")
+                router.push("/session/login")
         }
         else
             setToken(cookieToken)

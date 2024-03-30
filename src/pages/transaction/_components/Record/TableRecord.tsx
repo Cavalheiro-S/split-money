@@ -1,26 +1,27 @@
 import transactionCategory from "@/assets/translate/TransactionCategory.json"
 import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
-import { useTransaction } from "@/hooks/use-transaction"
 import { capitalizeFirstLetter } from '@/utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import { CreditCard, Money } from '@phosphor-icons/react'
 import { Popconfirm, Space, Table } from "antd"
 import { ColumnsType } from "antd/es/table"
 import moment from "moment"
-import { useRouter } from "next/router"
 import { twMerge } from 'tailwind-merge'
 import RecordModal from "./Modal"
-import { toast } from "react-toastify"
+import { useState } from "react"
 interface RecordProps {
   title: string,
   data: Transaction[] | undefined,
   onCreate?: (transaction: Transaction) => Promise<void>,
+  onDelete: (id: string) => Promise<void>
+  onEdit: (transaction: Transaction) => Promise<void>
   hasActions?: boolean,
   className?: string,
 }
 
-const TableRecord = ({ className, data, onCreate, hasActions, title }: RecordProps) => {
-  const { transactionDeleteMutate } = useTransaction()
+const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, title }: RecordProps) => {
+  const [selectedRow, setSelectedRow] = useState<Transaction | undefined>()
+  const [open, setOpen] = useState(false)
   const columns: ColumnsType<Transaction> = [
     {
       render: (_, record) => {
@@ -64,34 +65,24 @@ const TableRecord = ({ className, data, onCreate, hasActions, title }: RecordPro
       dataIndex: 'id',
       render: (_, record) => (
         <Space>
-          <span className='cursor-pointer hover:text-blue-600' onClick={() => handleEdit(record)}>Editar</span>
+          <span className='cursor-pointer hover:text-blue-600'
+            onClick={() => {
+              setSelectedRow(record)
+              setOpen(true)
+            }}>Editar</span>
           <Popconfirm
             icon={<DeleteOutlined style={{ color: "red" }} />}
             title="Deletar a transação"
             okText="Deletar"
             cancelText="Não"
             okButtonProps={{ danger: true }}
-            onConfirm={() => handleDelete(record.id ?? "")}
+            onConfirm={() => onDelete(record.id ?? "")}
             description={`Você tem certeza que deseja deletar a transação ${record.description}?`}>
             <span className='cursor-pointer hover:text-red-600'>Excluir</span>
           </Popconfirm>
         </Space>
       )
     })
-
-
-  const handleDelete = async (id: string) => {
-    try {
-      await transactionDeleteMutate.mutateAsync(id)
-      toast.success("Transação deletada com sucesso")
-    }
-    catch (error) {
-      console.log(error)
-      toast.error("Erro ao deletar a transação")
-    }
-  }
-
-  const handleEdit = async (transaction: Transaction) => { }
 
   return (
     <Table
@@ -102,7 +93,7 @@ const TableRecord = ({ className, data, onCreate, hasActions, title }: RecordPro
       title={() => (
         <div className='flex items-center justify-between w-full'>
           <h3 className='font-sans font-semibold text-gray-700'>{title}</h3>
-          {hasActions && <RecordModal />}
+          {hasActions && <RecordModal open={open} setOpen={setOpen} transaction={selectedRow} />}
         </div>
       )}
       onRow={record => {
