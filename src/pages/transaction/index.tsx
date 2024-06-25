@@ -1,11 +1,8 @@
-import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum';
 import { useTransaction } from '@/hooks/use-transaction';
-import TableRecord from '@/pages/transaction/_components/Record/TableRecord';
-import { zodResolver } from '@hookform/resolvers/zod';
 import moment from 'moment';
-import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import * as z from 'zod'
+
+import TableRecord from './_components/Record/table-record';
 
 interface Inputs {
     description: string,
@@ -21,27 +18,6 @@ export default function Page() {
         transactionDeleteMutate,
         transactionUpdateMutate
     } = useTransaction({ page: 1, count: 10 })
-
-    const schema = z.object({
-        description: z.string().nonempty({ message: "Descrição deve ter entre 3 e 50 caracteres" }),
-        amount: z.coerce.number().min(0, { message: "Valor deve ser maior que 0" }),
-        date: z.string(),
-        type: z.enum(["income", "outcome"]),
-        category: z.string().nonempty({ message: "Categoria é obrigatória" })
-    })
-
-    const initialValues = {
-        description: "",
-        amount: 0,
-        date: moment().format("YYYY-MM-DD"),
-        type: "income",
-        category: TransactionCategoryEnum.Others
-    } as Inputs
-
-    const methods = useForm<Inputs>({
-        resolver: zodResolver(schema),
-        defaultValues: initialValues,
-    })
 
     const handleDelete = async (id: string) => {
         try {
@@ -77,16 +53,14 @@ export default function Page() {
     }
 
     return (
-        <FormProvider {...methods}>
-            <div className='flex justify-center min-h-screen px-10 pt-10'>
-                <TableRecord
-                    onDelete={handleDelete}
-                    onEdit={handleEdit}
-                    data={transactions}
-                    hasActions
-                    className='w-full h-fit'
-                    title='Lançamentos' />
-            </div>
-        </FormProvider>
+        <div className='flex justify-center min-h-screen px-10 pt-10'>
+            <TableRecord
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+                data={transactions}
+                hasActions
+                className='w-full h-fit'
+                title='Lançamentos' />
+        </div>
     )
 }

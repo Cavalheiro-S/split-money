@@ -7,8 +7,9 @@ import { Popconfirm, Space, Table } from "antd"
 import { ColumnsType } from "antd/es/table"
 import moment from "moment"
 import { twMerge } from 'tailwind-merge'
-import RecordModal from "./Modal"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import RecordModal from "./modal"
+
 interface RecordProps {
   title: string,
   data: Transaction[] | undefined,
@@ -22,6 +23,13 @@ interface RecordProps {
 const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, title }: RecordProps) => {
   const [selectedRow, setSelectedRow] = useState<Transaction | undefined>()
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) {
+      setSelectedRow(undefined)
+    }
+  }, [open])
+
   const columns: ColumnsType<Transaction> = [
     {
       render: (_, record) => {

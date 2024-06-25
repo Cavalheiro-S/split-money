@@ -2,13 +2,16 @@ import TransactionCategoryTranslate from '@/assets/translate/TransactionCategory
 import { Modal } from '@/components/Modal/Modal'
 import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
 import { useTransaction } from '@/hooks/use-transaction'
-import { capitalizeFirstLetter } from '@/utils'
+import { DevTool } from "@hookform/devtools"
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Input, Select } from 'antd'
 import moment from 'moment'
-import { useEffect, useRef } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useEffect } from 'react'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import { toast } from 'react-toastify'
+import * as z from 'zod'
+
 type RecordModalProps = {
     open?: boolean,
     setOpen: (value: boolean) => void,
@@ -25,25 +28,45 @@ interface Inputs {
 
 const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
 
-    const methods = useFormContext<Inputs>()
+    const schema = z.object({
+        description: z.string().nonempty({ message: "Descrição deve ter entre 3 e 50 caracteres" }),
+        amount: z.coerce.number().min(0, { message: "Valor deve ser maior que 0" }),
+        date: z.string(),
+        type: z.enum(["income", "outcome"]),
+        category: z.string().nonempty({ message: "Categoria é obrigatória" })
+    })
+
+    const initialValues = {
+        description: "",
+        amount: 0,
+        date: moment().format("YYYY-MM-DD"),
+        type: "income",
+        category: TransactionCategoryEnum.Others
+    } as Inputs
+
+    const methods = useForm<Inputs>({
+        resolver: zodResolver(schema),
+        defaultValues: initialValues,
+        values: {
+            description: transaction?.description ?? "",
+            amount: transaction?.amount ?? 0,
+            date: moment(transaction?.date).format("YYYY-MM-DD") ?? "",
+            type: transaction?.type ?? "income",
+            category: transaction?.category ?? TransactionCategoryEnum.Others
+        }
+    })
+
     const { setValue, reset, control, handleSubmit } = methods
     const { transactionCreateMutate, transactionUpdateMutate } = useTransaction()
 
     useEffect(() => {
-        if (transaction) {
-            const { description, amount, date, type, category } = transaction
-            setValue('description', description)
-            setValue('amount', Number(amount))
-            setValue('date', moment(date).format('YYYY-MM-DD'))
-            setValue('type', type)
-            setValue('category', capitalizeFirstLetter(category))
-        }
+        console.log({ transaction });
 
-        return () => {
-            reset()
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [transaction])
+    const handleClose = () => {
+        reset()
+        setOpen(false)
+    }
 
     const onSubmit = async (data: Inputs) => {
         try {
@@ -66,7 +89,7 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
             await transactionCreateMutate.mutateAsync(dataMap, {
                 onSuccess: () => {
                     toast.success("Lançamento adicionado com sucesso")
-                    setOpen(false)
+                    handleClose()
                 }
             })
         }
@@ -89,62 +112,85 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
     }
 
     const renderContent = (
-        <Form
-            onFinish={handleSubmit(onSubmit)}
-            layout='vertical'
-            className='p-4 text-gray-800'>
-            <FormItem
-                label="Descrição"
-                name="description"
-                shouldUpdate
-                control={control}>
-                <Input placeholder='Descrição' type="text" />
-            </FormItem>
-            <FormItem
-                label="Data"
-                name="date"
-                shouldUpdate
-                control={control}>
-                <Input placeholder='Data' type="date" />
-            </FormItem>
-            <FormItem
-                label="Valor"
-                name="amount"
-                shouldUpdate
-                control={control}>
-                <Input addonBefore="R$" type='number' />
-            </FormItem>
+        <FormProvider {...methods}>
+            <Form
+                onFinish={handleSubmit(onSubmit)}
+                layout='vertical'
+                className='p-4 text-gray-800'>
+                <Form.Item label="Descrição">
 
-            <FormItem
-                label="Tipo"
-                name="type"
-                shouldUpdate
-                control={control}
-            >
-                <Select placeholder='Tipo'>
-                    <Select.Option value="income">Entrada</Select.Option>
-                    <Select.Option value="outcome">Despesa</Select.Option>
-                </Select>
-            </FormItem>
+                    <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                placeholder='Descrição'
+                                type="text"
+                            />
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item label="Data">
+                    <Controller
+                        name="date"
+                        control={control}
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                placeholder='Data'
+                                type="date"
+                            />
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item label="Valor">
+                    <Controller
+                        name="amount"
+                        control={control}
+                        render={({ field }) => (
+                            <Input {...field} addonBefore="R$" type='number' />
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item label="Tipo">
+                    <Controller
+                        name="type"
+                        control={control}
+                        render={({ field }) => (
+                            <Select {...field} placeholder='Tipo'>
+                                <Select.Option value="income">Entrada</Select.Option>
+                                <Select.Option value="outcome">Despesa</Select.Option>
+                            </Select>
+                        )}
+                    />
 
-            <FormItem
-                label="Categoria"
-                name="category"
-                shouldUpdate
-                control={control}>
-                <Select placeholder='Categoria' options={renderCategories()} />
-            </FormItem>
-            <Button className='w-full' size='large' htmlType='submit'>{transaction ? "Atualizar" : "Adicionar"}</Button>
-        </Form>
+                </Form.Item>
+                <Form.Item label="Categoria">
+                    <Controller
+                        name="category"
+                        control={control}
+                        render={({ field }) => (
+                            <Select {...field} placeholder='Categoria' options={renderCategories()} />
+                        )}
+                    />
+                </Form.Item>
+                <Button className='w-full' size='large' htmlType='submit'>{transaction ? "Atualizar" : "Adicionar"}</Button>
+            </Form>
+        </FormProvider>
     )
     return (
-        <Modal
-            closeModal={() => setOpen(false)}
-            openModal={() => setOpen(true)}
-            open={open}
-            trigger={<Button>Adicionar</Button>}
-            content={renderContent}
-        />)
+        <>
+            <Modal
+                closeModal={handleClose}
+                openModal={() => setOpen(true)}
+                open={open}
+                trigger={<Button>Adicionar</Button>}
+                content={renderContent}
+            />
+            <DevTool control={control} />
+        </>
+    )
 }
 
 export default RecordModal
