@@ -13,7 +13,7 @@ export default function Page() {
     const handleSignOut = () => {
         destroyCookie(null, JWT_TOKEN_COOKIE, {path: "/"})
         setToken(null)
-        router.push("/")
+        router.replace("/")
     }
 
     return (

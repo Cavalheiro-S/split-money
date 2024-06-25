@@ -39,8 +39,8 @@ export default function Page() {
     } as Inputs
 
     const methods = useForm<Inputs>({
+        resolver: zodResolver(schema),
         defaultValues: initialValues,
-        resolver: zodResolver(schema)
     })
 
     const handleDelete = async (id: string) => {

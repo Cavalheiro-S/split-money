@@ -5,7 +5,7 @@ import { useTransaction } from '@/hooks/use-transaction'
 import { capitalizeFirstLetter } from '@/utils'
 import { Button, Form, Input, Select } from 'antd'
 import moment from 'moment'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import { toast } from 'react-toastify'
@@ -25,9 +25,8 @@ interface Inputs {
 
 const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
 
-
-    const { setValue, reset, control, handleSubmit } = useFormContext<Inputs>()
-    const [form] = Form.useForm();
+    const methods = useFormContext<Inputs>()
+    const { setValue, reset, control, handleSubmit } = methods
     const { transactionCreateMutate, transactionUpdateMutate } = useTransaction()
 
     useEffect(() => {
@@ -38,19 +37,9 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
             setValue('date', moment(date).format('YYYY-MM-DD'))
             setValue('type', type)
             setValue('category', capitalizeFirstLetter(category))
-
-            const transactionToUpdate = {
-                description,
-                amount: Number(amount),
-                date: moment(date).format('YYYY-MM-DD'),
-                type,
-                category: capitalizeFirstLetter(category),
-            }
-            form.setFieldsValue(transactionToUpdate)
         }
 
         return () => {
-            form.resetFields()
             reset()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,7 +90,6 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
 
     const renderContent = (
         <Form
-            form={form}
             onFinish={handleSubmit(onSubmit)}
             layout='vertical'
             className='p-4 text-gray-800'>

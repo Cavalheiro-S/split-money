@@ -35,15 +35,21 @@ export default function Page() {
   })
 
   const OnSubmit: SubmitHandler<Inputs> = async data => {
-    await signInMutate.mutateAsync({ email: data.email, password: data.password }, {
-      onSuccess: async () => {
-        await mutateGetUser.mutateAsync(data.email, {
-          onSuccess: () => {
-            router.push("/dashboard")
-          }
-        })
-      }
-    })
+    try {
+
+      await signInMutate.mutateAsync({ email: data.email, password: data.password }, {
+        onSuccess: async () => {
+          await mutateGetUser.mutateAsync(data.email, {
+            onSuccess: () => {
+              router.push("/dashboard")
+            }
+          })
+        }
+      })
+    }
+    catch (error) {
+      console.log(error)
+    }
   }
 
   return (
