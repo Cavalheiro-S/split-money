@@ -1,11 +1,10 @@
-import { Loading } from '@/components/Loading/Loading'
 import { AuthContext } from '@/context/auth-context'
 import { useAuth } from '@/hooks/use-auth'
 import { useUser } from '@/hooks/use-user'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
 import { useRouter } from 'next/router'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import * as z from 'zod'

@@ -2,7 +2,7 @@ import { api } from "@/data/axios";
 
 export const getTransactions = async (filter: FilterTransaction) => {
     const url = "/transaction"
-    const response = await api.get<ApiBase<ResponseGetTransactions>>(url, { params: filter })
+    const response = await api.get<ApiBase<ResponseGetTransactions[]>>(url, { params: filter })
     return response.data.data
 }
 

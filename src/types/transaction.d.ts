@@ -5,7 +5,7 @@ type ResponseGetTransactions = {
     date: Date;
     type: TransactionType;
     category: string;
-}[]
+}
 
 type RequestCreateTransaction = {
     amount: number;

@@ -1,6 +1,6 @@
 import TransactionCategoryTranslate from '@/assets/translate/TransactionCategory.json'
 import { Modal } from '@/components/Modal/Modal'
-import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
+import { TransactionCategoryEnum } from '@/enums/transaction-category.enum'
 import { useTransaction } from '@/hooks/use-transaction'
 import { DevTool } from "@hookform/devtools"
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,14 +8,13 @@ import { Button, Form, Input, Select } from 'antd'
 import moment from 'moment'
 import { useEffect } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { FormItem } from 'react-hook-form-antd'
 import { toast } from 'react-toastify'
 import * as z from 'zod'
 
 type RecordModalProps = {
     open?: boolean,
     setOpen: (value: boolean) => void,
-    transaction?: Transaction
+    transaction?: ResponseGetTransactions
 }
 
 interface Inputs {

@@ -1,9 +1,9 @@
-import { Header } from "@/components/Header";
-import { NavBar } from "@/components/NavBar/NavBar";
 import { Providers } from "@/providers";
 import { Rubik } from 'next/font/google';
 import { Suspense } from "react";
 import Loading from "./loading";
+import { Header } from "@/components/Header";
+import { NavBar } from "@/components/NavBar/nav-bar";
 
 const rubik = Rubik({
     subsets: ['latin'],

@@ -12,7 +12,7 @@ export const useAuth = () => {
 
     const signInMutate = useMutation({
         mutationKey: ["auth"],
-        mutationFn: ({ email, password }: { email: string, password: string }) => signIn(email, password),
+        mutationFn: ({ email, password }: RequestLogin) => signIn(email, password),
         onSuccess: async ({ data }) => {
             if (data) {
                 const dataDecode = jwtDecode<AccessTokenPayload>(data.access_token)
@@ -26,7 +26,9 @@ export const useAuth = () => {
                 toast.success("Login realizado com sucesso!")
             }
         },
-        onError: (error) => toast.error("Email ou senha inválidos , " + error.message)
+        onError: (error) => {
+            toast.error(error.message)
+        }
     })
 
     return { signInMutate }
