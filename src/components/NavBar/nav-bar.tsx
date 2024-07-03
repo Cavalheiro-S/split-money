@@ -1,8 +1,8 @@
 "use client";
 
-import { AuthContext } from '@/context/auth-context';
 import { HomeOutlined, LogoutOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Menu, MenuProps } from 'antd';
+import { AuthContext } from 'context/auth-context';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';

@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import Logo from "@/assets/imgs/Logo.svg"
+import Logo from "assets/imgs/Logo.svg"
 
 export const Header = () => {
 

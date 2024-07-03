@@ -1,5 +1,5 @@
-import { AuthContext } from "@/context/auth-context";
-import { JWT_TOKEN_COOKIE } from "@/global.config";
+import { AuthContext } from "context/auth-context";
+import { JWT_TOKEN_COOKIE } from "global.config";
 import { Button, Typography } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

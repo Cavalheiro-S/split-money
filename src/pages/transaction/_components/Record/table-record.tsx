@@ -1,6 +1,6 @@
-import transactionCategory from "@/assets/translate/TransactionCategory.json"
-import { TransactionCategoryEnum } from "@/enums/transaction-category.enum"
-import { capitalizeFirstLetter } from '@/utils'
+import transactionCategory from "assets/translate/TransactionCategory.json"
+import { TransactionCategoryEnum } from "enums/transaction-category.enum"
+import { capitalizeFirstLetter } from 'utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import { CreditCard, Money } from '@phosphor-icons/react'
 import { Popconfirm, Space, Table } from "antd"

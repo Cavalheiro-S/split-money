@@ -1,6 +1,7 @@
-import { AxiosCodeErrorEnum } from "@/enums/axios.enum";
-import { JWT_TOKEN_COOKIE } from "@/global.config";
+
 import { AxiosError, HttpStatusCode } from "axios";
+import { AxiosCodeErrorEnum } from "enums/axios.enum";
+import { JWT_TOKEN_COOKIE } from "global.config";
 import { destroyCookie } from "nookies";
 
 export const transformErrorResponse = (error: AxiosError<any>) => {

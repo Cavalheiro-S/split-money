@@ -1,4 +1,4 @@
-import { createTransaction, deleteTransaction, getTransactions, updateTransaction } from "@/services/transaction"
+import { createTransaction, deleteTransaction, getTransactions, updateTransaction } from "services/transaction"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useTransaction = (filter?: FilterTransaction) => {

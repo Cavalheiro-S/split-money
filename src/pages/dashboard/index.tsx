@@ -1,8 +1,9 @@
-import { useTransaction } from "@/hooks/use-transaction";
+
 import { Space } from "antd";
 import moment from "moment";
 import { toast } from "react-toastify";
 import TableRecord from "../transaction/_components/Record/table-record";
+import { useTransaction } from "hooks/use-transaction";
 
 export default function Page() {
     const {

@@ -1,4 +1,4 @@
-import { useTransaction } from '@/hooks/use-transaction';
+import { useTransaction } from 'hooks/use-transaction';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 

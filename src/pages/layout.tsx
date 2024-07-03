@@ -1,10 +1,10 @@
  
-import { Providers } from "@/providers";
+import { Providers } from "../providers";
 import { Rubik } from 'next/font/google';
 import { Suspense } from "react";
 import Loading from "./loading";
-import { NavBar } from "@/components/NavBar/nav-bar";
-import { Header } from "@/components/Header/header";
+import { Header } from "components/Header/header";
+import { NavBar } from "components/NavBar/nav-bar";
 
 const rubik = Rubik({
     subsets: ['latin'],

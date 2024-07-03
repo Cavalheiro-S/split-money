@@ -1,11 +1,12 @@
-import { AuthContext } from "@/context/auth-context"
-import { JWT_TOKEN_COOKIE } from "@/global.config"
-import { signIn } from "@/services/auth"
+
 import { useMutation } from "@tanstack/react-query"
+import { AuthContext } from "context/auth-context"
+import { JWT_TOKEN_COOKIE } from "global.config"
 import { jwtDecode } from "jwt-decode"
 import { setCookie } from "nookies"
 import { useContext } from "react"
 import { toast } from "react-toastify"
+import { signIn } from "services/auth"
 
 export const useAuth = () => {
     const { setToken, setUser } = useContext(AuthContext)

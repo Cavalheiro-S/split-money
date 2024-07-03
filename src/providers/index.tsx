@@ -1,4 +1,5 @@
-import { AuthContextProvider } from "@/context/auth-context";
+
+import { AuthContextProvider } from "context/auth-context";
 import { AntDesignProvider } from "./ant-design.provider";
 import { QueryClientProvider } from "./query-client.provider";
 import { ToastContainer } from "react-toastify";

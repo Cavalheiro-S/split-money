@@ -1,4 +1,4 @@
-import { JWT_TOKEN_COOKIE } from "@/global.config";
+import { JWT_TOKEN_COOKIE } from "global.config";
 import { useRouter } from "next/router";
 import { parseCookies } from "nookies";
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";

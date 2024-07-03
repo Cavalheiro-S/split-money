@@ -1,7 +1,8 @@
-import { AuthContext } from '@/context/auth-context'
-import { useAuth } from '@/hooks/use-auth'
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
+import { AuthContext } from "context/auth-context"
+import { useAuth } from "hooks/use-auth"
 import { useRouter } from 'next/router'
 import { useContext } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'

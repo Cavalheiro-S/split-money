@@ -1,4 +1,4 @@
-import { api } from "@/data/axios";
+import { api } from "data/axios";
 
 export const getTransactions = async (filter: FilterTransaction) => {
     const url = "/transaction"
