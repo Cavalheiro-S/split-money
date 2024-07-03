@@ -5,13 +5,10 @@ const nextConfig = {
   reactStrictMode: true,
   distDir: "dist",
   webpack: (config) => {
-    console.log('Configuração atual do Webpack:', config);
-    if (config.resolve.plugins) {
-      config.resolve.plugins.push(new TsconfigPathsPlugin());
-    } else {
-      config.resolve.plugins = [new TsconfigPathsPlugin()];
+    if (!config.resolve.plugins) {
+      config.resolve.plugins = [];
     }
-    console.log('Configuração do Webpack após adicionar TsconfigPathsPlugin:', config.resolve.plugins);
+    config.resolve.plugins.push(new TsconfigPathsPlugin());
     return config;
   }
 }
