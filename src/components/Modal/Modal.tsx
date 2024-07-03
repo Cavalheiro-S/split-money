@@ -1,5 +1,3 @@
-'use client'
-
 import { Button, Modal as ModalAnt } from "antd";
 import React from 'react';
 
