@@ -14,7 +14,7 @@ export default function Page() {
         transactionDeleteMutate
     } = useTransaction({ page: 1, count: 10, type: "outcome" })
 
-    const handleEdit = async (data: Transaction) => {
+    const handleEdit = async (data: ResponseGetTransactions) => {
         try {
             const dataMap: RequestUpdateTransaction = {
                 id: data.id,

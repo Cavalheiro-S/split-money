@@ -47,7 +47,7 @@ export const NavBar = () => {
             key: 'signout',
             icon: <LogoutOutlined />,
         },
-    ], [])
+    ], [itemsUrls])
 
     const onClick: MenuProps['onClick'] = (e) => {
         setCurrent(e.key);

@@ -30,7 +30,7 @@ export default function Page() {
         }
     }
 
-    const handleEdit = async (data: Transaction) => {
+    const handleEdit = async (data: ResponseGetTransactions) => {
         try {
             const dataMap: RequestUpdateTransaction = {
                 id: data.id,

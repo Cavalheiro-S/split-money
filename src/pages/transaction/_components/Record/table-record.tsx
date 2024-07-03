@@ -1,36 +1,36 @@
 import transactionCategory from "@/assets/translate/TransactionCategory.json"
-import { TransactionCategoryEnum } from '@/enums/TransactionCategoryEnum'
+import { TransactionCategoryEnum } from "@/enums/transaction-category.enum"
 import { capitalizeFirstLetter } from '@/utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import { CreditCard, Money } from '@phosphor-icons/react'
 import { Popconfirm, Space, Table } from "antd"
 import { ColumnsType } from "antd/es/table"
 import moment from "moment"
-import { twMerge } from 'tailwind-merge'
 import { useEffect, useState } from "react"
+import { twMerge } from 'tailwind-merge'
 import RecordModal from "./modal"
 
 interface RecordProps {
   title: string,
-  data: Transaction[] | undefined,
-  onCreate?: (transaction: Transaction) => Promise<void>,
+  data: ResponseGetTransactions[] | undefined,
+  onCreate?: (transaction: ResponseGetTransactions) => Promise<void>,
   onDelete: (id: string) => Promise<void>
-  onEdit: (transaction: Transaction) => Promise<void>
+  onEdit: (transaction: ResponseGetTransactions) => Promise<void>
   hasActions?: boolean,
   className?: string,
 }
 
 const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, title }: RecordProps) => {
-  const [selectedRow, setSelectedRow] = useState<Transaction | undefined>()
+  const [selectedRow, setSelectedRow] = useState<ResponseGetTransactions | undefined>()
   const [open, setOpen] = useState(false)
-
+  
   useEffect(() => {
     if (!open) {
       setSelectedRow(undefined)
     }
   }, [open])
 
-  const columns: ColumnsType<Transaction> = [
+  const columns: ColumnsType<ResponseGetTransactions> = [
     {
       render: (_, record) => {
         if (record.type === "income")

@@ -1,6 +1,5 @@
 import { AuthContext } from '@/context/auth-context'
 import { useAuth } from '@/hooks/use-auth'
-import { useUser } from '@/hooks/use-user'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
 import { useRouter } from 'next/router'
@@ -22,7 +21,6 @@ const schema = z.object({
 export default function Page() {
   const { token } = useContext(AuthContext)
   const { signInMutate } = useAuth()
-  const { mutateGetUser } = useUser()
   const router = useRouter()
 
   const { handleSubmit, control, } = useForm<Inputs>({
@@ -35,14 +33,9 @@ export default function Page() {
 
   const OnSubmit: SubmitHandler<Inputs> = async data => {
     try {
-
       await signInMutate.mutateAsync({ email: data.email, password: data.password }, {
         onSuccess: async () => {
-          await mutateGetUser.mutateAsync(data.email, {
-            onSuccess: () => {
-              router.push("/dashboard")
-            }
-          })
+          router.push("/dashboard")
         }
       })
     }
