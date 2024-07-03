@@ -1,5 +1,5 @@
 import TransactionCategoryTranslate from 'assets/translate/TransactionCategory.json'
-import { Modal } from 'components/Modal/modal'
+import { Modal } from 'components/Modal/Modal'
 import { TransactionCategoryEnum } from 'enums/transaction-category.enum'
 import { useTransaction } from 'hooks/use-transaction'
 import { DevTool } from "@hookform/devtools"
