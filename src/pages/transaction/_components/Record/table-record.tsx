@@ -8,7 +8,7 @@ import { ColumnsType } from "antd/es/table"
 import moment from "moment"
 import { useEffect, useState } from "react"
 import { twMerge } from 'tailwind-merge'
-import RecordModal from "./Modal"
+import RecordModal from "./modal"
 
 interface RecordProps {
   title: string,
