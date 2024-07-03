@@ -1,4 +1,4 @@
-import { api } from "@/data/axios"
+import { api } from "data/axios"
 import { useMutation } from "@tanstack/react-query"
 
 export const useUser = () => {
