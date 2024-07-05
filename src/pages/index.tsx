@@ -1,9 +1,11 @@
 import { Button, Space } from "antd";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 export default function Page() {
 
   const router = useRouter();
+  const { data } = useSession()
   
   return (
     <Space className="flex flex-col col-span-2 col-start-1 row-start-2 m-auto">

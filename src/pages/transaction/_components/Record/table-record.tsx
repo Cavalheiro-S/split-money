@@ -47,7 +47,7 @@ const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, 
       title: 'Data',
       dataIndex: 'date',
       key: 'date',
-      render: (text: Date) => <p>{moment(text).format('DD/MM/YYYY')}</p>
+      render: (text: string) => <p>{text}</p>
     },
     {
       title: 'Categoria',

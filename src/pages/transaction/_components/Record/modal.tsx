@@ -1,12 +1,11 @@
+import { DevTool } from "@hookform/devtools"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button, Form, Input, Select } from 'antd'
 import TransactionCategoryTranslate from 'assets/translate/TransactionCategory.json'
 import { Modal } from 'components/Modal/Modal'
 import { TransactionCategoryEnum } from 'enums/transaction-category.enum'
 import { useTransaction } from 'hooks/use-transaction'
-import { DevTool } from "@hookform/devtools"
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Form, Input, Select } from 'antd'
 import moment from 'moment'
-import { useEffect } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as z from 'zod'
@@ -38,7 +37,7 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
     const initialValues = {
         description: "",
         amount: 0,
-        date: moment().format("YYYY-MM-DD"),
+        date: moment().format("yyyy-MM-dd"),
         type: "income",
         category: TransactionCategoryEnum.Others
     } as Inputs
@@ -49,19 +48,15 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
         values: {
             description: transaction?.description ?? "",
             amount: transaction?.amount ?? 0,
-            date: moment(transaction?.date).format("YYYY-MM-DD") ?? "",
+            date: moment(transaction?.date).format("yyyy-MM-dd") ?? moment().format("yyyy-MM-dd"),
             type: transaction?.type ?? "income",
             category: transaction?.category ?? TransactionCategoryEnum.Others
         }
     })
 
-    const { setValue, reset, control, handleSubmit } = methods
+    const { reset, control, handleSubmit } = methods
     const { transactionCreateMutate, transactionUpdateMutate } = useTransaction()
 
-    useEffect(() => {
-        console.log({ transaction });
-
-    }, [transaction])
     const handleClose = () => {
         reset()
         setOpen(false)
@@ -72,7 +67,7 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
             const dataMap: RequestCreateTransaction = {
                 amount: data.amount,
                 category: data.category,
-                date: moment(data.date).format('YYYY-MM-DD'),
+                date: data.date,
                 description: data.description,
                 type: data.type,
             }

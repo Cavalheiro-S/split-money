@@ -1,5 +1,6 @@
-import { createTransaction, deleteTransaction, getTransactions, updateTransaction } from "services/transaction"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import moment from "moment"
+import { createTransaction, deleteTransaction, getTransactions, updateTransaction } from "services/transaction"
 
 export const useTransaction = (filter?: FilterTransaction) => {
     const queryClient = useQueryClient()
@@ -7,6 +8,15 @@ export const useTransaction = (filter?: FilterTransaction) => {
     const { data: transactions, isLoading: transactionsLoading } = useQuery({
         queryKey: ["transactions", filter],
         queryFn: () => getTransactions(filter ?? {} as FilterTransaction),
+        select: (data) => {
+            return data?.map(item => {
+                const dataIso = moment.utc(item.date).local().format('DD/MM/YYYY')
+                return {
+                    ...item,
+                    date: dataIso
+                }
+            })
+        }
     })
 
     const transactionCreateMutate = useMutation({

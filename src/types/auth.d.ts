@@ -1,6 +1,5 @@
 type AccessToken = {
     access_token: string,
-    expiresIn: number
 }
 
 type AccessTokenPayload = {

@@ -2,7 +2,7 @@ type ResponseGetTransactions = {
     id: string;
     amount: number;
     description: string;
-    date: Date;
+    date: string;
     type: TransactionType;
     category: string;
 }

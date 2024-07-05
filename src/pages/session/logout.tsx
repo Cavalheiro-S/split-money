@@ -1,19 +1,17 @@
-import { AuthContext } from "context/auth-context";
-import { JWT_TOKEN_COOKIE } from "global.config";
 import { Button, Typography } from "antd";
+import { routes } from "global.config";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { destroyCookie } from "nookies"
-import { useContext } from "react";
 
 export default function Page() {
-    const router = useRouter()
-    const { setToken } = useContext(AuthContext)
 
-    const handleSignOut = () => {
-        destroyCookie(null, JWT_TOKEN_COOKIE, {path: "/"})
-        setToken(null)
-        router.replace("/")
+    const handleSignOut = async () => {
+        try {
+            await signOut({ callbackUrl: routes.login })
+        }
+        catch (error) {
+            console.log(error)
+        }
     }
 
     return (

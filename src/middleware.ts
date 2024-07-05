@@ -1,12 +1,11 @@
-import { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
-import { JWT_TOKEN_COOKIE } from './global.config'
+import { getToken } from 'next-auth/jwt';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(request: NextRequest) {
-    const token = request.cookies.get(JWT_TOKEN_COOKIE)?.value   
+export async function middleware(req: NextRequest) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const unprotectedRoutes = ["/session/login", "/session/signup"]
-    if(!token && !unprotectedRoutes.includes(request.nextUrl.pathname)){
-        return NextResponse.redirect(new URL('session/login', request.url))
+    if (!token && !unprotectedRoutes.includes(req.nextUrl.pathname)) {
+        return NextResponse.redirect(new URL('session/login', req.url))
     }
 }
 

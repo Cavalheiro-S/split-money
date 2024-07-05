@@ -1,16 +1,7 @@
 import { useTransaction } from 'hooks/use-transaction';
-import moment from 'moment';
 import { toast } from 'react-toastify';
 
 import TableRecord from './_components/Record/table-record';
-
-interface Inputs {
-    description: string,
-    amount: number,
-    date: string,
-    type: "income" | "outcome",
-    category: string
-}
 
 export default function Page() {
     const {
@@ -36,7 +27,7 @@ export default function Page() {
                 id: data.id,
                 amount: data.amount,
                 category: data.category,
-                date: moment(data.date).format("YYYY-MM-DD"),
+                date: data.date,
                 description: data.description,
                 type: data.type,
             }
