@@ -1,6 +1,5 @@
 import axios from "axios";
 import { api } from "data/axios";
-import { jwtDecode } from "jwt-decode";
 import { AuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -49,22 +48,35 @@ export const authOptions: AuthOptions = {
         )
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, account }) {
             if (user) {
-                token.jwt = user.jwt
-                token.user = user
-                // Definindo o campo `iat` (issued at) e `exp` (expiration)
-                const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-                token.iat = currentTimeInSeconds;
+                return {
+                    ...token,
+                    accessToken: user.jwt,
+                    exp: token.exp,
+                    user,
+                }
             }
+            console.log("JWT :");
+            console.log({ token })
+            console.log({ user })
+            console.log({ account })
+
+
             return token
         },
         async session({ session, token }) {
             session.user = token.user;
-            session.jwt = token.jwt;
+            session.accessToken = token.accessToken
             session.expires = new Date(token.exp * 1000).toISOString();
+            console.log({ session, token });
 
-            return session;
+
+            return {
+                ...session,
+                accessToken: token.accessToken,
+                expires: new Date(token.exp * 1000).toISOString()
+            };
         },
     },
     pages: {
