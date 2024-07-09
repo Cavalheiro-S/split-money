@@ -1,5 +1,6 @@
 import axios from "axios";
 import { api } from "data/axios";
+import jwt from 'jsonwebtoken';
 import { AuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -48,45 +49,35 @@ export const authOptions: AuthOptions = {
         )
     ],
     callbacks: {
-        async jwt({ token, user, account }) {
-            if (user) {
-                return {
-                    ...token,
-                    accessToken: user.jwt,
-                    exp: token.exp,
-                    user,
-                }
+        async jwt({ token, user }) {
+            if (token.accessToken) {
+                const jwtDecoded = jwt.decode(token.accessToken) as { id: string, email: string, exp: number }
+                token.exp = jwtDecoded.exp
+                token.accessTokenExpires = jwtDecoded.exp
             }
-            console.log("JWT :");
-            console.log({ token })
-            console.log({ user })
-            console.log({ account })
-
-
+            if (user) {
+                token.user = user
+                token.accessToken = user.jwt
+            }
             return token
         },
         async session({ session, token }) {
             session.user = token.user;
             session.accessToken = token.accessToken
-            session.expires = new Date(token.exp * 1000).toISOString();
-            console.log({ session, token });
-
-
-            return {
-                ...session,
-                accessToken: token.accessToken,
-                expires: new Date(token.exp * 1000).toISOString()
-            };
+            session.expires = new Date(token.accessTokenExpires * 1000).toISOString();
+            return session;
         },
     },
     pages: {
         signIn: "/session/login"
     },
     session: {
-        strategy: "jwt"
+        strategy: "jwt",
+        maxAge: 60 * 60 * 24 * 7
     },
     jwt: {
         secret: process.env.NEXTAUTH_SECRET,
+        maxAge: 60 * 60 * 24 * 7
     }
 }
 

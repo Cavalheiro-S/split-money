@@ -4,7 +4,6 @@ import { ERROR_MESSAGES } from "consts/error-messages";
 import { AxiosCodeErrorEnum } from "enums/axios.enum";
 
 export const transformErrorResponse = (error: AxiosError<any>) => {
-    console.log({ error });
 
     if (error.response?.status === HttpStatusCode.BadRequest && error.response?.data.message) {
         throw new Error(error.response.data.message)
