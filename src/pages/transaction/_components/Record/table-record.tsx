@@ -1,14 +1,14 @@
-import transactionCategory from "assets/translate/TransactionCategory.json"
-import { TransactionCategoryEnum } from "enums/transaction-category.enum"
-import { capitalizeFirstLetter } from 'utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import { CreditCard, Money } from '@phosphor-icons/react'
-import { Popconfirm, Space, Table } from "antd"
+import { Popconfirm, Space, Table, Typography } from "antd"
 import { ColumnsType } from "antd/es/table"
-import moment from "moment"
+import transactionCategory from "assets/translate/TransactionCategory.json"
+import { TransactionCategoryEnum } from "enums/transaction-category.enum"
 import { useEffect, useState } from "react"
 import { twMerge } from 'tailwind-merge'
+import { capitalizeFirstLetter } from 'utils'
 import RecordModal from "./modal"
+import moment from 'moment'
 
 interface RecordProps {
   title: string,
@@ -23,7 +23,7 @@ interface RecordProps {
 const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, title }: RecordProps) => {
   const [selectedRow, setSelectedRow] = useState<ResponseGetTransactions | undefined>()
   const [open, setOpen] = useState(false)
-  
+
   useEffect(() => {
     if (!open) {
       setSelectedRow(undefined)
@@ -47,7 +47,7 @@ const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, 
       title: 'Data',
       dataIndex: 'date',
       key: 'date',
-      render: (text: string) => <p>{text}</p>
+      render: (text: string) => <p>{moment(text).format("DD/MM/YYYY")}</p>
     },
     {
       title: 'Categoria',
@@ -98,6 +98,24 @@ const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, 
       dataSource={data}
       className={twMerge(className)}
       columns={columns}
+      summary={(pageData) => {
+        let totalTransaction = 0
+
+        pageData.forEach(({ amount, type }) => {
+          totalTransaction = type === "income" ? totalTransaction + amount : totalTransaction - amount
+        })
+
+        return (
+          <>
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0} colSpan={4} align='right' className='font-bold'>Total</Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={4}>
+                <Typography.Text className='font-bold'>{`${Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalTransaction)}`}</Typography.Text>
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          </>
+        )
+      }}
       title={() => (
         <div className='flex items-center justify-between w-full'>
           <h3 className='font-sans font-semibold text-gray-700'>{title}</h3>

@@ -42,7 +42,7 @@ export default function Page() {
             toast.success('Transação deletada com sucesso')
         } catch (error) {
             console.log(error)
-            toast.error('Erro ao deletar a transação')
+            toast.error('Não foi possível deletar a transação')
         }
     }
 

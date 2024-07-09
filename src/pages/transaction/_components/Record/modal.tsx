@@ -37,7 +37,7 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
     const initialValues = {
         description: "",
         amount: 0,
-        date: moment().format("yyyy-MM-dd"),
+        date: moment().format("yyyy-MM-DD"),
         type: "income",
         category: TransactionCategoryEnum.Others
     } as Inputs
@@ -48,7 +48,7 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
         values: {
             description: transaction?.description ?? "",
             amount: transaction?.amount ?? 0,
-            date: moment(transaction?.date).format("yyyy-MM-dd") ?? moment().format("yyyy-MM-dd"),
+            date: moment(transaction?.date).format("yyyy-MM-DD") ?? moment().format("yyyy-MM-DD"),
             type: transaction?.type ?? "income",
             category: transaction?.category ?? TransactionCategoryEnum.Others
         }
