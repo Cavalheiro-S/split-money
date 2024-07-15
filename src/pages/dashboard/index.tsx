@@ -12,6 +12,7 @@ export default function Page() {
     const [dateSelectedOutcome, setDateSelectedOutcome] = useState(new Date())
     const {
         transactions: transactionsIncome,
+        transactionsLoading: transactionsLoadingIncome,
         transactionUpdateMutate }
         = useTransaction({
             page: 1,
@@ -21,6 +22,7 @@ export default function Page() {
         })
     const {
         transactions: transactionsOutcome,
+        transactionsLoading: transactionsLoadingOutcome,
         transactionDeleteMutate
     } = useTransaction(
         {
@@ -75,12 +77,14 @@ export default function Page() {
                 onDelete={handleDelete}
                 onChangeDate={value => handleUpdateDate(value, setDateSelectedIncome)}
                 data={transactionsIncome ?? []}
+                isLoading={transactionsLoadingIncome}
                 title="Últimos Lançamentos" />
             <TableRecord
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onChangeDate={value => handleUpdateDate(value, setDateSelectedOutcome)}
                 data={transactionsOutcome ?? []}
+                isLoading={transactionsLoadingOutcome}
                 title="Últimas Despesas" />
         </Space>
     )

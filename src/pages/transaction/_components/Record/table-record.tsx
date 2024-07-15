@@ -17,9 +17,10 @@ interface RecordProps {
   onCreate?: (transaction: ResponseGetTransactions) => Promise<void>,
   onDelete: (id: string) => Promise<void>
   onEdit: (transaction: ResponseGetTransactions) => Promise<void>
-  onChangeDate: ((value: Dayjs | null, dateString: string) => void) | undefined
+  onChangeDate?: ((value: Dayjs | null, dateString: string) => void) | undefined
   hasActions?: boolean,
   className?: string,
+  isLoading?: boolean
 }
 
 const TableRecord = ({
@@ -27,6 +28,7 @@ const TableRecord = ({
   data,
   hasActions,
   title,
+  isLoading,
   onCreate,
   onDelete,
   onChangeDate,
@@ -105,6 +107,7 @@ const TableRecord = ({
 
   return (
     <Table
+      loading={isLoading}
       rowKey={record => record.id ?? record.description + record.category}
       dataSource={data}
       className={twMerge(className)}
@@ -131,11 +134,14 @@ const TableRecord = ({
         <div className='flex flex-col w-full'>
           <h3 className='font-sans font-semibold text-gray-700'>{title}</h3>
           <div className='flex flex-col'>
-            {onChangeDate && <DatePicker
-              defaultValue={dayjs(new Date())}
-              onChange={(value, dateString) => {
-                onChangeDate(value, dateString)
-              }} picker={"month"} format={"MM/YYYY"} className='w-52' placeholder='Selecione o mês' />}
+            {onChangeDate && <>
+              <Typography.Text>Selecione o mês</Typography.Text>
+              <DatePicker
+                defaultValue={dayjs(new Date())}
+                onChange={(value, dateString) => {
+                  onChangeDate(value, dateString)
+                }} picker={"month"} format={"MM/YYYY"} className='w-52' placeholder='Selecione o mês' />
+            </>}
             {hasActions && <RecordModal open={open} setOpen={setOpen} transaction={selectedRow} />}
           </div>
         </div>
