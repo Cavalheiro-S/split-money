@@ -1,6 +1,6 @@
 import { DeleteOutlined } from '@ant-design/icons'
 import { CreditCard, Money } from '@phosphor-icons/react'
-import { Popconfirm, Space, Table, Typography } from "antd"
+import { DatePicker, Popconfirm, Space, Table, Typography } from "antd"
 import { ColumnsType } from "antd/es/table"
 import transactionCategory from "assets/translate/TransactionCategory.json"
 import { TransactionCategoryEnum } from "enums/transaction-category.enum"
@@ -9,6 +9,7 @@ import { twMerge } from 'tailwind-merge'
 import { capitalizeFirstLetter } from 'utils'
 import RecordModal from "./modal"
 import moment from 'moment'
+import dayjs, { Dayjs } from 'dayjs'
 
 interface RecordProps {
   title: string,
@@ -16,11 +17,21 @@ interface RecordProps {
   onCreate?: (transaction: ResponseGetTransactions) => Promise<void>,
   onDelete: (id: string) => Promise<void>
   onEdit: (transaction: ResponseGetTransactions) => Promise<void>
+  onChangeDate: ((value: Dayjs | null, dateString: string) => void) | undefined
   hasActions?: boolean,
   className?: string,
 }
 
-const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, title }: RecordProps) => {
+const TableRecord = ({
+  className,
+  data,
+  hasActions,
+  title,
+  onCreate,
+  onDelete,
+  onChangeDate,
+  onEdit
+}: RecordProps) => {
   const [selectedRow, setSelectedRow] = useState<ResponseGetTransactions | undefined>()
   const [open, setOpen] = useState(false)
 
@@ -117,16 +128,19 @@ const TableRecord = ({ className, data, onCreate, onDelete, onEdit, hasActions, 
         )
       }}
       title={() => (
-        <div className='flex items-center justify-between w-full'>
+        <div className='flex flex-col w-full'>
           <h3 className='font-sans font-semibold text-gray-700'>{title}</h3>
-          {hasActions && <RecordModal open={open} setOpen={setOpen} transaction={selectedRow} />}
+          <div className='flex flex-col'>
+            {onChangeDate && <DatePicker
+              defaultValue={dayjs(new Date())}
+              onChange={(value, dateString) => {
+                onChangeDate(value, dateString)
+              }} picker={"month"} format={"MM/YYYY"} className='w-52' placeholder='Selecione o mês' />}
+            {hasActions && <RecordModal open={open} setOpen={setOpen} transaction={selectedRow} />}
+          </div>
         </div>
       )}
-      onRow={record => {
-        return {
-          ...(onCreate && { onClick: () => onCreate(record) })
-        }
-      }} />
+      onRow={record => onCreate ? { onClick: () => onCreate(record) } : {}} />
 
 
   )

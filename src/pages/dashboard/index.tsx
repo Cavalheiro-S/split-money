@@ -1,19 +1,34 @@
 
 import { Space } from "antd";
+import { Dayjs } from "dayjs";
+import { useTransaction } from "hooks/use-transaction";
 import moment from "moment";
+import { SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
 import TableRecord from "../transaction/_components/Record/table-record";
-import { useTransaction } from "hooks/use-transaction";
 
 export default function Page() {
+    const [dateSelectedIncome, setDateSelectedIncome] = useState(new Date())
+    const [dateSelectedOutcome, setDateSelectedOutcome] = useState(new Date())
     const {
         transactions: transactionsIncome,
         transactionUpdateMutate }
-        = useTransaction({ page: 1, count: 10, type: "income" })
+        = useTransaction({
+            page: 1,
+            count: 10,
+            type: "income",
+            period: dateSelectedIncome
+        })
     const {
         transactions: transactionsOutcome,
         transactionDeleteMutate
-    } = useTransaction({ page: 1, count: 10, type: "outcome" })
+    } = useTransaction(
+        {
+            page: 1,
+            count: 10,
+            type: "outcome",
+            period: dateSelectedOutcome
+        })
 
     const handleEdit = async (data: ResponseGetTransactions) => {
         try {
@@ -46,16 +61,25 @@ export default function Page() {
         }
     }
 
+    const handleUpdateDate = (value: Dayjs | null, setData: (value: SetStateAction<Date>) => void) => {
+        if (value) {
+            const date = value?.toDate()
+            setData(date)
+        }
+    }
+
     return (
         <Space direction="vertical" className="col-start-2 px-10 mt-10">
             <TableRecord
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onChangeDate={value => handleUpdateDate(value, setDateSelectedIncome)}
                 data={transactionsIncome ?? []}
                 title="Últimos Lançamentos" />
             <TableRecord
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onChangeDate={value => handleUpdateDate(value, setDateSelectedOutcome)}
                 data={transactionsOutcome ?? []}
                 title="Últimas Despesas" />
         </Space>

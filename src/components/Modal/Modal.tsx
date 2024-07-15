@@ -1,5 +1,6 @@
 import { Button, Modal as ModalAnt } from "antd";
 import React from 'react';
+import { twMerge } from "tailwind-merge";
 
 interface ModalProps {
     content: React.ReactNode
@@ -8,12 +9,13 @@ interface ModalProps {
     open?: boolean
     trigger?: React.ReactNode
     title?: string
+    className?: string
 }
 
-export const Modal = ({ content, openModal, closeModal, open }: ModalProps) => {
+export const Modal = ({ content, openModal, closeModal, open, className }: ModalProps) => {
 
     return (
-        <div className='flex justify-end'>
+        <div className={twMerge('flex justify-end', className)}>
             <Button onClick={openModal}>
                 Adicionar
             </Button>

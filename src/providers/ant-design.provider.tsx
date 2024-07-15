@@ -1,5 +1,5 @@
 import { ConfigProvider } from "antd";
-
+import ptBR from 'antd/lib/locale/pt_BR'
 interface Props {
     children: React.ReactNode;
 }
@@ -7,12 +7,13 @@ interface Props {
 export const AntDesignProvider = ({ children }: Props) => {
 
     return (
-        <ConfigProvider theme={{
-            token: {
-                colorPrimary: "#00B528",
-            },
-            
-        }}>
+        <ConfigProvider
+            locale={ptBR}
+            theme={{
+                token: {
+                    colorPrimary: "#00B528",
+                },
+            }}>
             {children}
         </ConfigProvider>
     )

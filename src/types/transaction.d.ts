@@ -33,4 +33,5 @@ type TransactionType = "income" | "outcome"
 
 type FilterTransaction = Pagination & {
     type?: TransactionType
+    period?: Date
 }
