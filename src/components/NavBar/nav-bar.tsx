@@ -3,7 +3,7 @@
 import { HomeOutlined, LogoutOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Menu, MenuProps } from 'antd';
 import { routes } from 'global.config';
-import { useSession } from 'next-auth/react';
+import { useVerifTokenValid } from 'hooks/use-verif-token-valid';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 export const NavBar = () => {
     const [current, setCurrent] = useState('dashboard');
     const router = useRouter()
-    const { data } = useSession()
+    const valid = useVerifTokenValid();
 
     const itemsUrls = useMemo(() => ({
         dashboard: routes.dashboard,
@@ -55,7 +55,7 @@ export const NavBar = () => {
     };
 
     const renderMenu = useMemo(() => {
-        if (data?.accessToken)
+        if (valid)
             return <Menu
                 className='top-0 left-0 w-48 h-full col-start-1 row-span-3 row-start-2 border-2 border-green-500'
                 onClick={onClick}
@@ -64,7 +64,7 @@ export const NavBar = () => {
                 items={items} />
         else
             return null
-    }, [data, items, current])
+    }, [valid, items, current])
 
     return renderMenu
 }
