@@ -27,6 +27,7 @@ export const authOptions: AuthOptions = {
                     })
                     const { data } = response.data
                     if (data?.access_token) {
+
                         const { data: dataUser } = await axios.get<ApiBase<User>>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/me`, {
                             headers: {
                                 Authorization: `Bearer ${data.access_token}`
