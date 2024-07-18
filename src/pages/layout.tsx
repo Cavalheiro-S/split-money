@@ -15,7 +15,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <Providers>
             <main
-                className={`${rubik.variable} text-gray-800 relative grid grid-rows-[100px_1fr] grid-cols-[192px_1fr] overflow-hidden font-sans bg-background`}>
+                className={`${rubik.variable} text-gray-800 relative grid grid-rows-[100px_1fr] grid-cols-[192px_1fr] min-h-screen overflow-hidden font-sans bg-background`}>
                 <Suspense fallback={<Loading />}>
                     <Header />
                     <NavBar />
