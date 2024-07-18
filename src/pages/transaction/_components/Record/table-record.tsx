@@ -8,7 +8,7 @@ import moment from 'moment'
 import { useEffect, useState } from "react"
 import { twMerge } from 'tailwind-merge'
 import { capitalizeFirstLetter } from 'utils'
-import { RecordModal } from './modal'
+import RecordModal from './modal'
 
 
 interface RecordProps {

@@ -1,4 +1,4 @@
-import { PlusOutlined, SaveOutlined } from "@ant-design/icons"
+import { PlusOutlined } from "@ant-design/icons"
 import { DevTool } from "@hookform/devtools"
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Input, Select, Space } from 'antd'
@@ -25,7 +25,7 @@ interface Inputs {
     category: string
 }
 
-export const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
+const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
 
     const schema = z.object({
         description: z.string().nonempty({ message: "Descrição deve ter entre 3 e 50 caracteres" }),
@@ -202,4 +202,4 @@ export const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) =>
     )
 }
 
-
+export default RecordModal

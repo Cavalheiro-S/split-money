@@ -1,7 +1,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
-import { SessionStatusEnum } from "enums/next-auth.enum"
 import { routes } from "global.config"
 import { signIn, useSession } from "next-auth/react"
 import { useRouter } from 'next/router'
