@@ -57,7 +57,7 @@ export const NavBar = () => {
     const renderMenu = useMemo(() => {
         if (valid)
             return <Menu
-                className='top-0 left-0 w-48 h-full col-start-1 row-span-3 row-start-2 border-2 border-green-500'
+                className='top-0 left-0 w-48 h-full col-start-1 row-span-3 row-start-2 mt-0.5 border-2 border-green-500 rounded-lg'
                 onClick={onClick}
                 selectedKeys={[current]}
                 mode="vertical"

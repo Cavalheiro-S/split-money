@@ -1,6 +1,7 @@
+import { PlusOutlined, SaveOutlined } from "@ant-design/icons"
 import { DevTool } from "@hookform/devtools"
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Form, Input, Select } from 'antd'
+import { Button, Form, Input, Select, Space } from 'antd'
 import TransactionCategoryTranslate from 'assets/translate/TransactionCategory.json'
 import { Modal } from 'components/Modal/Modal'
 import { TransactionCategoryEnum } from 'enums/transaction-category.enum'
@@ -24,7 +25,7 @@ interface Inputs {
     category: string
 }
 
-const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
+export const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
 
     const schema = z.object({
         description: z.string().nonempty({ message: "Descrição deve ter entre 3 e 50 caracteres" }),
@@ -169,7 +170,21 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
                         )}
                     />
                 </Form.Item>
-                <Button className='w-full' size='large' htmlType='submit'>{transaction ? "Atualizar" : "Adicionar"}</Button>
+                <Space className="flex justify-between">
+                    <Button
+                        size='large'
+                        onClick={handleClose}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="primary"
+                        size='large'
+                        icon={<PlusOutlined />}
+                        loading={transactionCreateMutate.isPending || transactionUpdateMutate.isPending}
+                        htmlType='submit'>{
+                            transaction ? "Atualizar" : "Adicionar"}
+                    </Button>
+                </Space>
             </Form>
         </FormProvider>
     )
@@ -179,7 +194,7 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
                 closeModal={handleClose}
                 openModal={() => setOpen(true)}
                 open={open}
-                trigger={<Button>Adicionar</Button>}
+                isLoading={transactionCreateMutate.isPending || transactionUpdateMutate.isPending}
                 content={renderContent}
             />
             <DevTool control={control} />
@@ -187,4 +202,4 @@ const RecordModal = ({ open, setOpen, transaction }: RecordModalProps) => {
     )
 }
 
-export default RecordModal
+
