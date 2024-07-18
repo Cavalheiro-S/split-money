@@ -6,6 +6,7 @@ import TableRecord from './_components/Record/table-record';
 export default function Page() {
     const {
         transactions,
+        transactionsLoading,
         transactionDeleteMutate,
         transactionUpdateMutate
     } = useTransaction({ page: 1, count: 10 })
@@ -50,7 +51,7 @@ export default function Page() {
                 onEdit={handleEdit}
                 data={transactions}
                 hasActions
-                className='w-full h-fit'
+                isLoading={transactionsLoading}
                 title='Lançamentos' />
         </div>
     )

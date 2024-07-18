@@ -71,7 +71,7 @@ export default function Page() {
     }
 
     return (
-        <Space direction="vertical" className="col-start-2 px-10 mt-10">
+        <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10">
             <TableRecord
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -86,6 +86,6 @@ export default function Page() {
                 data={transactionsOutcome ?? []}
                 isLoading={transactionsLoadingOutcome}
                 title="Últimas Despesas" />
-        </Space>
+        </div>
     )
 }

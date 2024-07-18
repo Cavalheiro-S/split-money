@@ -1,10 +1,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input } from 'antd'
-import { SessionStatusEnum } from "enums/next-auth.enum"
 import { routes } from "global.config"
 import { signIn, useSession } from "next-auth/react"
 import { useRouter } from 'next/router'
+import { useState } from "react"
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import * as z from 'zod'
@@ -20,6 +20,7 @@ const schema = z.object({
 })
 
 export default function Page() {
+  const [loading, setLoading] = useState(false)
   const { data, status } = useSession()
   const router = useRouter()
 
@@ -33,6 +34,7 @@ export default function Page() {
 
   const OnSubmit: SubmitHandler<Inputs> = async data => {
     try {
+      setLoading(true)
       await signIn('credentials', {
         email: data.email,
         password: data.password,
@@ -42,6 +44,9 @@ export default function Page() {
     }
     catch (error) {
       console.log(error)
+    }
+    finally {
+      setLoading(false)
     }
   }
 
@@ -67,9 +72,9 @@ export default function Page() {
           <Input.Password size='large' type='password' placeholder='********' />
         </FormItem>
         <div className='flex flex-col gap-4'>
-          <Button loading={status === SessionStatusEnum.loading} htmlType="submit" size='large'>Entrar</Button>
+          <Button loading={loading} htmlType="submit" size='large'>Entrar</Button>
           <Button
-            disabled={status === SessionStatusEnum.loading}
+            disabled={loading}
             htmlType='button'
             size='large'
             onClick={() => router.push("/session/signup")}>Criar Conta</Button>
