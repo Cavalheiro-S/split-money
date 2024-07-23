@@ -10,7 +10,7 @@ type CardProps = {
     title: string
 }
 
-export const TransactionCard = ({ type, title }: CardProps) => {
+const TransactionCard = ({ type, title }: CardProps) => {
     const { setPage, setCount, page, count } = useTable()
     const [dateSelected, setDateSelected] = useState(new Date())
 
@@ -53,3 +53,5 @@ export const TransactionCard = ({ type, title }: CardProps) => {
             title={title} />
     )
 }
+
+export default TransactionCard

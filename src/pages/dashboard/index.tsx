@@ -1,5 +1,5 @@
 
-import { TransactionCard } from "./_components/transaction-card";
+import TransactionCard from "./_components/transaction-card";
 
 export default function Page() {
     return (

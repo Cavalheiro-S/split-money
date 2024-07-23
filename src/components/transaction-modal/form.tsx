@@ -1,7 +1,6 @@
 import { PlusOutlined } from "@ant-design/icons"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, Form, Input, Select, Space, Switch } from "antd"
-import TransactionCategoryTranslate from 'assets/translate/TransactionCategory.json'
 import { TransactionTableContext } from "contexts/transaction-table-context"
 import { TransactionCategoryEnum } from "enums/transaction-category.enum"
 import { TransactionRecurrenceIntervalEnum } from "enums/transaction-recurrence-interval"
