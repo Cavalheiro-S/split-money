@@ -9,7 +9,7 @@ export const useTransaction = (filter?: FilterTransaction) => {
         queryKey: ["transactions", filter],
         queryFn: () => getTransactions(filter ?? {} as FilterTransaction),
         select: (data) => {
-            return data?.map(item => {
+            const transactions = data?.data.map(item => {
                 const dataIso = moment.utc(item.date)
                     .format('YYYY-MM-DD HH:mm:ss')
                 return {
@@ -17,6 +17,10 @@ export const useTransaction = (filter?: FilterTransaction) => {
                     date: dataIso
                 }
             })
+            return {
+                data: transactions,
+                ...data
+            }
         }
     })
 
