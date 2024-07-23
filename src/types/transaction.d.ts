@@ -5,6 +5,7 @@ type ResponseGetTransactions = {
     date: string;
     type: TransactionType;
     category: string;
+    recurrent: boolean;
 }
 
 type RequestCreateTransaction = {
@@ -13,6 +14,11 @@ type RequestCreateTransaction = {
     description: string;
     date: string;
     type: TransactionType;
+    recurrent: boolean;
+    recurrence?: {
+        interval: string;
+        occurrences: number;
+    }
 }
 
 type RequestUpdateTransaction = RequestCreateTransaction & {
