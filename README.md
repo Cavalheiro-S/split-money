@@ -1,38 +1,94 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Split Money
 
-## Getting Started
+## Descrição
 
-First, run the development server:
+O **Split Money** é uma aplicação de controle financeiro que permite cadastrar transações com informações de entradas e saídas de dinheiro. Você pode informar o tipo do gasto, valor, data e nome, além de poder cadastrar transações recorrentes. O sistema também conta com um dashboard com informações dos últimos gastos, lançamentos e filtros por mês.
+
+## Tecnologias Utilizadas
+
+- **Next.js**: Framework React para renderização do lado do servidor e geração de sites estáticos.
+- **TypeScript**: Linguagem que adiciona tipagem estática ao JavaScript.
+- **React**: Biblioteca para construção de interfaces de usuário.
+- **Tailwind CSS**: Framework de CSS utilitário para estilização rápida e personalizada.
+- **Ant Design**: Biblioteca de componentes React para interfaces de usuário com design sofisticado.
+- **React Query**: Biblioteca para gerenciamento e sincronização de estados de servidor.
+- **Day.js** e **Moment.js**: Bibliotecas para manipulação de datas.
+- **Axios**: Biblioteca para fazer requisições HTTP.
+- **JWT**: JSON Web Token para autenticação e autorização.
+- **Zod**: Biblioteca para validação de esquemas e tipos.
+
+## Instalação
+
+Para instalar e configurar o projeto localmente, siga os passos abaixo:
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/Cavalheiro-S/split-money.git
+   ```
+
+2. Navegue até o diretório do projeto:
+   ```bash
+   cd split-money
+   ```
+
+3. Instale as dependências:
+   ```bash
+   npm install
+   ```
+
+## Configuração
+
+Antes de executar o projeto, configure as variáveis de ambiente necessárias. Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis (substitua pelos valores corretos):
+
+```env
+NEXT_PUBLIC_BACKEND_URL=your_database_url
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_jwt_secret
+```
+
+## Uso
+
+Para iniciar o servidor de desenvolvimento, execute:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Para construir o projeto para produção, execute:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Para iniciar o servidor em produção, execute:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+npm run start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Contribuição
 
-## Learn More
+Contribuições são bem-vindas! Para contribuir com o projeto:
 
-To learn more about Next.js, take a look at the following resources:
+1. Faça um fork do repositório.
+2. Crie uma branch para sua feature:
+   ```bash
+   git checkout -b minha-feature
+   ```
+3. Faça as mudanças e commit:
+   ```bash
+   git commit -am 'Adiciona nova feature'
+   ```
+4. Envie para o repositório remoto:
+   ```bash
+   git push origin minha-feature
+   ```
+5. Abra um pull request.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Licença
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Este projeto está licenciado sob a [MIT License](LICENSE).
 
-## Deploy on Vercel
+## Contato
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Para questões ou suporte, entre em contato com [luccribeiro53@gmail.com](mailto:luccribeiro53@gmail.com).
