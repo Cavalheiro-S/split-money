@@ -12,6 +12,7 @@ export const AntDesignProvider = ({ children }: Props) => {
             theme={{
                 token: {
                     colorPrimary: "#00B528",
+                    fontFamily: 'Rubik',
                 }
             }}
         >

@@ -37,7 +37,7 @@ type ResponseCreateTransaction = {
 
 type TransactionType = "income" | "outcome"
 
-type FilterTransaction = Pagination & {
+type FilterTransaction = Omit<Pagination<ResponseGetTransactions>, "total" | "data"> & {
     type?: TransactionType
     period?: Date
 }
