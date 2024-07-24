@@ -1,4 +1,4 @@
-import { DatePicker, Input, Space, Typography } from "antd"
+import { DatePicker, Space } from "antd"
 import { TransactionModal } from "components/transaction-modal/modal"
 import dayjs, { Dayjs } from "dayjs"
 
@@ -28,7 +28,6 @@ export const TableTitle = ({ title, onChangeDate, hasActions }: TitleProps) => {
                 {hasActions && <TransactionModal />}
             </Space>
             <div className='flex gap-2'>
-                <Input placeholder="Pesquisar" className='w-52'/>
                 {renderChangeDateFilter()}
             </div>
         </div>
