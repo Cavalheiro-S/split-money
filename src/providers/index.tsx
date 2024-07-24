@@ -12,7 +12,7 @@ export const Providers = ({ children }: Props) => {
     return (
         <AntDesignProvider>
             <QueryClientProvider >
-                <ToastContainer limit={1} />
+                <ToastContainer limit={3} />
                 <SessionProvider>
                     {children}
                 </SessionProvider>

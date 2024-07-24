@@ -1,4 +1,5 @@
 export enum TransactionCategoryEnum {
+    Others = "Outros",
     Food = "Comida",
     Transportation = "Transporte",
     Health = "Saúde",
@@ -8,5 +9,4 @@ export enum TransactionCategoryEnum {
     Beauty = "Beleza",
     Electronics = "Eletrônicos",
     Home= "Casa",
-    Others = "Outros"
 }

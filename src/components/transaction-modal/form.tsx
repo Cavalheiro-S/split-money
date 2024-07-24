@@ -9,6 +9,7 @@ import moment from "moment"
 import { useContext, useEffect } from "react"
 import { Controller, FormProvider, useForm } from "react-hook-form"
 import { toast } from "react-toastify"
+import { getFirstEnumKey } from "utils"
 import * as z from 'zod'
 
 export const TransactionModalForm = () => {
@@ -34,7 +35,7 @@ export const TransactionModalForm = () => {
         defaultValues: {
             date: moment().format("yyyy-MM-DD"),
             type: "income",
-            category: TransactionCategoryEnum.Others,
+            category: getFirstEnumKey(TransactionCategoryEnum),
             recurrent: {
                 active: false
             },
@@ -52,7 +53,7 @@ export const TransactionModalForm = () => {
             setValue("amount", transaction.amount ?? 0);
             setValue("date", moment(transaction.date).format("YYYY-MM-DD") ?? moment().format("YYYY-MM-DD"));
             setValue("type", transaction.type ?? "income");
-            setValue("category", transaction.category ?? TransactionCategoryEnum.Others);
+            setValue("category", transaction.category ?? getFirstEnumKey(TransactionCategoryEnum));
             setValue("recurrent.active", transaction.recurrent ?? false);
         }
     }, [transaction, setValue]);
@@ -110,11 +111,11 @@ export const TransactionModalForm = () => {
 
     const renderCategories = () => {
         const categories = Object.entries(TransactionCategoryEnum)
-        return categories.map(([value, label], index) => ({
+        return categories.map(([key, label], index) => ({
 
             label: label,
-            value: value,
-            key: value + index.toString()
+            value: key,
+            key: key + index.toString()
 
         }))
     }
