@@ -1,6 +1,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Form, Input } from 'antd'
+import { Button, Card, Form, Input, Typography } from 'antd'
 import { routes } from "global.config"
 import { signIn, useSession } from "next-auth/react"
 import { useRouter } from 'next/router'
@@ -62,11 +62,11 @@ export default function Page() {
   }
 
   return (
-    <div className={`flex flex-col gap-5 p-8 m-auto bg-white rounded row-start-2 ${data?.accessToken ? "col-start-2" : "col-span-2"}`}>
-      <div>
-        <h3 className='text-2xl font-semibold'>Acesse sua conta</h3>
-        <span className='text-gray-500'>Informe seus dados para acessar , ou acesse com outra forma de login</span>
-      </div>
+    <Card
+      className={`flex flex-col gap-4 p-8 m-auto bg-white border-2 border-solid border-gray-200 shadow-md rounded-md ${data?.accessToken ? "col-start-2" : "col-span-2"}`}>
+      <Typography.Title level={3} className='m-0 font-semibold'>Acesse sua conta</Typography.Title>
+      <Typography.Text className='inline-block mb-2 text-gray-500'>Informe seus dados para acessar , ou acesse com outra forma de login</Typography.Text>
+
       <Form layout='vertical' onFinish={handleSubmit(OnSubmit)}>
         <FormItem
           label="Email"
@@ -83,14 +83,14 @@ export default function Page() {
           <Input.Password size='large' type='password' placeholder='********' />
         </FormItem>
         <div className='flex flex-col gap-4'>
-          <Button loading={loading} htmlType="submit" size='large'>Entrar</Button>
-          <Button
+          <Button loading={loading} htmlType="submit" size='large' type='primary'>Entrar</Button>
+          {/* <Button
             disabled={loading}
             htmlType='button'
             size='large'
-            onClick={() => router.push("/session/signup")}>Criar Conta</Button>
+            onClick={() => router.push("/session/signup")}>Criar Conta</Button> */}
         </div>
       </Form>
-    </div>
+    </Card>
   )
 }

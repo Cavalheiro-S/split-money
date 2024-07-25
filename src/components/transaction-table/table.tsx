@@ -48,7 +48,7 @@ export const TransactionTableRoot = ({
     const columns = useColumns(hasActions ?? false, onEdit, onDelete)
     
     return (
-        <Flex className='flex-col w-full p-2 py-1 bg-white rounded-lg h-fit'>
+        <Flex className='flex-col w-full p-2 py-1 bg-white border-2 border-gray-200 border-solid rounded-lg h-fit'>
             <Table
                 loading={isLoading}
                 rowKey={record => record.id ?? record.description + record.category}
