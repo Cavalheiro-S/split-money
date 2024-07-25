@@ -1,5 +1,3 @@
-
-
 import { Flex, Table } from "antd"
 import { TransactionTableContext } from 'contexts/transaction-table-context'
 import { Dayjs } from 'dayjs'
@@ -9,7 +7,6 @@ import { useColumns } from './hooks/use-columns'
 import { TablePagination } from './pagination'
 import { TableSummary } from './summary'
 import { TableTitle } from './title'
-
 
 export type TransactionTableProps = {
     title: string,

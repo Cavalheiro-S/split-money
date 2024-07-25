@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useState } from "react"
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
+import { toast } from "react-toastify"
 import * as z from 'zod'
 
 interface Inputs {
@@ -21,10 +22,10 @@ const schema = z.object({
 
 export default function Page() {
   const [loading, setLoading] = useState(false)
-  const { data, status } = useSession()
+  const { data } = useSession()
   const router = useRouter()
 
-  const { handleSubmit, control, } = useForm<Inputs>({
+  const { handleSubmit, control } = useForm<Inputs>({
     defaultValues: {
       email: "",
       password: ""
@@ -35,12 +36,22 @@ export default function Page() {
   const OnSubmit: SubmitHandler<Inputs> = async data => {
     try {
       setLoading(true)
-      await signIn('credentials', {
+      const response = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: true,
-        callbackUrl: routes.dashboard
+        redirect: false,
       })
+
+      if (response?.error) {
+        toast.error(response.error)
+        return;
+      }
+
+      if (response?.ok) {
+        toast.success("Login efetuado com sucesso")
+        router.push(routes.dashboard)
+      }
+
     }
     catch (error) {
       console.log(error)
