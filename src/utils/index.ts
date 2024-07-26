@@ -15,3 +15,8 @@ export const formatInputMoney = (value: string): number => {
         .replace(",", ".")
     return Number(valueAsString)
 }
+
+export const getFirstEnumKey = (enumObj: object): string => {
+    const keys = Object.keys(enumObj) as Array<keyof typeof enumObj>;
+    return keys[0];
+}

@@ -12,7 +12,7 @@ module.exports = {
         'background': '#EEEEEE',
       },
       fontFamily: {
-        'sans': ['var(--font-rubik)'],
+        'sans': ['Rubik', 'sans-serif'],
       }
     },
   },

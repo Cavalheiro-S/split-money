@@ -9,6 +9,7 @@ import moment from "moment"
 import { useContext, useEffect } from "react"
 import { Controller, FormProvider, useForm } from "react-hook-form"
 import { toast } from "react-toastify"
+import { getFirstEnumKey } from "utils"
 import * as z from 'zod'
 
 export const TransactionModalForm = () => {
@@ -34,7 +35,7 @@ export const TransactionModalForm = () => {
         defaultValues: {
             date: moment().format("yyyy-MM-DD"),
             type: "income",
-            category: TransactionCategoryEnum.Others,
+            category: getFirstEnumKey(TransactionCategoryEnum),
             recurrent: {
                 active: false
             },
@@ -52,16 +53,16 @@ export const TransactionModalForm = () => {
             setValue("amount", transaction.amount ?? 0);
             setValue("date", moment(transaction.date).format("YYYY-MM-DD") ?? moment().format("YYYY-MM-DD"));
             setValue("type", transaction.type ?? "income");
-            setValue("category", transaction.category ?? TransactionCategoryEnum.Others);
+            setValue("category", transaction.category ?? getFirstEnumKey(TransactionCategoryEnum));
             setValue("recurrent.active", transaction.recurrent ?? false);
         }
     }, [transaction, setValue]);
 
     useEffect(() => {
-        if(!open){
+        if (!open) {
             reset()
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
     const handleClose = () => {
@@ -110,11 +111,11 @@ export const TransactionModalForm = () => {
 
     const renderCategories = () => {
         const categories = Object.entries(TransactionCategoryEnum)
-        return categories.map(([value, label], index) => ({
+        return categories.map(([key, label], index) => ({
 
             label: label,
-            value: value,
-            key: value + index.toString()
+            value: key,
+            key: key + index.toString()
 
         }))
     }
@@ -133,7 +134,7 @@ export const TransactionModalForm = () => {
             <Form
                 onFinish={handleSubmit(onSubmit)}
                 layout='vertical'
-                className='grid grid-cols-2 gap-2 p-4 text-gray-800'>
+                className='grid grid-cols-2 p-4 text-gray-800 gap-x-2'>
                 <Form.Item label="Descrição" className="col-span-2" >
                     <Controller
                         name="description"
@@ -203,16 +204,15 @@ export const TransactionModalForm = () => {
                                 checked={field.value}
                                 checkedChildren={<>Habilitado</>}
                                 unCheckedChildren={<>Desabilitado</>}
-                                onChange={(e) => {
-                                    field.onChange(e)
-                                }
-                                } />
+                                onChange={(e) => { field.onChange(e) }} />
                         )}
                     />
                 </Form.Item>
                 {(watch("recurrent.active") && !transaction)
                     ? <>
-                        <Form.Item label="Intervalo">
+                        <Form.Item
+                            label="Intervalo"
+                            tooltip={{ title: "Intervalo entre a recorrência dessa transação" }}>
                             <Controller
                                 name="recurrent.interval"
                                 control={control}
@@ -221,7 +221,7 @@ export const TransactionModalForm = () => {
                                 )}
                             />
                         </Form.Item>
-                        <Form.Item label="Frequencia">
+                        <Form.Item label="Frequencia" tooltip={{ title: "Quantidade de ocorrências dessa transação" }}>
                             <Controller
                                 name="recurrent.occurrences"
                                 control={control}
