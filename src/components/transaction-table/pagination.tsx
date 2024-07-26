@@ -17,13 +17,13 @@ export const TablePagination = ({ data, handleSetCount, handleSetPage }: Paginat
         <Flex className='items-center justify-end '>
             <Typography.Text className='mr-2'>Transações por página:</Typography.Text>
             <Select
-                defaultValue={data?.count ?? 5}
+                defaultValue={data?.count ?? 15}
                 options={[{
                     label: 5,
                     value: 5
                 }, {
-                    label: 10,
-                    value: 10
+                    label: 15,
+                    value: 15
                 }, {
                     label: 25,
                     value: 25
@@ -39,7 +39,7 @@ export const TablePagination = ({ data, handleSetCount, handleSetPage }: Paginat
             <Pagination
                 className='py-6'
                 current={data?.page ?? 1}
-                pageSize={data?.count ?? 10}
+                pageSize={data?.count ?? 15}
                 total={data?.total ?? 0}
                 showLessItems
                 onChange={page => handleSetPage(page)}

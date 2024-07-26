@@ -1,8 +1,8 @@
 import { useState } from "react"
 
-export const useTable = () => {
-    const [page, setPage] = useState(1)
-    const [count, setCount] = useState(5)
+export const useTable = (pageDefault = 1, countDefault = 15) => {
+    const [page, setPage] = useState(pageDefault)
+    const [count, setCount] = useState(countDefault)
 
     const handleSetPage = (value: number) => {
         setPage(value)
