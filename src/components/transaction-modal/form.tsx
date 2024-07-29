@@ -59,10 +59,10 @@ export const TransactionModalForm = () => {
     }, [transaction, setValue]);
 
     useEffect(() => {
-        if(!open){
+        if (!open) {
             reset()
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
     const handleClose = () => {
@@ -134,7 +134,7 @@ export const TransactionModalForm = () => {
             <Form
                 onFinish={handleSubmit(onSubmit)}
                 layout='vertical'
-                className='grid grid-cols-2 gap-2 p-4 text-gray-800'>
+                className='grid grid-cols-2 p-4 text-gray-800 gap-x-2'>
                 <Form.Item label="Descrição" className="col-span-2" >
                     <Controller
                         name="description"
@@ -204,16 +204,15 @@ export const TransactionModalForm = () => {
                                 checked={field.value}
                                 checkedChildren={<>Habilitado</>}
                                 unCheckedChildren={<>Desabilitado</>}
-                                onChange={(e) => {
-                                    field.onChange(e)
-                                }
-                                } />
+                                onChange={(e) => { field.onChange(e) }} />
                         )}
                     />
                 </Form.Item>
                 {(watch("recurrent.active") && !transaction)
                     ? <>
-                        <Form.Item label="Intervalo">
+                        <Form.Item
+                            label="Intervalo"
+                            tooltip={{ title: "Intervalo entre a recorrência dessa transação" }}>
                             <Controller
                                 name="recurrent.interval"
                                 control={control}
@@ -222,7 +221,7 @@ export const TransactionModalForm = () => {
                                 )}
                             />
                         </Form.Item>
-                        <Form.Item label="Frequencia">
+                        <Form.Item label="Frequencia" tooltip={{ title: "Quantidade de ocorrências dessa transação" }}>
                             <Controller
                                 name="recurrent.occurrences"
                                 control={control}

@@ -42,8 +42,10 @@ export const authOptions: AuthOptions = {
                     return null
                 }
                 catch (error) {
-                    console.log('Login error', error)
-                    return null
+                    if(error instanceof Error) {
+                        throw new Error(error.message)
+                    }
+                    throw new Error("Falha ao se comunicar com o servidor , por favor tente novamente mais tarde.")
                 }
             },
         },
@@ -70,7 +72,7 @@ export const authOptions: AuthOptions = {
         },
     },
     pages: {
-        signIn: "/session/login"
+        signIn: "/session/login",
     },
     session: {
         strategy: "jwt",

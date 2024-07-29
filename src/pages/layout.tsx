@@ -9,7 +9,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <Providers>
             <main
-                className={`text-gray-800 relative grid grid-rows-[100px_1fr] grid-cols-[192px_1fr] min-h-screen overflow-hidden font-sans bg-background`}>
+                className={`text-gray-800 relative grid grid-rows-[100px_1fr] grid-cols-[192px_1fr] min-h-screen overflow-hidden font-sans `}>
                 <Suspense fallback={<Loading />}>
                     <Header />
                     <NavBar />
