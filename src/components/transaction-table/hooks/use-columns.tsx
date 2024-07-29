@@ -28,6 +28,13 @@ export const useColumns = (hasActions: boolean, onEdit: (transaction: ResponseGe
             key: 'description',
         },
         {
+            title: 'Recorrente',
+            className: '!p-2',
+            dataIndex: 'recurrent',
+            key: 'recurrent',
+            render: (_, record) => <p>{(record.recurrent || record.hasChildren) ? 'Sim' : 'Não'}</p>
+        },
+        {
             title: 'Data',
             className: '!p-2',
             dataIndex: 'date',

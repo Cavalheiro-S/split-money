@@ -6,6 +6,7 @@ type ResponseGetTransactions = {
     type: TransactionType;
     category: string;
     recurrent: boolean;
+    hasChildren: boolean
 }
 
 type RequestCreateTransaction = {
