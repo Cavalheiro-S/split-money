@@ -7,12 +7,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { TransactionCategoryEnum } from "@/enums/transaction-category.enum";
+import { api } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
@@ -20,8 +23,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { toast } from "sonner";
-import { api } from "@/lib/axios";
 
 
 const schema = z.object({
@@ -35,10 +36,14 @@ const schema = z.object({
 
 interface TransactionTableActionModalProps {
   trigger: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  transaction?: Transaction;
 }
 
 
-function TransactionActionModal({ trigger }: TransactionTableActionModalProps) {
+function TransactionActionModal({ trigger, transaction, open, onOpenChange }: TransactionTableActionModalProps) {
+  const isEditing = !!transaction
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -50,11 +55,21 @@ function TransactionActionModal({ trigger }: TransactionTableActionModalProps) {
     },
   });
 
+  const { setValue, reset, formState: { isSubmitting } } = form
+
   async function onSubmit(data: z.infer<typeof schema>) {
     try {
-      const response = await api.post("/transaction", data)
-      console.log({ response });
-
+      if (isEditing) {
+        const response = await api.patch(`/transaction/${transaction?.id}`, data)
+        console.log({ response });
+        toast("Transação atualizada com sucesso")
+      }
+      else {
+        const response = await api.post("/transaction", data)
+        console.log({ response });
+        toast("Transação criada com sucesso")
+      }
+      onOpenChange?.(false)
     }
     catch (error) {
       toast("Falha ao criar transação")
@@ -63,8 +78,33 @@ function TransactionActionModal({ trigger }: TransactionTableActionModalProps) {
     }
   }
 
+  useEffect(() => {
+    if (transaction) {
+      setValue("amount", transaction.amount)
+      setValue("category", transaction.category)
+      setValue("date", new Date(transaction.date))
+      setValue("description", transaction.description)
+      setValue("recurrent", transaction.recurrent || false)
+      setValue("type", transaction.type)
+    }
+    else {
+      reset()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transaction])
+
+  useEffect(() => {
+    if (!open) {
+      reset()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  console.log({ errors: form.formState.errors });
+
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
@@ -199,9 +239,12 @@ function TransactionActionModal({ trigger }: TransactionTableActionModalProps) {
                 )}
               />
 
-              <div className="flex w-full">
+              <div className="flex w-full justify-end">
 
-                <Button className="" type="submit">Enviar</Button>
+                <Button disabled={isSubmitting} type="submit">
+                  {isSubmitting && <Loader2 className="animate-spin" />}
+                  {isSubmitting ? "Enviando..." : "Enviar"}
+                </Button>
               </div>
             </form>
           </Form>

@@ -6,25 +6,37 @@ import { useEffect, useState } from "react";
 
 export default function Page() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
+    const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
+
     const getTransactions = async () => {
         const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions")
-        console.log(data.data);
-
         setTransactions(data.data)
-        console.log(data.data);
+    }
+
+    const handleEdit = (id: string) => {
+        setModalTransactionOpen(true)
+        const transaction = id ? transactions.find(transaction => transaction.id === id) : undefined
+        setTransactionSelected(transaction)
     }
 
     useEffect(() => {
         getTransactions()
-    }, [])
+    }, [transactionSelected])
+
+    useEffect(() => {
+        if (!modalTransactionOpen) {
+            setTransactionSelected(undefined)
+        }
+    }, [modalTransactionOpen])
 
     return (
         <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10">
             <TableTransaction.Container>
                 <TableTransaction.Header title="Transações" subtitle="Aqui você pode ver os seus lançamentos">
-                    <TableTransaction.ActionModal trigger={<Button className="place-self-end">Adicionar</Button>} />
+                    <TableTransaction.ActionModal transaction={transactionSelected} open={modalTransactionOpen} onOpenChange={open => setModalTransactionOpen(open)} trigger={<Button className="place-self-end">Adicionar</Button>} />
                 </TableTransaction.Header>
-                <TableTransaction.Table data={transactions} />
+                <TableTransaction.Table onEditClick={handleEdit} data={transactions} />
             </TableTransaction.Container>
 
         </div>

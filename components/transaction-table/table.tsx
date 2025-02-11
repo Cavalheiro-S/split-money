@@ -9,11 +9,13 @@ import {
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { api } from "@/lib/axios";
+import { TransactionCategoryEnum } from "@/enums/transaction-category.enum";
 
 interface TransactionTableProps {
     data: Transaction[];
+    onEditClick?: (id: string) => void;
 }
-function TransactionTable({ data, }: TransactionTableProps) {
+function TransactionTable({ data, onEditClick }: TransactionTableProps) {
 
     const handleDelete = async (id: string) => {
         try {
@@ -49,10 +51,10 @@ function TransactionTable({ data, }: TransactionTableProps) {
                             <TableCell className="font-medium">{item.description}</TableCell>
                             <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell>
                             <TableCell>{new Date(item.date).toLocaleDateString("pt-br")}</TableCell>
-                            <TableCell className="text-right">{item.category}</TableCell>
-                            <TableCell className="text-right">{item.amount.toLocaleString("pt-br")}</TableCell>
+                            <TableCell className="text-right">{TransactionCategoryEnum[item.category as keyof typeof TransactionCategoryEnum]}</TableCell>
+                            <TableCell className="text-right">{item.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                             <TableCell className="text-center">
-                                <Button className="mr-2">Editar</Button>
+                                <Button onClick={() => { onEditClick?.(item.id) }} className="mr-2">Editar</Button>
                                 <Button onClick={() => { handleDelete(item.id) }} variant="destructive">Excluir</Button>
                             </TableCell>
                         </TableRow>

@@ -5,4 +5,5 @@ type Transaction = {
     date: string;
     category: string;
     amount: number;
+    type: "income" | "outcome";
 }
