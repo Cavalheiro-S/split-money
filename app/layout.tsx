@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const rubikSans = Rubik({
   variable: "--font-rubik",
@@ -23,6 +24,7 @@ export default function RootLayout({
         className={`${rubikSans.variable} antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );
