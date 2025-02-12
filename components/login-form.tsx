@@ -2,16 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { api } from "@/lib/axios"
+import { STORAGE_KEYS } from "@/consts/storage"
+import { apiWithoutAuth } from "@/lib/axios"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GalleryVerticalEnd, Loader } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
-import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   email: z
@@ -38,8 +39,8 @@ export function LoginForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const {data} = await api.post<{ accessToken: string, refreshToken: string }>("/sign-in", values)
-      localStorage.setItem("token", data.accessToken)
+      const { data: { accessToken } } = await apiWithoutAuth.post<{ accessToken: string, refreshToken: string }>("/sign-in", values)
+      localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, accessToken)
       toast.success("Login realizado com sucesso!")
       router.push("/dashboard")
     }
