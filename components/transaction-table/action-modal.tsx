@@ -43,7 +43,6 @@ interface TransactionTableActionModalProps {
 
 
 function TransactionActionModal({ trigger, transaction, open, onOpenChange }: TransactionTableActionModalProps) {
-  const isEditing = !!transaction
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -58,21 +57,20 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange }: Tr
   const { setValue, reset, formState: { isSubmitting } } = form
 
   async function onSubmit(data: z.infer<typeof schema>) {
+    const action = transaction ? "atualizar" : "criar"
     try {
-      if (isEditing) {
-        const response = await api.patch(`/transaction/${transaction?.id}`, data)
-        console.log({ response });
+      if (transaction) {
+        await api.patch(`/transaction/${transaction.id}`, data)
         toast("Transação atualizada com sucesso")
       }
       else {
-        const response = await api.post("/transaction", data)
-        console.log({ response });
+        await api.post("/transaction", data)
         toast("Transação criada com sucesso")
       }
       onOpenChange?.(false)
     }
     catch (error) {
-      toast("Falha ao criar transação")
+      toast(`Falha ao ${action} transação`)
       console.log({ error });
 
     }
@@ -110,9 +108,9 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange }: Tr
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novo lançamento</DialogTitle>
+          <DialogTitle>{transaction ? "Editar" : "Novo"} lançamento</DialogTitle>
           <DialogDescription>
-            Informe os dados abaixo para criar um novo lançamento.
+            {`Informe os dados abaixo para ${transaction ? "editar" : "criar" } um lançamento.`}
           </DialogDescription>
         </DialogHeader>
         <div>

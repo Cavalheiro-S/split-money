@@ -36,7 +36,7 @@ export default function Page() {
                 <TableTransaction.Header title="Transações" subtitle="Aqui você pode ver os seus lançamentos">
                     <TableTransaction.ActionModal transaction={transactionSelected} open={modalTransactionOpen} onOpenChange={open => setModalTransactionOpen(open)} trigger={<Button className="place-self-end">Adicionar</Button>} />
                 </TableTransaction.Header>
-                <TableTransaction.Table onEditClick={handleEdit} data={transactions} />
+                <TableTransaction.Table hasActions onEditClick={handleEdit} data={transactions} />
             </TableTransaction.Container>
 
         </div>
