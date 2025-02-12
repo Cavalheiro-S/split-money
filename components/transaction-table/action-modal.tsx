@@ -39,10 +39,11 @@ interface TransactionTableActionModalProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   transaction?: Transaction;
+  updateData?: () => Promise<void>;
 }
 
 
-function TransactionActionModal({ trigger, transaction, open, onOpenChange }: TransactionTableActionModalProps) {
+function TransactionActionModal({ trigger, transaction, open, onOpenChange, updateData }: TransactionTableActionModalProps) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -68,6 +69,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange }: Tr
         toast("Transação criada com sucesso")
       }
       onOpenChange?.(false)
+      await updateData?.()
     }
     catch (error) {
       toast(`Falha ao ${action} transação`)
@@ -110,7 +112,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange }: Tr
         <DialogHeader>
           <DialogTitle>{transaction ? "Editar" : "Novo"} lançamento</DialogTitle>
           <DialogDescription>
-            {`Informe os dados abaixo para ${transaction ? "editar" : "criar" } um lançamento.`}
+            {`Informe os dados abaixo para ${transaction ? "editar" : "criar"} um lançamento.`}
           </DialogDescription>
         </DialogHeader>
         <div>

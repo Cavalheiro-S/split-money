@@ -34,9 +34,16 @@ export default function Page() {
         <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10">
             <TableTransaction.Container>
                 <TableTransaction.Header title="Transações" subtitle="Aqui você pode ver os seus lançamentos">
-                    <TableTransaction.ActionModal transaction={transactionSelected} open={modalTransactionOpen} onOpenChange={open => setModalTransactionOpen(open)} trigger={<Button className="place-self-end">Adicionar</Button>} />
+                    <TableTransaction.ActionModal
+                        transaction={transactionSelected}
+                        open={modalTransactionOpen}
+                        onOpenChange={open => setModalTransactionOpen(open)}
+                        updateData={getTransactions}
+                        trigger={<Button className="place-self-end">
+                            Adicionar
+                        </Button>} />
                 </TableTransaction.Header>
-                <TableTransaction.Table hasActions onEditClick={handleEdit} data={transactions} />
+                <TableTransaction.Table hasActions onEditClick={handleEdit} data={transactions} updateData={getTransactions} />
             </TableTransaction.Container>
 
         </div>
