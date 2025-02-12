@@ -85,8 +85,8 @@ function TransactionTable({ data, onEditClick, hasActions, updateData }: Transac
                     <TableHead className="w-[300px]">Descrição</TableHead>
                     <TableHead>Recorrente</TableHead>
                     <TableHead className="w-28">Data</TableHead>
-                    <TableHead className="text-right">Categoria</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
+                    <TableHead className="text-left">Categoria</TableHead>
+                    <TableHead className="text-left">Valor</TableHead>
                     {hasActions && <TableHead className="text-center">Ações</TableHead>}
                 </TableRow>
             </TableHeader>
@@ -97,8 +97,8 @@ function TransactionTable({ data, onEditClick, hasActions, updateData }: Transac
                         <TableCell className="font-medium">{item.description}</TableCell>
                         <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell>
                         <TableCell>{new Date(item.date).toLocaleDateString("pt-br")}</TableCell>
-                        <TableCell className="text-right">{TransactionCategoryEnum[item.category as keyof typeof TransactionCategoryEnum]}</TableCell>
-                        <TableCell className="text-right">{item.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
+                        <TableCell className="text-left">{TransactionCategoryEnum[item.category as keyof typeof TransactionCategoryEnum]}</TableCell>
+                        <TableCell className="text-left">{item.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                         {
                             hasActions && (
                                 <TableCell className="text-center">

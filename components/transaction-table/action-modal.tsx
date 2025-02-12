@@ -143,7 +143,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
                           <SelectValue placeholder="Selecione um tipo de transação" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="z-50">
                         <SelectItem key={"income"} value={"income"}>
                           Entrada
                         </SelectItem>
