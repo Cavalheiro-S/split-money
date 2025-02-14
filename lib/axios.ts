@@ -16,8 +16,9 @@ api.interceptors.request.use(
         const token = localStorage.getItem(STORAGE_KEYS.JWT_TOKEN)
         if (token) {
             const tokenPayload = decodeJwtPayload(token)
-            const expirationDate = new Date(tokenPayload?.exp * 1000)            
+            const expirationDate = new Date(tokenPayload?.exp * 1000)
             if (expirationDate < new Date()) {
+                localStorage.removeItem(STORAGE_KEYS.JWT_TOKEN)
                 redirect("sign-in");
             }
 
@@ -41,6 +42,7 @@ api.interceptors.response.use(
     },
     (error) => {
         if (error.response?.status === 401) {
+            localStorage.removeItem(STORAGE_KEYS.JWT_TOKEN)
             redirect("sign-in");
         }
         return Promise.reject(error)

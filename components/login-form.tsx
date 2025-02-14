@@ -2,8 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { STORAGE_KEYS } from "@/consts/storage"
-import { apiWithoutAuth } from "@/lib/axios"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GalleryVerticalEnd, Loader } from "lucide-react"
@@ -23,10 +21,12 @@ const formSchema = z.object({
     .min(8, { message: "Senha deve ter no mínimo 8 caracteres" }),
 })
 
+type LoginFormProps = React.ComponentPropsWithoutRef<"div">
+
 export function LoginForm({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: LoginFormProps) {
 
   const router = useRouter()
   const form = useForm({
@@ -39,8 +39,11 @@ export function LoginForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const { data: { accessToken } } = await apiWithoutAuth.post<{ accessToken: string, refreshToken: string }>("/sign-in", values)
-      localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, accessToken)
+      await fetch("/api/auth/sign-in", {
+        body: JSON.stringify(values),
+        method: "POST",
+      })
+      
       toast.success("Login realizado com sucesso!")
       router.push("/dashboard")
     }
