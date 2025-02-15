@@ -6,38 +6,20 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
-import { Button } from "../ui/button";
-import { toast } from "sonner";
-import { api } from "@/lib/axios";
 import { TransactionCategoryEnum } from "@/enums/transaction-category.enum";
 import { ArrowLeftRight, DollarSign, Landmark, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Button } from "../ui/button";
 
 interface TransactionTableProps {
     data: Transaction[];
+    loading?: boolean;
     hasActions?: boolean;
     onEditClick?: (id: string) => void;
-    updateData?: () => Promise<void>;
+    onDeleteClick?: (id: string) => void;
 }
-function TransactionTable({ data, onEditClick, hasActions, updateData }: TransactionTableProps) {
+function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loading }: TransactionTableProps) {
 
-    const [loading, setLoading] = useState(false);
-    const handleDelete = async (id: string) => {
-        try {
-            setLoading(true)
-            await api.delete(`/transaction/${id}`)
-            await updateData?.()
-            toast.success("Transação deletada com sucesso")
 
-        }
-        catch (error) {
-            toast.error("Falha ao deletar transação")
-            console.log({ error });
-        }
-        finally {
-            setLoading(false)
-        }
-    }
 
     const renderTypeCell = (type: "income" | "outcome") => {
         if (type === "income") {
@@ -58,20 +40,20 @@ function TransactionTable({ data, onEditClick, hasActions, updateData }: Transac
         )
     }
 
-    if (!data?.length) {
-        return (
-            <div className="flex flex-col h-full items-center justify-center p-10 gap-2">
-                <ArrowLeftRight />
-                <span className="text-muted-foreground">Nenhuma transação encontrada</span>
-            </div>
-        )
-    }
-
     if (loading) {
         return (
             <div className="flex h-full items-center justify-center p-10 gap-2">
                 < Loader2 className="animate-spin" />
                 <span className="text-muted-foreground">Carregando transações</span>
+            </div>
+        )
+    }
+
+    if (data && data.length < 1) {
+        return (
+            <div className="flex flex-col h-full items-center justify-center p-10 gap-2">
+                <ArrowLeftRight />
+                <span className="text-muted-foreground">Nenhuma transação encontrada</span>
             </div>
         )
     }
@@ -103,7 +85,7 @@ function TransactionTable({ data, onEditClick, hasActions, updateData }: Transac
                             hasActions && (
                                 <TableCell className="text-center">
                                     <Button disabled={loading} onClick={() => { onEditClick?.(item.id) }} className="mr-2">Editar</Button>
-                                    <Button disabled={loading} onClick={() => { handleDelete(item.id) }} variant="destructive">Excluir</Button>
+                                    <Button disabled={loading} onClick={() => { onDeleteClick?.(item.id) }} variant="destructive">Excluir</Button>
                                 </TableCell>
                             )
                         }

@@ -1,5 +1,4 @@
 import { STORAGE_KEYS } from "@/consts/storage";
-import { decodeJwtPayload } from "@/utils/auth";
 import axios from "axios";
 import { redirect } from "next/navigation";
 
@@ -15,19 +14,10 @@ api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem(STORAGE_KEYS.JWT_TOKEN)
         if (token) {
-            const tokenPayload = decodeJwtPayload(token)
-            const expirationDate = new Date(tokenPayload?.exp * 1000)
-            if (expirationDate < new Date()) {
-                localStorage.removeItem(STORAGE_KEYS.JWT_TOKEN)
-                redirect("sign-in");
-            }
-
             if (!config.headers) {
                 config.headers = {};
             }
             config.headers.Authorization = `Bearer ${token}`
-        } else {
-            redirect("sign-in");
         }
         return config
     },

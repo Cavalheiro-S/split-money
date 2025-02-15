@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
+import { STORAGE_KEYS } from "@/consts/storage"
 
 const formSchema = z.object({
   email: z
@@ -39,13 +40,18 @@ export function LoginForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await fetch("/api/auth/sign-in", {
+      const response = await fetch("/api/auth/sign-in", {
         body: JSON.stringify(values),
         method: "POST",
       })
-      
-      toast.success("Login realizado com sucesso!")
-      router.push("/dashboard")
+      if (response.ok) {
+        const { accessToken } = await response.json()
+        localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, accessToken)
+        router.push("/dashboard")
+        return;
+      }
+      toast.error("Falha ao realizar login")
+
     }
     catch (error) {
       toast.error("Falha ao realizar login")

@@ -3,15 +3,27 @@ import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/axios";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function Page() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
     const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
+    const [loading, setLoading] = useState(false);
 
     const getTransactions = async () => {
-        const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions")
-        setTransactions(data.data)
+        try{
+            setLoading(true)
+            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions")
+            setTransactions(data.data)
+        }
+        catch (error) {
+            toast.error("Falha ao buscar transações")
+            console.log({ error });
+        }
+        finally{
+            setLoading(false)
+        }
     }
 
     const handleEdit = (id: string) => {
@@ -20,9 +32,26 @@ export default function Page() {
         setTransactionSelected(transaction)
     }
 
+    const handleDelete = async (id: string) => {
+        try {
+            setLoading(true)
+            await api.delete(`/transaction/${id}`)
+            await getTransactions()
+            toast.success("Transação deletada com sucesso")
+
+        }
+        catch (error) {
+            toast.error("Falha ao deletar transação")
+            console.log({ error });
+        }
+        finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         getTransactions()
-    }, [transactionSelected])
+    }, [])
 
     useEffect(() => {
         if (!modalTransactionOpen) {
@@ -43,7 +72,13 @@ export default function Page() {
                             Adicionar
                         </Button>} />
                 </TableTransaction.Header>
-                <TableTransaction.Table hasActions onEditClick={handleEdit} data={transactions} updateData={getTransactions} />
+                <TableTransaction.Table
+                    hasActions
+                    onEditClick={handleEdit}
+                    data={transactions}
+                    loading={loading}
+                    onDeleteClick={handleDelete}
+                     />
             </TableTransaction.Container>
 
         </div>
