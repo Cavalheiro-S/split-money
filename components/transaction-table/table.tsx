@@ -91,6 +91,12 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                         }
                     </TableRow>
                 ))}
+                <TableRow>
+                    <TableCell colSpan={5} className="text-right font-semibold">Total</TableCell>
+                    <TableCell className="text-left font-semibold">{data.reduce((acc, item) => {
+                        return item.type === "income" ? acc + item.amount : acc - item.amount 
+                    }, 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
+                </TableRow>
             </TableBody>
         </Table>
     )
