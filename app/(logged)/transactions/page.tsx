@@ -14,7 +14,7 @@ export default function Page() {
     const getTransactions = async () => {
         try{
             setLoading(true)
-            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions")
+            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions?page=1&limit=10")
             setTransactions(data.data)
         }
         catch (error) {

@@ -5,37 +5,53 @@ import { api } from "@/lib/axios";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [incomes, setIncomes] = useState<Transaction[]>([]);
+    const [outcomes, setOutcomes] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const getTransactions = async () => {
-        try{
+    const getIncomes = async () => {
+        try {
             setLoading(true)
-            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions")
-            setTransactions(data.data)
+            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions?page=1&limit=10&type=income")
+            setIncomes(data.data)
         }
         catch (error) {
             console.log({ error });
         }
-        finally{
+        finally {
+            setLoading(false)
+        }
+    }
+
+    const getOutcomes = async () => {
+        try {
+            setLoading(true)
+            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions?page=1&limit=10&type=outcome")
+            setOutcomes(data.data)
+        }
+        catch (error) {
+            console.log({ error });
+        }
+        finally {
             setLoading(false)
         }
     }
 
     useEffect(() => {
-        getTransactions()
+        getIncomes()
+        getOutcomes()
     }, [])
 
     return (
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10">
             <TableTransaction.Container>
                 <TableTransaction.Header title="Últimos lançamentos" subtitle="Aqui você pode ver os seus lançamentos recentes" />
-                <TableTransaction.Table loading={loading} data={transactions} />
+                <TableTransaction.Table loading={loading} data={incomes} />
             </TableTransaction.Container>
 
             <TableTransaction.Container>
-                <TableTransaction.Header title="Últimas despesas" subtitle="Aqui você pode ver os seus lançamentos" />
-                <TableTransaction.Table loading={loading} data={transactions} />
+                <TableTransaction.Header title="Últimas despesas" subtitle="Aqui você pode ver os suas despesas recentes" />
+                <TableTransaction.Table loading={loading} data={outcomes} />
             </TableTransaction.Container>
         </div>
     )
