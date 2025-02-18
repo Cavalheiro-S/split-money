@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { GalleryVerticalEnd, Loader } from "lucide-react"
+import { Eye, EyeClosed, GalleryVerticalEnd, Loader } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -13,6 +13,7 @@ import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
 import { STORAGE_KEYS } from "@/consts/storage"
 import { AuthExceptions } from "@/enums/exceptions/auth"
+import { useState } from "react"
 
 const formSchema = z.object({
   email: z
@@ -29,7 +30,7 @@ export function LoginForm({
   className,
   ...props
 }: LoginFormProps) {
-
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -55,7 +56,7 @@ export function LoginForm({
       if (data.error?.code === AuthExceptions.InvalidInput) {
         toast.error("Email ou senha inválidos")
       }
-      else{
+      else {
         toast.error("Falha ao realizar login")
       }
 
@@ -111,7 +112,13 @@ export function LoginForm({
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
                     <FormControl>
-                      <Input placeholder="********" type="password" {...field} />
+                      <div className="relative">
+                        <Input placeholder="********" type={showPassword ? "text" : "password"} {...field} />
+                        {showPassword
+                          ? <EyeClosed onClick={() => setShowPassword(false)} className="h-5 w-5 text-muted-foreground right-0 absolute top-0 m-2 cursor-pointer" />
+                          : <Eye onClick={() => setShowPassword(true)} className="h-5 w-5 text-muted-foreground right-0 absolute top-0 m-2 cursor-pointer" />
+                        }
+                      </div>
                     </FormControl>
                     <Link
                       href="#"
