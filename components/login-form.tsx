@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
 import { STORAGE_KEYS } from "@/consts/storage"
+import { AuthExceptions } from "@/enums/exceptions/auth"
 
 const formSchema = z.object({
   email: z
@@ -44,13 +45,19 @@ export function LoginForm({
         body: JSON.stringify(values),
         method: "POST",
       })
+      const data = await response.json() as ResponseSignIn
       if (response.ok) {
-        const { accessToken } = await response.json()
+        const { accessToken } = data
         localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, accessToken)
         router.push("/dashboard")
         return;
       }
-      toast.error("Falha ao realizar login")
+      if (data.error?.code === AuthExceptions.InvalidInput) {
+        toast.error("Email ou senha inválidos")
+      }
+      else{
+        toast.error("Falha ao realizar login")
+      }
 
     }
     catch (error) {

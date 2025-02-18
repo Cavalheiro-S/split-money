@@ -100,9 +100,6 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  console.log({ errors: form.formState.errors });
-
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>

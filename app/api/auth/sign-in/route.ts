@@ -1,5 +1,8 @@
 import { STORAGE_KEYS } from "@/consts/storage";
+import { decodeJwtPayload } from "@/utils/auth";
 import { NextResponse } from "next/server";
+
+
 
 export async function POST(req: Request) {
     try {
@@ -8,15 +11,25 @@ export async function POST(req: Request) {
             body: JSON.stringify(data),
             method: "POST",
         });
-        console.log({ responseApi });
+        const { accessToken, error } = await responseApi.json() as ResponseSignIn;
 
-        const { accessToken } = await responseApi.json();
+        if (!responseApi.ok) {
+            return NextResponse.json({
+                message: "Login failed",
+                error: error
+            }, { status: 400 });
+        }
         const response = NextResponse.json({
             message: "Login successful",
-            accessToken,
+            accessToken: accessToken
         }, { status: 200 });
 
-        response.cookies.set(STORAGE_KEYS.JWT_TOKEN, accessToken);
+        const payload = await decodeJwtPayload(accessToken);
+        response.cookies.set(STORAGE_KEYS.JWT_TOKEN, accessToken, {
+            expires: payload?.exp,
+            path: "/",
+
+        });
         return response;
     } catch (error) {
         console.log(error);

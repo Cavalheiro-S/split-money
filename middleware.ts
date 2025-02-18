@@ -3,7 +3,6 @@ import { STORAGE_KEYS } from './consts/storage';
 
 export function middleware(request: NextRequest) {
     const token = request.cookies.get(STORAGE_KEYS.JWT_TOKEN);
-    console.log({ token });
     
     // Se o usuário tentar acessar /sign-in e já estiver autenticado, redireciona para /dashboard
     if (token && request.nextUrl.pathname.startsWith('/sign-in')) {
