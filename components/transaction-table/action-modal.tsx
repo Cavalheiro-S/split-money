@@ -23,15 +23,29 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-
+import CurrencyInput from "react-currency-input-field";
 
 const schema = z.object({
-  description: z.string().nonempty(),
-  type: z.enum(["income", "outcome"]),
+  description: z
+    .string({ message: "A descrição é obrigatória" })
+    .nonempty("A descrição é obrigatória"),
+  type: z
+    .enum(["income", "outcome"], { message: "O tipo é obrigatório" }),
   recurrent: z.boolean(),
-  date: z.coerce.date(),
-  category: z.string().nonempty(),
-  amount: z.coerce.number().nonnegative(),
+  date: z
+    .coerce
+    .date()
+    .default(() => new Date())
+  ,
+  category: z
+    .string({ message: "A categoria é obrigatória" })
+    .nonempty("A categoria é obrigatória"),
+  amount: z
+    .string({ message: "O valor é obrigatório" })
+    .min(1, "O valor é obrigatório")
+    .transform((val) => val.replace(/\./g, "").replace(",", "."))
+    .transform((val) => parseFloat(val))
+  ,
 })
 
 interface TransactionTableActionModalProps {
@@ -80,7 +94,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
 
   useEffect(() => {
     if (transaction) {
-      setValue("amount", transaction.amount)
+      setValue("amount", parseFloat(transaction.amount.toString()))
       setValue("category", transaction.category)
       setValue("date", new Date(transaction.date))
       setValue("description", transaction.description)
@@ -160,7 +174,17 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
                   <FormItem>
                     <FormLabel>Valor</FormLabel>
                     <FormControl>
-                      <Input placeholder="Valor" {...field} />
+
+                      <CurrencyInput
+                        decimalSeparator=","
+                        groupSeparator="."
+                        decimalsLimit={2}
+                        prefix="R$ "
+                        allowNegativeValue={false}
+                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                        customInput={Input}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -198,7 +222,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
                           selected={field.value}
                           onSelect={field.onChange}
                           disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
+                            date < new Date("1900-01-01")
                           }
                           initialFocus
                         />
