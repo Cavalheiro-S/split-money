@@ -2,29 +2,51 @@
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
+
+type Pagination = {
+    currentPage: number;
+    perPage: number;
+    total: number;
+    totalPages: number;
+}
 
 export default function Page() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
     const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
     const [loading, setLoading] = useState(false);
-
-    const getTransactions = async () => {
-        try{
+    const [pagination, setPagination] = useState<Pagination>({
+        currentPage: 1,
+        perPage: 2,
+        total: 0,
+        totalPages: 0
+    })
+    const getTransactions = useCallback(async () => {
+        try {
             setLoading(true)
-            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions?page=1&limit=10")
+            const { data } = await api.get<{
+                message: string,
+                data: Transaction[],
+                pagination: { total: number, page: 1, limit: number, totalPages: number }
+            }>(`/transactions?page=${pagination.currentPage}&limit=${pagination.perPage}`)
             setTransactions(data.data)
+
+            setPagination((prev) => ({
+                ...prev,
+                total: data.pagination.total,
+                totalPages: data.pagination.totalPages
+            }));
         }
         catch (error) {
             toast.error("Falha ao buscar transações")
             console.log({ error });
         }
-        finally{
+        finally {
             setLoading(false)
         }
-    }
+    }, [pagination])
 
     const handleEdit = (id: string) => {
         setModalTransactionOpen(true)
@@ -50,8 +72,8 @@ export default function Page() {
     }
 
     useEffect(() => {
-        getTransactions()
-    }, [])
+        getTransactions();
+    }, [pagination.currentPage, pagination.perPage]);
 
     useEffect(() => {
         if (!modalTransactionOpen) {
@@ -78,7 +100,12 @@ export default function Page() {
                     data={transactions}
                     loading={loading}
                     onDeleteClick={handleDelete}
-                     />
+                />
+                <TableTransaction.Pagination
+                    total={pagination.total}
+                    perPage={pagination.perPage}
+                    currentPage={pagination.currentPage}
+                    onPageChange={(page) => setPagination((prev) => ({ ...prev, currentPage: page }))} />
             </TableTransaction.Container>
 
         </div>
