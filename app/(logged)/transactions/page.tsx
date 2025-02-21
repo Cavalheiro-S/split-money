@@ -2,7 +2,7 @@
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
@@ -11,12 +11,23 @@ export default function Page() {
     const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
     const [loading, setLoading] = useState(false);
     const [date, setDate] = useState<Date | undefined>(new Date());
+    const [pagination, setPagination] = useState<Pagination>({
+        page: 1,
+        totalPages: 1,
+        total: 0,
+        limit: 10
+    })
 
-    const getTransactions = async () => {
+    const getTransactions = useCallback(async () => {
         try {
             setLoading(true)
-            const { data } = await api.get<{ message: string, data: Transaction[] }>(`/transactions?page=1&limit=10&date=${date?.toISOString()}`)
+            const { data } = await api.get<{
+                message: string,
+                data: Transaction[],
+                pagination: Pagination
+            }>(`/transactions?page=${pagination.page}&limit=${pagination.limit}&date=${date?.toISOString()}`)
             setTransactions(data.data)
+            setPagination(data.pagination)
         }
         catch (error) {
             toast.error("Falha ao buscar transações")
@@ -25,7 +36,7 @@ export default function Page() {
         finally {
             setLoading(false)
         }
-    }
+    }, [pagination.page, pagination.limit, date])
 
     const handleEdit = (id: string) => {
         setModalTransactionOpen(true)
@@ -52,7 +63,7 @@ export default function Page() {
 
     useEffect(() => {
         getTransactions()
-    }, [date])
+    }, [date, pagination.page, pagination.limit])
 
     useEffect(() => {
         if (!modalTransactionOpen) {
@@ -67,7 +78,7 @@ export default function Page() {
                     title="Transações"
                     subtitle="Aqui você pode ver os seus lançamentos"
                     onChange={(date) => setDate(date)}
-                    >
+                >
                     <TableTransaction.ActionModal
                         transaction={transactionSelected}
                         open={modalTransactionOpen}
@@ -83,6 +94,11 @@ export default function Page() {
                     data={transactions}
                     loading={loading}
                     onDeleteClick={handleDelete}
+                />
+                <TableTransaction.Pagination
+                    page={pagination.page}
+                    totalPages={pagination.totalPages}
+                    onChange={(page) => setPagination({ ...pagination, page })}
                 />
             </TableTransaction.Container>
 
