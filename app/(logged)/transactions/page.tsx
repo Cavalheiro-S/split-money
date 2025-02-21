@@ -10,18 +10,19 @@ export default function Page() {
     const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
     const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
     const [loading, setLoading] = useState(false);
+    const [date, setDate] = useState<Date | undefined>(new Date());
 
     const getTransactions = async () => {
-        try{
+        try {
             setLoading(true)
-            const { data } = await api.get<{ message: string, data: Transaction[] }>("/transactions?page=1&limit=10")
+            const { data } = await api.get<{ message: string, data: Transaction[] }>(`/transactions?page=1&limit=10&date=${date?.toISOString()}`)
             setTransactions(data.data)
         }
         catch (error) {
             toast.error("Falha ao buscar transações")
             console.log({ error });
         }
-        finally{
+        finally {
             setLoading(false)
         }
     }
@@ -51,7 +52,7 @@ export default function Page() {
 
     useEffect(() => {
         getTransactions()
-    }, [])
+    }, [date])
 
     useEffect(() => {
         if (!modalTransactionOpen) {
@@ -62,7 +63,11 @@ export default function Page() {
     return (
         <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10">
             <TableTransaction.Container>
-                <TableTransaction.Header title="Transações" subtitle="Aqui você pode ver os seus lançamentos">
+                <TableTransaction.Header
+                    title="Transações"
+                    subtitle="Aqui você pode ver os seus lançamentos"
+                    onChange={(date) => setDate(date)}
+                    >
                     <TableTransaction.ActionModal
                         transaction={transactionSelected}
                         open={modalTransactionOpen}
@@ -78,7 +83,7 @@ export default function Page() {
                     data={transactions}
                     loading={loading}
                     onDeleteClick={handleDelete}
-                     />
+                />
             </TableTransaction.Container>
 
         </div>
