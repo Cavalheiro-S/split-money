@@ -1,31 +1,23 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-type PaginationProps = {
-    total: number;
-    perPage: number;
-    currentPage: number;
-    onPageChange: (page: number) => void;
+interface TransactionTablePaginationProps {
+    page: number;
+    totalPages: number;
+    onChange?: (page: number) => void;
+    limit?: number;
 }
-function TransactionPagination({ total, perPage, currentPage, onPageChange }: PaginationProps) {
+
+function TransactionTablePagination({ page, totalPages, onChange }: TransactionTablePaginationProps) {
 
     return (
-
-        <div className="flex gap-2">
-            {total > 0 &&
-                Array.from({ length: Math.max(1, Math.ceil(total / perPage)) }, (_, index) => index + 1).map((page) => (
-                    <button
-                        key={page}
-                        onClick={() => onPageChange(page)}
-                        aria-label={`Página ${page}`}
-                        className={`w-8 h-8 flex items-center justify-center rounded-md transition 
-                    ${currentPage === page ? 'bg-primary text-white' : 'text-primary hover:bg-gray-200'}`}
-                    >
-                        {page}
-                    </button>
-                ))
-            }
+        <div className="flex gap-2 items-center justify-center">
+            <ChevronLeft className="w-6 h-6" onClick={() => onChange?.(page - 1)} />
+            {Array.from({ length: totalPages }, (_, i) => (
+                <button onClick={() => onChange?.(i + 1)} key={i} className={`w-6 h-6 rounded ${page === i + 1 ? "bg-primary text-white" : "bg-white"}`}>{i + 1}</button>
+            ))}
+            <ChevronRight className="w-6 h-6" />
         </div>
-
     )
 }
 
-export default TransactionPagination
+export default TransactionTablePagination;

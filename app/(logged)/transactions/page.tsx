@@ -2,7 +2,7 @@
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/axios";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type Pagination = {
@@ -17,27 +17,24 @@ export default function Page() {
     const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
     const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
     const [loading, setLoading] = useState(false);
+    const [date, setDate] = useState<Date | undefined>(new Date());
     const [pagination, setPagination] = useState<Pagination>({
         currentPage: 1,
-        perPage: 2,
+        perPage: 10,
+        totalPages: 1,
         total: 0,
-        totalPages: 0
     })
+
     const getTransactions = useCallback(async () => {
         try {
             setLoading(true)
             const { data } = await api.get<{
                 message: string,
                 data: Transaction[],
-                pagination: { total: number, page: 1, limit: number, totalPages: number }
-            }>(`/transactions?page=${pagination.currentPage}&limit=${pagination.perPage}`)
+                pagination: Pagination
+            }>(`/transactions?page=${pagination.currentPage}&perPage=${pagination.perPage}&date=${date?.toISOString()}`)
             setTransactions(data.data)
-
-            setPagination((prev) => ({
-                ...prev,
-                total: data.pagination.total,
-                totalPages: data.pagination.totalPages
-            }));
+            setPagination(data.pagination)
         }
         catch (error) {
             toast.error("Falha ao buscar transações")
@@ -46,7 +43,7 @@ export default function Page() {
         finally {
             setLoading(false)
         }
-    }, [pagination])
+    }, [pagination.currentPage, pagination.perPage, date])
 
     const handleEdit = (id: string) => {
         setModalTransactionOpen(true)
@@ -72,8 +69,9 @@ export default function Page() {
     }
 
     useEffect(() => {
-        getTransactions();
-    }, [pagination.currentPage, pagination.perPage]);
+        getTransactions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [date, pagination.currentPage, pagination.perPage])
 
     useEffect(() => {
         if (!modalTransactionOpen) {
@@ -84,7 +82,11 @@ export default function Page() {
     return (
         <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10">
             <TableTransaction.Container>
-                <TableTransaction.Header title="Transações" subtitle="Aqui você pode ver os seus lançamentos">
+                <TableTransaction.Header
+                    title="Transações"
+                    subtitle="Aqui você pode ver os seus lançamentos"
+                    onChange={(date) => setDate(date)}
+                >
                     <TableTransaction.ActionModal
                         transaction={transactionSelected}
                         open={modalTransactionOpen}
@@ -102,10 +104,10 @@ export default function Page() {
                     onDeleteClick={handleDelete}
                 />
                 <TableTransaction.Pagination
-                    total={pagination.total}
-                    perPage={pagination.perPage}
-                    currentPage={pagination.currentPage}
-                    onPageChange={(page) => setPagination((prev) => ({ ...prev, currentPage: page }))} />
+                    page={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    onChange={(currentPage) => setPagination({ ...pagination, currentPage })}
+                />
             </TableTransaction.Container>
 
         </div>
