@@ -63,8 +63,12 @@ export default function Page() {
     }, [paginationOutcome.page, paginationOutcome.limit, dateOutcome])
 
     useEffect(() => {
-        getIncomes()
-        getOutcomes()
+        if (paginationIncome.page && paginationIncome.limit) {
+            getIncomes()
+        }
+        if (paginationOutcome.page && paginationOutcome.limit) {
+            getOutcomes()
+        }
     }, [dateIncome, dateOutcome, paginationIncome.page, paginationIncome.limit, paginationOutcome.page, paginationOutcome.limit])
 
     return (

@@ -5,12 +5,6 @@ import { api } from "@/lib/axios";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-type Pagination = {
-    currentPage: number;
-    perPage: number;
-    total: number;
-    totalPages: number;
-}
 
 export default function Page() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -19,11 +13,14 @@ export default function Page() {
     const [loading, setLoading] = useState(false);
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [pagination, setPagination] = useState<Pagination>({
-        currentPage: 1,
-        perPage: 10,
+        page: 1,
         totalPages: 1,
         total: 0,
+        limit: 10
     })
+
+    console.log({date});
+    
 
     const getTransactions = useCallback(async () => {
         try {
@@ -32,9 +29,9 @@ export default function Page() {
                 message: string,
                 data: Transaction[],
                 pagination: Pagination
-            }>(`/transactions?page=${pagination.currentPage}&perPage=${pagination.perPage}&date=${date?.toISOString()}`)
+            }>(`/transactions?page=${pagination.page}&limit=${pagination.limit}&date=${date?.toISOString()}`)
             setTransactions(data.data)
-            setPagination(data.pagination)
+            setPagination(data.pagination)  
         }
         catch (error) {
             toast.error("Falha ao buscar transações")
@@ -43,7 +40,7 @@ export default function Page() {
         finally {
             setLoading(false)
         }
-    }, [pagination.currentPage, pagination.perPage, date])
+    }, [pagination.page, pagination.limit, date])
 
     const handleEdit = (id: string) => {
         setModalTransactionOpen(true)
@@ -70,8 +67,8 @@ export default function Page() {
 
     useEffect(() => {
         getTransactions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [date, pagination.currentPage, pagination.perPage])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [date, pagination.page, pagination.limit])
 
     useEffect(() => {
         if (!modalTransactionOpen) {
@@ -104,9 +101,9 @@ export default function Page() {
                     onDeleteClick={handleDelete}
                 />
                 <TableTransaction.Pagination
-                    page={pagination.currentPage}
+                    page={pagination.page}
                     totalPages={pagination.totalPages}
-                    onChange={(currentPage) => setPagination({ ...pagination, currentPage })}
+                    onChange={(page) => setPagination({ ...pagination, page })}
                 />
             </TableTransaction.Container>
 
