@@ -76,7 +76,7 @@ export default function Page() {
     }, [dateOutcome, paginationOutcome.page, paginationOutcome.limit])
 
     return (
-        <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10">
+        <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
             <TableTransaction.Container>
                 <TableTransaction.Header onChange={(date) => setDateIncome(date)} title="Últimos lançamentos" subtitle="Aqui você pode ver os seus lançamentos recentes" />
                 <TableTransaction.Table loading={loadingIncome} data={incomes} />

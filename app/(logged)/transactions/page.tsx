@@ -77,7 +77,7 @@ export default function Page() {
     }, [modalTransactionOpen])
 
     return (
-        <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10">
+        <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10 bg-gray-100 py-10">
             <TableTransaction.Container>
                 <TableTransaction.Header
                     title="Transações"
