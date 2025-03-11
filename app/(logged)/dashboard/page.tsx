@@ -7,7 +7,8 @@ import { useCallback, useEffect, useState } from "react";
 export default function Page() {
     const [incomes, setIncomes] = useState<Transaction[]>([]);
     const [outcomes, setOutcomes] = useState<Transaction[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loadingIncome, setLoadingIncome] = useState(false);
+    const [loadingOutcome, setLoadingOutcome] = useState(false);
     const [dateIncome, setDateIncome] = useState<Date | undefined>(new Date());
     const [dateOutcome, setDateOutcome] = useState<Date | undefined>(new Date());
     const [paginationIncome, setPaginationIncome] = useState<Pagination>({
@@ -25,7 +26,7 @@ export default function Page() {
 
     const getIncomes = useCallback(async () => {
         try {
-            setLoading(true)
+            setLoadingIncome(true)
             const { data } = await api.get<{
                 message: string,
                 data: Transaction[],
@@ -39,13 +40,13 @@ export default function Page() {
             console.log({ error });
         }
         finally {
-            setLoading(false)
+            setLoadingIncome(false)
         }
     }, [paginationIncome.page, paginationIncome.limit, dateIncome])
 
     const getOutcomes = useCallback(async () => {
         try {
-            setLoading(true)
+            setLoadingOutcome(true)
             const { data } = await api.get<{
                 message: string,
                 data: Transaction[],
@@ -58,7 +59,7 @@ export default function Page() {
             console.log({ error });
         }
         finally {
-            setLoading(false)
+            setLoadingOutcome(false)
         }
     }, [paginationOutcome.page, paginationOutcome.limit, dateOutcome])
 
@@ -66,30 +67,37 @@ export default function Page() {
         if (paginationIncome.page && paginationIncome.limit) {
             getIncomes()
         }
-        if (paginationOutcome.page && paginationOutcome.limit) {
+    }, [dateIncome, paginationIncome.page, paginationIncome.limit])
+
+    useEffect(() => {
+        if(paginationOutcome.page && paginationOutcome.limit) {
             getOutcomes()
         }
-    }, [dateIncome, dateOutcome, paginationIncome.page, paginationIncome.limit, paginationOutcome.page, paginationOutcome.limit])
+    }, [dateOutcome, paginationOutcome.page, paginationOutcome.limit])
 
     return (
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10">
             <TableTransaction.Container>
                 <TableTransaction.Header onChange={(date) => setDateIncome(date)} title="Últimos lançamentos" subtitle="Aqui você pode ver os seus lançamentos recentes" />
-                <TableTransaction.Table loading={loading} data={incomes} />
+                <TableTransaction.Table loading={loadingIncome} data={incomes} />
                 <TableTransaction.Pagination
                     page={paginationIncome.page}
                     totalPages={paginationIncome.totalPages}
                     onChange={(page) => setPaginationIncome({ ...paginationIncome, page })}
+                    limit={paginationIncome.limit}
+                    onChangeLimit={(limit) => setPaginationIncome({ ...paginationIncome, limit })}
                 />
             </TableTransaction.Container>
 
             <TableTransaction.Container>
                 <TableTransaction.Header onChange={(date) => setDateOutcome(date)} title="Últimas despesas" subtitle="Aqui você pode ver os suas despesas recentes" />
-                <TableTransaction.Table loading={loading} data={outcomes} />
+                <TableTransaction.Table loading={loadingOutcome} data={outcomes} />
                 <TableTransaction.Pagination
                     page={paginationOutcome.page}
                     totalPages={paginationOutcome.totalPages}
                     onChange={(page) => setPaginationOutcome({ ...paginationOutcome, page })}
+                    limit={paginationOutcome.limit}
+                    onChangeLimit={(limit) => setPaginationOutcome({ ...paginationOutcome, limit })}
                 />
             </TableTransaction.Container>
         </div>

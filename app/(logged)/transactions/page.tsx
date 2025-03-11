@@ -104,6 +104,8 @@ export default function Page() {
                     page={pagination.page}
                     totalPages={pagination.totalPages}
                     onChange={(page) => setPagination({ ...pagination, page })}
+                    limit={pagination.limit}
+                    onChangeLimit={(limit) => setPagination({ ...pagination, limit })}
                 />
             </TableTransaction.Container>
 

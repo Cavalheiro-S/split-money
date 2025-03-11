@@ -14,7 +14,7 @@ function TransactionTableHeader({ title, subtitle, children, onChange }: Transac
 
     return (
         <>
-            <div className="flex w-full justify-between">
+            <div className="flex  w-full justify-between">
                 <div className="flex flex-col ">
                     <h3 className="text-lg font-semibold">{title}</h3>
                     <span className="text-sm text-muted-foreground">{subtitle}</span>
@@ -22,9 +22,14 @@ function TransactionTableHeader({ title, subtitle, children, onChange }: Transac
                 {/* Modal open Trigger */}
                 {children}
             </div>
-            <div className="flex gap-4 items-center justify-center">
-                <label className="text-sm ">Filtrar por mês</label>
-                <MonthPicker onChange={onChange} />
+            <div className="flex flex-col w-full py-4 border-b  border-gray-200">
+                <h3 className="text-lg font-semibold">Filtros</h3>
+                <div className="flex gap-2">
+                    <div className="flex flex-col gap-1 mt-2">
+                        <label className="text-sm font-semibold">Por mês</label>
+                        <MonthPicker onChange={onChange} />
+                    </div>
+                </div>
             </div>
         </>
     )
