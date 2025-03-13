@@ -19,9 +19,6 @@ export default function Page() {
         limit: 10
     })
 
-    console.log({date});
-    
-
     const getTransactions = useCallback(async () => {
         try {
             setLoading(true)
@@ -70,6 +67,8 @@ export default function Page() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [date, pagination.page, pagination.limit])
 
+    
+
     useEffect(() => {
         if (!modalTransactionOpen) {
             setTransactionSelected(undefined)
@@ -82,7 +81,10 @@ export default function Page() {
                 <TableTransaction.Header
                     title="Transações"
                     subtitle="Aqui você pode ver os seus lançamentos"
-                    onChange={(date) => setDate(date)}
+                    onChange={(date) => {
+                        setPagination({ ...pagination, page: 1 })
+                        setDate(date)
+                    }}
                 >
                     <TableTransaction.ActionModal
                         transaction={transactionSelected}

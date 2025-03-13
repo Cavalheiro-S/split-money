@@ -70,7 +70,7 @@ export default function Page() {
     }, [dateIncome, paginationIncome.page, paginationIncome.limit])
 
     useEffect(() => {
-        if(paginationOutcome.page && paginationOutcome.limit) {
+        if (paginationOutcome.page && paginationOutcome.limit) {
             getOutcomes()
         }
     }, [dateOutcome, paginationOutcome.page, paginationOutcome.limit])
@@ -78,7 +78,10 @@ export default function Page() {
     return (
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
             <TableTransaction.Container>
-                <TableTransaction.Header onChange={(date) => setDateIncome(date)} title="Últimos lançamentos" subtitle="Aqui você pode ver os seus lançamentos recentes" />
+                <TableTransaction.Header onChange={(date) => {
+                    setDateIncome(date)
+                    setPaginationIncome({ ...paginationIncome, page: 1 })
+                }} title="Últimos lançamentos" subtitle="Aqui você pode ver os seus lançamentos recentes" />
                 <TableTransaction.Table loading={loadingIncome} data={incomes} />
                 <TableTransaction.Pagination
                     page={paginationIncome.page}
@@ -90,7 +93,13 @@ export default function Page() {
             </TableTransaction.Container>
 
             <TableTransaction.Container>
-                <TableTransaction.Header onChange={(date) => setDateOutcome(date)} title="Últimas despesas" subtitle="Aqui você pode ver os suas despesas recentes" />
+                <TableTransaction.Header
+                    onChange={(date) => {
+                        setDateOutcome(date)
+                        setPaginationOutcome({ ...paginationOutcome, page: 1 })
+                    }}
+                    title="Últimas despesas"
+                    subtitle="Aqui você pode ver os suas despesas recentes" />
                 <TableTransaction.Table loading={loadingOutcome} data={outcomes} />
                 <TableTransaction.Pagination
                     page={paginationOutcome.page}
