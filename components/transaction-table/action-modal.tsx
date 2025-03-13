@@ -6,13 +6,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TransactionCategoryEnum } from "@/enums/transaction-category.enum";
 import { api } from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon, Info, Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,6 +23,10 @@ import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import CurrencyInput from "react-currency-input-field";
+import { TransactionCategoryEnum, TransactionFrequencyEnum } from "@/enums/transaction";
+import { Transaction } from "@/types/transaction";
+import { Switch } from "../ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 const schema = z.object({
   description: z
@@ -31,7 +34,6 @@ const schema = z.object({
     .nonempty("A descrição é obrigatória"),
   type: z
     .enum(["income", "outcome"], { message: "O tipo é obrigatório" }),
-  recurrent: z.boolean(),
   date: z
     .coerce
     .date()
@@ -46,6 +48,13 @@ const schema = z.object({
     .transform((val) => val.replace(/\./g, "").replace(",", "."))
     .transform((val) => parseFloat(val))
   ,
+  recurrent: z
+    .object({
+      active: z.boolean(),
+      frequency: z.enum(Object.keys(TransactionFrequencyEnum).map(item => item.toLowerCase()) as [string, ...string[]]),
+      quantity: z.coerce.number().int().positive().default(1),
+    })
+    .optional(),
 })
 
 interface TransactionTableActionModalProps {
@@ -62,24 +71,27 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
     resolver: zodResolver(schema),
     defaultValues: {
       description: "",
-      recurrent: false,
       date: new Date(),
       category: "",
       amount: 0,
     },
   });
 
-  const { setValue, reset, formState: { isSubmitting } } = form
+  const { setValue, reset, watch, formState: { isSubmitting } } = form
 
   async function onSubmit(data: z.infer<typeof schema>) {
     const action = transaction ? "atualizar" : "criar"
     try {
+      const mapData = {
+        ...data,
+        ...(data.recurrent?.active ? data.recurrent : {}),
+      }
       if (transaction) {
         await api.patch(`/transaction/${transaction.id}`, data)
         toast("Transação atualizada com sucesso")
       }
       else {
-        await api.post("/transaction", data)
+        await api.post("/transaction", mapData)
         toast("Transação criada com sucesso")
       }
       onOpenChange?.(false)
@@ -98,7 +110,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
       setValue("category", transaction.category)
       setValue("date", new Date(transaction.date))
       setValue("description", transaction.description)
-      setValue("recurrent", transaction.recurrent || false)
+      setValue("recurrent", transaction.recurrent && { active: true, ...transaction.recurrent })
       setValue("type", transaction.type)
     }
     else {
@@ -259,6 +271,98 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
                   </FormItem>
                 )}
               />
+              <div className="flex flex-col border-t border-gray-200 pt-4 space-y-4">
+
+                <FormField
+                  control={form.control}
+                  name="recurrent.active"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col justify-between">
+                      <div className="space-y-0.5">
+                        <FormLabel>Recorrente</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {
+                  watch("recurrent.active") && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="recurrent.frequency"
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex gap-2 items-center">
+                              <FormLabel>Frequência</FormLabel>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Info className="w-5 h-5 text-muted-foreground" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <span>Frequência que a ocorrência vai acontecer</span>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione uma frequência" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {Object.entries(TransactionFrequencyEnum).map(([key, value]) => (
+                                  <SelectItem key={key} value={key.toLowerCase()}>
+                                    {value}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="recurrent.quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex gap-2 items-center">
+                              <FormLabel>Quantidade</FormLabel>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Info className="w-5 h-5 text-muted-foreground" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <span>Quantidade de ocorrências da transação</span>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="Quantidade"
+                                {...field}
+                                value={field.value ?? 1}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )
+                }
+              </div>
 
               <div className="flex w-full justify-end">
 

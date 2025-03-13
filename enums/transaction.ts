@@ -1,3 +1,9 @@
+export enum TransactionFrequencyEnum {
+    DAILY = "Diária",
+    WEEKLY = "Semanal",
+    MONTHLY = "Mensal",
+    YEARLY = "Anual",
+}
 export enum TransactionCategoryEnum {
     Others = "Outros",
     Food = "Comida",

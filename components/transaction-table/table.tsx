@@ -6,9 +6,10 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
-import { TransactionCategoryEnum } from "@/enums/transaction-category.enum";
 import { ArrowLeftRight, DollarSign, Landmark, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
+import { TransactionCategoryEnum } from "@/enums/transaction";
+import { Transaction } from "@/types/transaction";
 
 interface TransactionTableProps {
     data: Transaction[];

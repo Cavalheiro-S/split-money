@@ -2,6 +2,7 @@
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/axios";
+import { Transaction } from "@/types/transaction";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 

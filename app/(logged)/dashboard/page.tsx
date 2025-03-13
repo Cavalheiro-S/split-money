@@ -2,6 +2,7 @@
 
 import { TableTransaction } from "@/components/transaction-table";
 import { api } from "@/lib/axios";
+import { Transaction } from "@/types/transaction";
 import { useCallback, useEffect, useState } from "react";
 
 export default function Page() {
@@ -67,12 +68,14 @@ export default function Page() {
         if (paginationIncome.page && paginationIncome.limit) {
             getIncomes()
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dateIncome, paginationIncome.page, paginationIncome.limit])
 
     useEffect(() => {
         if (paginationOutcome.page && paginationOutcome.limit) {
             getOutcomes()
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dateOutcome, paginationOutcome.page, paginationOutcome.limit])
 
     return (
