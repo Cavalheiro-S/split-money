@@ -1,7 +1,7 @@
 "use client"
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
-import { api } from "@/lib/axios";
+import { TransactionService } from "@/services/transaction.service";
 import { Transaction } from "@/types/transaction";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,11 +23,7 @@ export default function Page() {
     const getTransactions = useCallback(async () => {
         try {
             setLoading(true)
-            const { data } = await api.get<{
-                message: string,
-                data: Transaction[],
-                pagination: Pagination
-            }>(`/transactions?page=${pagination.page}&limit=${pagination.limit}&date=${date?.toISOString()}`)
+            const data = await TransactionService.getTransactions(pagination, date)
             setTransactions(data.data)
             setPagination(data.pagination)  
         }
@@ -49,7 +45,7 @@ export default function Page() {
     const handleDelete = async (id: string) => {
         try {
             setLoading(true)
-            await api.delete(`/transaction/${id}`)
+            await TransactionService.deleteTransaction(id)
             await getTransactions()
             toast.success("Transação deletada com sucesso")
 

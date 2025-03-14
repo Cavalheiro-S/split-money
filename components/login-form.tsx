@@ -2,18 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { AuthExceptions } from "@/enums/exceptions/auth"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeClosed, GalleryVerticalEnd, Loader } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
-import { STORAGE_KEYS } from "@/consts/storage"
-import { AuthExceptions } from "@/enums/exceptions/auth"
-import { useState } from "react"
 
 const formSchema = z.object({
   email: z
@@ -46,10 +45,10 @@ export function LoginForm({
         body: JSON.stringify(values),
         method: "POST",
       })
+      
       const data = await response.json() as ResponseSignIn
-      if (response.ok) {
-        const { accessToken } = data
-        localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, accessToken)
+      
+      if (data.accessToken) {
         router.push("/dashboard")
         return;
       }

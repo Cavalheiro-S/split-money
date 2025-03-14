@@ -6,13 +6,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { api } from "@/lib/axios";
+import { TransactionCategoryEnum, TransactionFrequencyEnum } from "@/enums/transaction";
 import { cn } from "@/lib/utils";
+import { TransactionService } from "@/services/transaction.service";
+import { RequestCreateTransaction, Transaction } from "@/types/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, Info, Loader2 } from "lucide-react";
 import { useEffect } from "react";
+import CurrencyInput from "react-currency-input-field";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -22,9 +25,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import CurrencyInput from "react-currency-input-field";
-import { TransactionCategoryEnum, TransactionFrequencyEnum } from "@/enums/transaction";
-import { Transaction } from "@/types/transaction";
 import { Switch } from "../ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
@@ -74,6 +74,11 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
       date: new Date(),
       category: "",
       amount: 0,
+      recurrent: {
+        active: false,
+        frequency: "daily",
+        quantity: 1
+      }
     },
   });
 
@@ -82,16 +87,21 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
   async function onSubmit(data: z.infer<typeof schema>) {
     const action = transaction ? "atualizar" : "criar"
     try {
-      const mapData = {
+      const mapData: RequestCreateTransaction = {
         ...data,
-        ...(data.recurrent?.active ? data.recurrent : {}),
+        recurrent: data.recurrent?.active
+          ? {
+            frequency: TransactionFrequencyEnum[data.recurrent.frequency.toUpperCase() as keyof typeof TransactionFrequencyEnum],
+            quantity: data.recurrent.quantity
+          }
+          : undefined,
       }
       if (transaction) {
-        await api.patch(`/transaction/${transaction.id}`, data)
+        await TransactionService.updateTransaction({ ...mapData, id: transaction.id })
         toast("Transação atualizada com sucesso")
       }
       else {
-        await api.post("/transaction", mapData)
+        await TransactionService.createTransaction(mapData)
         toast("Transação criada com sucesso")
       }
       onOpenChange?.(false)
@@ -283,6 +293,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
                       </div>
                       <FormControl>
                         <Switch
+                          disabled={!!transaction}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />

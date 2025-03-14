@@ -1,7 +1,7 @@
 "use client"
 
 import { TableTransaction } from "@/components/transaction-table";
-import { api } from "@/lib/axios";
+import { TransactionService } from "@/services/transaction.service";
 import { Transaction } from "@/types/transaction";
 import { useCallback, useEffect, useState } from "react";
 
@@ -28,12 +28,7 @@ export default function Page() {
     const getIncomes = useCallback(async () => {
         try {
             setLoadingIncome(true)
-            const { data } = await api.get<{
-                message: string,
-                data: Transaction[],
-                pagination: Pagination
-            }>(
-                `/transactions?page=${paginationIncome.page}&limit=${paginationIncome.limit}&date=${dateIncome?.toISOString()}&type=income`)
+            const data = await TransactionService.getTransactions(paginationIncome, dateIncome, "income")
             setIncomes(data.data)
             setPaginationIncome(data.pagination)
         }
@@ -48,11 +43,7 @@ export default function Page() {
     const getOutcomes = useCallback(async () => {
         try {
             setLoadingOutcome(true)
-            const { data } = await api.get<{
-                message: string,
-                data: Transaction[],
-                pagination: Pagination
-            }>(`/transactions?page=${paginationOutcome.page}&limit=${paginationOutcome.limit}&date=${dateOutcome?.toISOString()}&type=outcome`)
+            const data = await TransactionService.getTransactions(paginationOutcome, dateOutcome, "outcome")
             setOutcomes(data.data)
             setPaginationOutcome(data.pagination)
         }

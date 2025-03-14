@@ -1,12 +1,12 @@
 import { STORAGE_KEYS } from "@/consts/storage";
 import { decodeJwtPayload } from "@/utils/auth";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-
-
 
 export async function POST(req: Request) {
     try {
         const data = await req.json();
+        
         const responseApi = await fetch(`${process.env.API_URL}/sign-in`, {
             body: JSON.stringify(data),
             method: "POST",
@@ -25,11 +25,14 @@ export async function POST(req: Request) {
         }, { status: 200 });
 
         const payload = await decodeJwtPayload(accessToken);
-        response.cookies.set(STORAGE_KEYS.JWT_TOKEN, accessToken, {
-            expires: payload?.exp,
-            path: "/",
-
-        });
+        const cookiesData = await cookies();
+        cookiesData.set(STORAGE_KEYS.JWT_TOKEN, accessToken, {
+            httpOnly: true, // Segurança extra (não acessível pelo JavaScript no cliente)
+            secure: process.env.NODE_ENV === "production", // Apenas HTTPS em produção
+            sameSite: "strict", // Proteção contra CSRF
+            path: "/", // Disponível em toda a aplicação
+            maxAge: payload?.exp, // Cookie expira automaticamente quando o token expirar
+        })
         return response;
     } catch (error) {
         console.log(error);
