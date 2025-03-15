@@ -2,7 +2,6 @@
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
 import { TransactionService } from "@/services/transaction.service";
-import { Transaction } from "@/types/transaction";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
