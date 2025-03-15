@@ -9,7 +9,6 @@ import {
 import { TransactionCategoryEnum, TransactionFrequencyEnum } from "@/enums/transaction";
 import { cn } from "@/lib/utils";
 import { TransactionService } from "@/services/transaction.service";
-import { RequestCreateTransaction, Transaction } from "@/types/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -51,7 +50,7 @@ const schema = z.object({
   recurrent: z
     .object({
       active: z.boolean(),
-      frequency: z.enum(Object.keys(TransactionFrequencyEnum).map(item => item.toLowerCase()) as [string, ...string[]]),
+      frequency: z.string(),
       quantity: z.coerce.number().int().positive().default(1),
     })
     .optional(),
@@ -91,7 +90,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
         ...data,
         recurrent: data.recurrent?.active
           ? {
-            frequency: TransactionFrequencyEnum[data.recurrent.frequency.toUpperCase() as keyof typeof TransactionFrequencyEnum],
+            frequency: data.recurrent.frequency,
             quantity: data.recurrent.quantity
           }
           : undefined,

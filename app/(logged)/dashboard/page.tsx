@@ -2,7 +2,6 @@
 
 import { TableTransaction } from "@/components/transaction-table";
 import { TransactionService } from "@/services/transaction.service";
-import { Transaction } from "@/types/transaction";
 import { useCallback, useEffect, useState } from "react";
 
 export default function Page() {

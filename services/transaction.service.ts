@@ -1,44 +1,42 @@
-import { RequestCreateTransaction, RequestUpdateTransaction, Transaction } from "@/types/transaction";
-import { fetchWithAuth } from "@/utils/data";
+import { ApiService } from "./base.service";
 
-export class TransactionService {
+export class TransactionService extends ApiService {
+    static async getTransactions(pagination: Pagination, date?: Date, type?: "income" | "outcome") {
+        const params = new URLSearchParams();
+        params.append("page", pagination.page.toString());
+        params.append("limit", pagination.limit.toString());
+        if (date) params.append("date", date.toISOString());
+        if (type) params.append("type", type);
 
-    static async getTransactions(pagination: Pagination, date: Date | undefined, type?: "income" | "outcome") {
-        const params = new URLSearchParams()
-        params.append("page", pagination.page.toString())
-        params.append("limit", pagination.limit.toString())
-        params.append("date", date?.toISOString() || "")
-        if (type) {
-            params.append("type", type)
-        }
-        const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/transaction?${params.toString()}`)
-        return response.json() as Promise<{
-            message: string,
-            data: Transaction[],
-            pagination: Pagination
-        }>
+        return this.request<{ message: string; data: Transaction[]; pagination: Pagination }>(
+            `/transaction?${params.toString()}`
+        );
     }
 
     static async createTransaction(transaction: RequestCreateTransaction) {
-        const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/transaction`, {
-            method: "POST",
-            body: JSON.stringify(transaction)
-        })
-        return response.json() as Promise<{ message: string, data: Transaction }>
+        return this.request<{ message: string; data: Transaction }>(
+            "/transaction",
+            {
+                method: "POST",
+                body: JSON.stringify(transaction),
+            }
+        );
     }
 
     static async updateTransaction(transaction: RequestUpdateTransaction) {
-        const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/transaction/${transaction.id}`, {
-            method: "PUT",
-            body: JSON.stringify(transaction)
-        })
-        return response.json() as Promise<{ message: string, data: Transaction }>
+        return this.request<{ message: string; data: Transaction }>(
+            `/transaction/${transaction.id}`,
+            {
+                method: "PUT",
+                body: JSON.stringify(transaction),
+            }
+        );
     }
 
     static async deleteTransaction(id: string) {
-        const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/transaction/${id}`, {
-            method: "DELETE",
-        })
-        return response.json() as Promise<{ message: string }>
+        return this.request<{ message: string }>(
+            `/transaction/${id}`,
+            { method: "DELETE" }
+        );
     }
 }

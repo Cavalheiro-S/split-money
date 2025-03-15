@@ -1,4 +1,3 @@
-import { TransactionFrequencyEnum } from "@/enums/transaction";
 
 type Transaction = {
     id: string;
@@ -8,7 +7,7 @@ type Transaction = {
     amount: number;
     type: "income" | "outcome";
     recurrent?: {
-        frequency: TransactionFrequencyEnum;
+        frequency: string;
         quantity: number;
     };
 }
@@ -20,7 +19,7 @@ type RequestCreateTransaction = {
     amount: number;
     type: "income" | "outcome";
     recurrent?: {
-        frequency: TransactionFrequencyEnum;
+        frequency: string;
         quantity: number;
     };
 }
