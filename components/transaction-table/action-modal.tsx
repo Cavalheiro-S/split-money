@@ -45,7 +45,6 @@ const schema = z.object({
     .string({ message: "O valor é obrigatório" })
     .min(1, "O valor é obrigatório")
     .transform((val) => val.replace(/\./g, "").replace(",", "."))
-    .transform((val) => parseFloat(val))
   ,
   recurrent: z
     .object({
@@ -72,7 +71,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
       description: "",
       date: new Date(),
       category: "",
-      amount: 0,
+      amount: "0",
       recurrent: {
         active: false,
         frequency: "daily",
@@ -81,13 +80,14 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
     },
   });
 
-  const { setValue, reset, watch, formState: { isSubmitting } } = form
+  const { setValue, reset, watch, formState: { isSubmitting} } = form
 
   async function onSubmit(data: z.infer<typeof schema>) {
     const action = transaction ? "atualizar" : "criar"
     try {
       const mapData: RequestCreateTransaction = {
         ...data,
+        amount: parseFloat(data.amount),
         recurrent: data.recurrent?.active
           ? {
             frequency: data.recurrent.frequency,
@@ -115,7 +115,8 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
 
   useEffect(() => {
     if (transaction) {
-      setValue("amount", parseFloat(transaction.amount.toString()))
+      const amount = transaction.amount.toString().replace(".", ",")
+      setValue("amount", amount)
       setValue("category", transaction.category)
       setValue("date", new Date(transaction.date))
       setValue("description", transaction.description)
@@ -203,7 +204,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
                         prefix="R$ "
                         allowNegativeValue={false}
                         value={field.value}
-                        onValueChange={(value) => field.onChange(value)}
+                        onValueChange={(value) => field.onChange(value ?? 0)}
                         customInput={Input}
                       />
                     </FormControl>

@@ -27,7 +27,7 @@ export class TransactionService extends ApiService {
         return this.request<{ message: string; data: Transaction }>(
             `/transaction/${transaction.id}`,
             {
-                method: "PUT",
+                method: "PATCH",
                 body: JSON.stringify(transaction),
             }
         );
