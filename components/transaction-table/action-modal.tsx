@@ -49,7 +49,7 @@ const schema = z.object({
   recurrent: z
     .object({
       active: z.boolean(),
-      frequency: z.string(),
+      frequency: z.string().optional(),
       quantity: z.coerce.number().int().positive().default(1),
     })
     .optional(),
@@ -80,7 +80,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
     },
   });
 
-  const { setValue, reset, watch, formState: { isSubmitting} } = form
+  const { setValue, reset, watch, formState: { isSubmitting } } = form
 
   async function onSubmit(data: z.infer<typeof schema>) {
     const action = transaction ? "atualizar" : "criar"
@@ -90,7 +90,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
         amount: parseFloat(data.amount),
         recurrent: data.recurrent?.active
           ? {
-            frequency: data.recurrent.frequency,
+            frequency: data.recurrent.frequency ?? TransactionFrequencyEnum.DAILY,
             quantity: data.recurrent.quantity
           }
           : undefined,
