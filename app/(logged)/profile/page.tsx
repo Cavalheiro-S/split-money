@@ -1,79 +1,84 @@
 "use client"
 
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PaymentStatusService } from "@/services/payment-status.service";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
-import {  useForm } from "react-hook-form";
-import { z } from "zod";
 
-const schema = z.object({
-    paymentStatus: z.string(),
-});
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PaymentStatusService } from "@/services/payment-status.service";
+import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import { DialogNewStatus } from "./(components)/dialog-new-status";
+import { Cog, LoaderCircle } from "lucide-react";
+
+
 
 export default function Page() {
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([]);
-    const form = useForm<z.infer<typeof schema>>({
-        resolver: zodResolver(schema),
-    });
+    const [loading, setLoading] = useState(true);
 
     const getPaymentStatus = async () => {
         try {
+            setLoading(true);
             const response = await PaymentStatusService.getPaymentStatus();
             setPaymentStatus(response.data);
         }
         catch (error) {
             console.error(error);
         }
+        finally{
+            setLoading(false);
+        }
     };
 
-    const onSubmit = async (data: z.infer<typeof schema>) => {
-        try {
-            await PaymentStatusService.createPaymentStatus(data.paymentStatus);
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
+
 
     useEffect(() => {
         getPaymentStatus();
     }, []);
 
+    const LoadingComponent = () => <div className="flex justify-center items-center w-full h-full"> 
+        <LoaderCircle className="animate-spin"/>
+    </div>
+
     return (
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
             <div className="flex flex-col gap-10 w-full bg-white p-5 rounded-lg shadow-sm">
-                <h3>Configurações</h3>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
+                <div className="flex items-center gap-2">
+                    <Cog className="w-10 h-10" />
+                    <div className="flex flex-col">
+                        <h3 className="font-semibold">Configurações</h3>
+                        <span className="text-sm text-muted-foreground">Gerencie as configurações do seu perfil</span>
+                    </div>
+                </div>
+                {loading ? <LoadingComponent/> : <div>
+                    <div className="flex w-full justify-between">
+                        <div className="flex flex-col mr-auto">
+                            <h3 className="font-semibold">Status de pagamento</h3>
+                            <span className="text-sm text-muted-foreground">Cadastre novos status de pagamento para aparecerem aqui</span>
+                        </div>
+                        <DialogNewStatus refreshData={getPaymentStatus}/>
+                    </div>
+                    <Table className="min-w-[900px] mt-4">
 
-                        <FormField
-                            control={form.control}
-                            name="paymentStatus"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Status de pagamento</FormLabel>
-                                    <Select onValueChange={field.onChange}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Selecione um tipo de transação" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {paymentStatus.map(({ id, status }) => (
-                                                <SelectItem key={id} value={id}>
-                                                    {status}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                        <TableHeader>
 
-                                </FormItem>
-                            )}
-                        />
-                    </form>
-                </Form>
+                            <TableRow>
+                                <TableHead className="w-[350px]">id</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Data Criação</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {paymentStatus?.map((item) => (
+                                <TableRow key={item.id}>
+                                    <TableCell className="font-medium">{item.id}</TableCell>
+                                    <TableCell>{item.status}</TableCell>
+                                    <TableCell>{format(item.createdAt, "dd/MM/yyyy")}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>}
+
+
             </div>
         </div>
     )
