@@ -2,11 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { STORAGE_KEYS } from "./consts/storage";
 
+const publicRoutes = [
+  "/sign-in",
+  "/sign-up",
+  "/forgot-password",
+  "/confirm-email",
+  "/reset-password",
+];
+
 export async function middleware(request: NextRequest) {
     const cookiesData = await cookies();
     const token = cookiesData.get(STORAGE_KEYS.JWT_TOKEN)?.value;
     
-    const isSignInPage = request.nextUrl.pathname === "/sign-in";
+    const isPublicRoute = publicRoutes.some(route => 
+      request.nextUrl.pathname === route
+    );
     
     if (token) {
         try {
@@ -15,8 +25,7 @@ export async function middleware(request: NextRequest) {
             console.error("Token inválido ou expirado:", error);
         }
     }
-    else if (!isSignInPage) {
-
+    else if (!isPublicRoute) {
         return NextResponse.redirect(new URL("/sign-in", request.url));
     }
     return NextResponse.next();
