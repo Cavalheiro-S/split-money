@@ -6,7 +6,7 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
-import { ArrowLeftRight, DollarSign, Landmark, Loader2 } from "lucide-react";
+import { ArrowLeftRight, DollarSign, Landmark, Loader2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { TransactionCategoryEnum } from "@/enums/transaction";
 
@@ -18,8 +18,6 @@ interface TransactionTableProps {
     onDeleteClick?: (id: string) => void;
 }
 function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loading }: TransactionTableProps) {
-
-
 
     const renderTypeCell = (type: "income" | "outcome") => {
         if (type === "income") {
@@ -61,13 +59,13 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
     return (
         <Table className="min-w-[900px] mt-4">
             <TableHeader>
-
                 <TableRow>
                     <TableHead className="w-10"></TableHead>
                     <TableHead className="w-[300px]">Descrição</TableHead>
                     <TableHead>Recorrente</TableHead>
                     <TableHead className="w-28">Data</TableHead>
                     <TableHead className="text-left">Categoria</TableHead>
+                    <TableHead className="text-left">Status de pagamento</TableHead>
                     <TableHead className="text-left">Valor</TableHead>
                     {hasActions && <TableHead className="text-center">Ações</TableHead>}
                 </TableRow>
@@ -80,12 +78,31 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                         <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell>
                         <TableCell>{new Date(item.date).toLocaleDateString("pt-br")}</TableCell>
                         <TableCell className="text-left">{TransactionCategoryEnum[item.category as keyof typeof TransactionCategoryEnum]}</TableCell>
+                        <TableCell className="text-left">{item.payment_status?.status ?? "Sem status"}</TableCell>
                         <TableCell className="text-left">{item.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                         {
                             hasActions && (
                                 <TableCell className="text-center">
-                                    <Button disabled={loading} onClick={() => { onEditClick?.(item.id) }} className="mr-2">Editar</Button>
-                                    <Button disabled={loading} onClick={() => { onDeleteClick?.(item.id) }} variant="destructive">Excluir</Button>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Button 
+                                            disabled={loading} 
+                                            onClick={() => { onEditClick?.(item.id) }} 
+                                            variant="ghost" 
+                                            size="icon"
+                                            className="text-blue-500 hover:text-blue-700"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button 
+                                            disabled={loading} 
+                                            onClick={() => { onDeleteClick?.(item.id) }} 
+                                            variant="ghost" 
+                                            size="icon"
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </TableCell>
                             )
                         }

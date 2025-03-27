@@ -1,4 +1,4 @@
-import { ConfirmEmailForm } from "@/components/confirm-email-form";
+import { ConfirmEmailForm } from "@/components/forms/confirm-email-form";
 import { Suspense } from "react";
 
 export default function ConfirmEmailPage() {

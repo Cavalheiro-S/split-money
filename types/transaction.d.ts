@@ -10,6 +10,7 @@ type Transaction = {
         frequency: string;
         quantity: number;
     };
+    payment_status?: Omit<PaymentStatus, "updatedAt" | "createdAt">;
 }
 
 type RequestCreateTransaction = {
@@ -22,6 +23,7 @@ type RequestCreateTransaction = {
         frequency: string;
         quantity: number;
     };
+    paymentStatusId?: string;
 }
 
 type RequestUpdateTransaction = RequestCreateTransaction & {

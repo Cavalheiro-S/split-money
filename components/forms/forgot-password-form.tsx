@@ -6,51 +6,45 @@ import { AuthExceptions } from "@/enums/exceptions/auth"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GalleryVerticalEnd, Loader } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 
 const formSchema = z.object({
-  code: z
-    .string({ required_error: "Código é obrigatório" })
-    .min(6, { message: "Código deve ter 6 dígitos" })
-    .max(6, { message: "Código deve ter 6 dígitos" })
+  email: z
+    .string({ required_error: "Email é obrigatório" })
+    .email({ message: "Email inválido" }),
 })
 
-type ConfirmEmailFormProps = React.ComponentPropsWithoutRef<"div">
+type ForgotPasswordFormProps = React.ComponentPropsWithoutRef<"div">
 
-export function ConfirmEmailForm({
+export function ForgotPasswordForm({
   className,
   ...props
-}: ConfirmEmailFormProps) {
+}: ForgotPasswordFormProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const email = searchParams.get("email")
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      code: "",
+      email: "",
     },
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch("/api/auth/confirm-email", {
-        body: JSON.stringify({
-          email: email,
-          code: values.code,
-        }),
+      const response = await fetch("/api/auth/forgot-password", {
+        body: JSON.stringify(values),
         method: "POST",
       })
       
       const data = await response.json()
       
       if (response.ok) {
-        toast.success("E-mail confirmado com sucesso!")
-        router.push("/sign-in")
+        toast.success("Código de recuperação enviado com sucesso!")
+        router.push(`/reset-password?email=${values.email}`)
         return
       }
 
@@ -58,24 +52,18 @@ export function ConfirmEmailForm({
         case AuthExceptions.InvalidInput:
           toast.error("Dados inválidos. Verifique as informações e tente novamente.")
           break;
-        case AuthExceptions.InvalidConfirmationCode:
-          toast.error("Código de confirmação inválido. Verifique e tente novamente.")
-          break;
-        case AuthExceptions.ExpiredConfirmationCode:
-          toast.error("Código de confirmação expirado. Solicite um novo código.")
-          break;
         case AuthExceptions.UserNotFound:
           toast.error("Usuário não encontrado.")
           break;
         case AuthExceptions.Default:
-          toast.error("Erro ao confirmar e-mail. Tente novamente mais tarde.")
+          toast.error("Erro ao enviar código de recuperação. Tente novamente mais tarde.")
           break;
         default:
-          toast.error(data.message || "Falha ao confirmar e-mail")
+          toast.error(data.message || "Falha ao enviar código de recuperação")
       }
     }
     catch (error) {
-      toast.error("Falha ao confirmar e-mail")
+      toast.error("Falha ao enviar código de recuperação")
       console.log(error)
     }
   }
@@ -95,20 +83,20 @@ export function ConfirmEmailForm({
                 </div>
                 <span className="sr-only">Split Money</span>
               </a>
-              <h1 className="text-xl font-bold">Confirmar E-mail</h1>
+              <h1 className="text-xl font-bold">Recuperar Senha</h1>
               <div className="text-center text-sm">
-                Digite o código enviado para {email}
+                Digite seu email para receber um código de recuperação
               </div>
             </div>
             <div className="flex flex-col gap-6">
               <FormField
                 control={form.control}
-                name="code"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Código de Confirmação</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="000000" {...field} />
+                      <Input placeholder="seu@email.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -116,8 +104,14 @@ export function ConfirmEmailForm({
               />
               <Button type="submit" className="w-full" disabled={form.formState.isLoading || form.formState.isSubmitting}>
                 {(form.formState.isLoading || form.formState.isSubmitting) && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                Confirmar
+                Enviar Código
               </Button>
+              <div className="text-center text-sm">
+                Lembrou sua senha?{" "}
+                <a href="/sign-in" className="underline underline-offset-4">
+                  Fazer login
+                </a>
+              </div>
             </div>
           </div>
         </form>
