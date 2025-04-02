@@ -1,141 +1,161 @@
 "use client"
 
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PaymentStatusService } from "@/services/payment-status.service";
-import { format } from "date-fns";
-import { Cog, LoaderCircle, Trash2 } from "lucide-react";
+import { User, Pencil, Check, X, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { DialogNewStatus } from "./(components)/dialog-new-status";
+import { Input } from "@/components/ui/input";
+import { useUser } from "@/contexts/user-context";
+import { UserService } from "@/services/user.service";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const formSchema = z.object({
+    email: z.string().email("Email inválido"),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function Page() {
-    const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [openDialogId, setOpenDialogId] = useState<string | null>(null);
+    const [isEditingEmail, setIsEditingEmail] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isPageLoading, setIsPageLoading] = useState(true);
+    const { user, setUser } = useUser();
 
-    const getPaymentStatus = async () => {
-        try {
-            setLoading(true);
-            const response = await PaymentStatusService.getPaymentStatus();
-            setPaymentStatus(response.data);
-        }
-        catch (error) {
-            console.error(error);
-        }
-        finally{
-            setLoading(false);
-        }
-    };
+    const form = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            email: user?.email || "",
+        },
+    });
 
-    const handleDeleteStatus = async (id: string) => {
+    const handleSaveEmail = async (data: FormValues) => {
+        setIsLoading(true);
         try {
-            setDeletingId(id);
-            await PaymentStatusService.deletePaymentStatus(id);
-            await getPaymentStatus();
-            setOpenDialogId(null);
+            const response = await UserService.updateEmail(data.email);
+            if (response.data && user?.id) {
+                setUser({ ...user, email: response.data });
+            }
+            setIsEditingEmail(false);
         } catch (error) {
-            console.error(error);
+            console.error("Erro ao atualizar email:", error);
         } finally {
-            setDeletingId(null);
+            setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        getPaymentStatus();
+        const fetchUserData = async () => {
+            try {
+                const response = await UserService.getMe();
+                setUser(response.data);
+                form.reset({ email: response.data.email });
+            } catch (error) {
+                console.error("Erro ao carregar dados do usuário:", error);
+            } finally {
+                setIsPageLoading(false);
+            }
+        };
+
+        fetchUserData();
     }, []);
 
-    const LoadingComponent = () => <div className="flex justify-center items-center w-full h-full"> 
-        <LoaderCircle className="animate-spin"/>
-    </div>
+    if (isPageLoading) {
+        return (
+            <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
+                <div className="flex flex-col gap-10 w-full bg-white p-5 rounded-lg shadow-sm">
+                    <div className="flex items-center gap-2">
+                        <Skeleton className="w-10 h-10 rounded-full" />
+                        <div className="flex flex-col gap-2">
+                            <Skeleton className="h-5 w-20" />
+                            <Skeleton className="h-4 w-40" />
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-4 w-48" />
+                        </div>
+                        <div className="flex gap-2">
+                            <Skeleton className="h-10 w-32" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
             <div className="flex flex-col gap-10 w-full bg-white p-5 rounded-lg shadow-sm">
                 <div className="flex items-center gap-2">
-                    <Cog className="w-10 h-10" />
+                    <User className="w-10 h-10" />
                     <div className="flex flex-col">
-                        <h3 className="font-semibold">Configurações</h3>
-                        <span className="text-sm text-muted-foreground">Gerencie as configurações do seu perfil</span>
+                        <h3 className="font-semibold">Perfil</h3>
+                        <span className="text-sm text-muted-foreground">Gerencie as informações do seu perfil</span>
                     </div>
                 </div>
-                {loading ? <LoadingComponent/> : <div>
-                    <div className="flex w-full justify-between items-center">
-                        <div className="flex flex-col">
-                            <h3 className="font-semibold">Status de pagamento</h3>
-                            <span className="text-sm text-muted-foreground">Gerencie os status de pagamento disponíveis</span>
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                        <h4 className="font-semibold">Nome</h4>
+                        <p className="text-sm text-muted-foreground">{user?.name}</p>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <h4 className="font-semibold">Email</h4>
+                        <div className="flex items-center gap-2">
+                            {isEditingEmail ? (
+                                <form onSubmit={form.handleSubmit(handleSaveEmail)} className="flex items-center gap-2">
+                                    <Input
+                                        type="email"
+                                        {...form.register("email")}
+                                        className="max-w-sm"
+                                    />
+                                    <Button
+                                        type="submit"
+                                        variant="ghost"
+                                        size="icon"
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Check className="h-4 w-4" />
+                                        )}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setIsEditingEmail(false)}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </form>
+                            ) : (
+                                <>
+                                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setIsEditingEmail(true)}
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                </>
+                            )}
                         </div>
-                        <DialogNewStatus refreshData={getPaymentStatus}/>
                     </div>
-                    <div className="mt-6 rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Data Criação</TableHead>
-                                    <TableHead className="w-[100px] text-right">Ações</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {paymentStatus?.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell>
-                                            <Badge variant="secondary">{item.status}</Badge>
-                                        </TableCell>
-                                        <TableCell>{format(item.createdAt, "dd/MM/yyyy")}</TableCell>
-                                        <TableCell className="text-right">
-                                            <AlertDialog open={openDialogId === item.id} onOpenChange={(open) => setOpenDialogId(open ? item.id : null)}>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Tem certeza que deseja remover o status &quot;{item.status}&quot;? Esta ação não pode ser desfeita.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel disabled={deletingId === item.id}>Cancelar</AlertDialogCancel>
-                                                        <AlertDialogAction 
-                                                            onClick={() => handleDeleteStatus(item.id)} 
-                                                            className="bg-red-500 hover:bg-red-600"
-                                                            disabled={deletingId === item.id}
-                                                        >
-                                                            {deletingId === item.id ? (
-                                                                <div className="flex items-center gap-2">
-                                                                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                                                                    Removendo...
-                                                                </div>
-                                                            ) : (
-                                                                "Remover"
-                                                            )}
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                    <div className="flex gap-2">
+                        <Button variant="outline">Alterar senha</Button>
+                        <Button variant="destructive">Excluir conta</Button>
                     </div>
-                </div>}
+                </div>
             </div>
         </div>
-    )
+    );
 }

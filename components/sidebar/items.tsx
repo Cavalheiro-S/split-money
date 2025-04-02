@@ -1,7 +1,7 @@
 "use client"
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { Cog, Home, LogOut, PlusCircle } from "lucide-react";
+import { Cog, Home, LogOut, PlusCircle, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -30,8 +30,13 @@ export const SidebarItems = () => {
     const router = useRouter()
     const itemsProfile: SidebarItem[] = [
         {
-            title: "Configurações",
+            title: "Perfil",
             url: "/profile",
+            Icon: User,
+        },
+        {
+            title: "Configurações",
+            url: "/config",
             Icon: Cog,
         },
         {

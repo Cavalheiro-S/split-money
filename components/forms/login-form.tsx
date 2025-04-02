@@ -2,8 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useUser } from "@/contexts/user-context"
 import { AuthExceptions } from "@/enums/exceptions/auth"
 import { cn } from "@/lib/utils"
+import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeClosed, GalleryVerticalEnd, Loader } from "lucide-react"
 import Link from "next/link"
@@ -31,6 +33,7 @@ export function LoginForm({
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
+  const { setUser } = useUser()
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,6 +52,8 @@ export function LoginForm({
       const data = await response.json() as ResponseSignIn
       
       if (data.accessToken) {
+        const user = await UserService.getMe()
+        setUser(user.data)
         router.push("/dashboard")
         return;
       }
