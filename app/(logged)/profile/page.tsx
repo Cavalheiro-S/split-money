@@ -1,15 +1,16 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { User, Pencil, Check, X, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/contexts/user-context";
 import { UserService } from "@/services/user.service";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Check, Loader2, User, X } from "lucide-react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
     email: z.string().email("Email inválido"),
@@ -139,20 +140,20 @@ export default function Page() {
                             ) : (
                                 <>
                                     <p className="text-sm text-muted-foreground">{user?.email}</p>
-                                    <Button
+                                    {/* <Button
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => setIsEditingEmail(true)}
                                     >
                                         <Pencil className="h-4 w-4" />
-                                    </Button>
+                                    </Button> */}
                                 </>
                             )}
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline">Alterar senha</Button>
-                        <Button variant="destructive">Excluir conta</Button>
+                        <Button onClick={() => redirect("/forgot-password")} variant="outline">Alterar senha</Button>
+                        {/* <Button variant="destructive">Excluir conta</Button> */}
                     </div>
                 </div>
             </div>

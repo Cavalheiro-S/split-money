@@ -12,9 +12,9 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
+import { useToast } from "@/hooks/use-toast"
 
 const formSchema = z.object({
   email: z
@@ -33,6 +33,7 @@ export function LoginForm({
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
+  const { toast } = useToast()
   const { setUser } = useUser()
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -58,15 +59,15 @@ export function LoginForm({
         return;
       }
       if (data.error?.code === AuthExceptions.InvalidInput) {
-        toast.error("Email ou senha inválidos")
+        toast({title: "Email ou senha inválidos", variant: "destructive"})
       }
       else {
-        toast.error("Falha ao realizar login")
+        toast({title: "Falha ao fazer login", variant: "destructive"})
       }
 
     }
     catch (error) {
-      toast.error("Falha ao realizar login")
+      toast({title: "Falha ao fazer login", variant: "destructive"})
       console.log(error)
     }
   }
