@@ -1,8 +1,8 @@
 "use client"
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
-import { TransactionService } from "@/services/transaction.service";
-import { useCallback, useEffect, useState } from "react";
+import { type TransactionFilters, TransactionService } from "@/services/transaction.service";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 
 
@@ -10,21 +10,36 @@ export default function Page() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
     const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
-    const [loading, setLoading] = useState(false);
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         totalPages: 1,
         total: 0,
         limit: 10
-    })
+    });
+
+    const [filters, setFilters] = useState<TransactionFilters>({
+        date: date,
+        type: undefined,
+        sort: {
+            sortBy: "date",
+            sortOrder: "desc"
+        },
+    });
+
+    const memoizedFilters = useMemo(() => ({
+        ...filters,
+        date: date
+    }), [date, filters]);
+
+    const [loading, setLoading] = useState(true);
 
     const getTransactions = useCallback(async () => {
         try {
             setLoading(true)
-            const data = await TransactionService.getTransactions(pagination, date)
+            const data = await TransactionService.getTransactions(pagination, memoizedFilters)
             setTransactions(data.data)
-            setPagination(data.pagination)  
+            setPagination(data.pagination)
         }
         catch (error) {
             toast.error("Falha ao buscar transações")
@@ -33,7 +48,7 @@ export default function Page() {
         finally {
             setLoading(false)
         }
-    }, [pagination.page, pagination.limit, date])
+    }, [pagination, memoizedFilters])
 
     const handleEdit = (id: string) => {
         setModalTransactionOpen(true)
@@ -61,9 +76,7 @@ export default function Page() {
     useEffect(() => {
         getTransactions()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [date, pagination.page, pagination.limit])
-
-    
+    }, [date, pagination.page, pagination.limit, memoizedFilters])
 
     useEffect(() => {
         if (!modalTransactionOpen) {
@@ -77,7 +90,7 @@ export default function Page() {
                 <TableTransaction.Header
                     title="Transações"
                     subtitle="Aqui você pode ver os seus lançamentos"
-                    onChange={(date) => {
+                    onChangeDate={(date) => {
                         setPagination({ ...pagination, page: 1 })
                         setDate(date)
                     }}
@@ -97,6 +110,11 @@ export default function Page() {
                     data={transactions}
                     loading={loading}
                     onDeleteClick={handleDelete}
+                    onChangeFilters={(filters) => {
+                        setPagination({ ...pagination, page: 1 })
+                        setFilters(filters)
+                    }}
+                    filters={filters}
                 />
                 <TableTransaction.Pagination
                     page={pagination.page}
@@ -109,4 +127,4 @@ export default function Page() {
 
         </div>
     )
-} 
+}

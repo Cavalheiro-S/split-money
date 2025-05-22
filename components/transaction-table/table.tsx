@@ -6,48 +6,39 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
-import { ArrowLeftRight, DollarSign, Landmark, Loader2, Pencil, Trash2 } from "lucide-react";
-import { Button } from "../ui/button";
 import { TransactionCategoryEnum } from "@/enums/transaction";
+import { cn } from "@/lib/utils";
+import { TransactionFilters } from "@/services/transaction.service";
+import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface TransactionTableProps {
     data: Transaction[];
     loading?: boolean;
     hasActions?: boolean;
+    filters?: TransactionFilters;
     onEditClick?: (id: string) => void;
     onDeleteClick?: (id: string) => void;
+    onChangeFilters?: (filters: TransactionFilters) => void;
 }
-function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loading }: TransactionTableProps) {
+function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loading, onChangeFilters, filters }: TransactionTableProps) {
 
     const renderTypeCell = (type: "income" | "outcome") => {
         if (type === "income") {
             return (
-                <TableCell className="text-green-500">
-                    <div className="p-1 bg-green-100 rounded-full w-8 h-8 flex items-center justify-center">
-                        <DollarSign className="w-5 h-5" />
-                    </div>
-                </TableCell>
+                <div className="p-1 bg-green-100 rounded-full w-8 h-8 flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-green-500" />
+                </div>
             )
         }
         return (
-            <TableCell className="text-red-500">
-                <div className="p-1 bg-red-100 rounded-full w-8 h-8 flex items-center justify-center">
-                    <Landmark className="w-5 h-5" />
-                </div>
-            </TableCell>
-        )
-    }
-
-    if (loading) {
-        return (
-            <div className="flex h-full items-center justify-center p-10 gap-2">
-                < Loader2 className="animate-spin" />
-                <span className="text-muted-foreground">Carregando transações</span>
+            <div className="p-1 bg-red-100 rounded-full w-8 h-8 flex items-center justify-center">
+                <Landmark className="w-5 h-5 text-red-500" />
             </div>
         )
     }
 
-    if (data && data.length < 1) {
+    if (data && data.length < 1 && !loading) {
         return (
             <div className="flex flex-col h-full items-center justify-center p-10 gap-2">
                 <ArrowLeftRight />
@@ -56,26 +47,59 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
         )
     }
 
+    const renderTableHead = (title: string, sort: NonNullable<TransactionFilters["sort"]>["sortBy"], style?: string) => {
+        return (
+            <TableHead
+                onClick={() => onChangeFilters?.({
+                    ...filters,
+                    sort: {
+                        ...filters?.sort,
+                        sortBy: sort,
+                        sortOrder: filters?.sort?.sortOrder === "asc" ? "desc" : "asc"
+                    }
+                })}
+                className={cn("hover:bg-gray-300/30", style)}>
+                <div className="flex items-center gap-2">
+                    {filters?.sort?.sortBy === sort && filters.sort.sortOrder === "asc" ? <ArrowDown className="w-4 h-4" /> : <ArrowUp className="w-4 h-4" />}
+                    {title}
+                </div>
+            </TableHead>
+        )
+    }
+
     return (
         <Table className="min-w-[900px] mt-4">
             <TableHeader>
-                <TableRow>
-                    <TableHead className="w-10"></TableHead>
-                    <TableHead className="w-[300px]">Descrição</TableHead>
-                    <TableHead>Recorrente</TableHead>
-                    <TableHead className="w-28">Data</TableHead>
-                    <TableHead className="text-left">Categoria</TableHead>
-                    <TableHead className="text-left">Status de pagamento</TableHead>
-                    <TableHead className="text-left">Valor</TableHead>
+                <TableRow className="hover:bg-white">
+                    {renderTableHead("Tipo", "type", "w-[80px]")}
+                    {renderTableHead("Descrição", "description")}
+                    {renderTableHead("Data", "date")}
+                    {renderTableHead("Categoria", "category")}
+                    {renderTableHead("Status de pagamento", "payment_status")}
+                    {renderTableHead("Valor", "amount")}
                     {hasActions && <TableHead className="text-center">Ações</TableHead>}
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {data?.map((item) => (
+                {loading ? (
+                    <TableRow>
+                        <TableCell colSpan={6}>
+                            <div className="p-6 flex items-center justify-center gap-2">
+                                < Loader2 className="animate-spin" />
+                                Carregando transações
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                ) : data?.map((item) => (
                     <TableRow className={item.type === "income" ? "hover:bg-green-100/30" : "hover:bg-red-100/30"} key={item.id}>
-                        {renderTypeCell(item.type)}
-                        <TableCell className="font-medium">{item.description}</TableCell>
-                        <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell>
+
+                        <TableCell className="text-center">
+                            {renderTypeCell(item.type)}
+                        </TableCell>
+                        <TableCell className="flex font-medium items-center gap-2">
+                            {item.description}
+                        </TableCell>
+                        {/* <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell> */}
                         <TableCell>{new Date(item.date).toLocaleDateString("pt-br")}</TableCell>
                         <TableCell className="text-left">{TransactionCategoryEnum[item.category as keyof typeof TransactionCategoryEnum]}</TableCell>
                         <TableCell className="text-left">{item.payment_status?.status ?? "Sem status"}</TableCell>
@@ -84,19 +108,19 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                             hasActions && (
                                 <TableCell className="text-center">
                                     <div className="flex items-center justify-center gap-2">
-                                        <Button 
-                                            disabled={loading} 
-                                            onClick={() => { onEditClick?.(item.id) }} 
-                                            variant="ghost" 
+                                        <Button
+                                            disabled={loading}
+                                            onClick={() => { onEditClick?.(item.id) }}
+                                            variant="ghost"
                                             size="icon"
                                             className="text-blue-500 hover:text-blue-700"
                                         >
                                             <Pencil className="h-4 w-4" />
                                         </Button>
-                                        <Button 
-                                            disabled={loading} 
-                                            onClick={() => { onDeleteClick?.(item.id) }} 
-                                            variant="ghost" 
+                                        <Button
+                                            disabled={loading}
+                                            onClick={() => { onDeleteClick?.(item.id) }}
+                                            variant="ghost"
                                             size="icon"
                                             className="text-red-500 hover:text-red-700"
                                         >
@@ -111,7 +135,7 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                 <TableRow>
                     <TableCell colSpan={5} className="text-right font-semibold">Total</TableCell>
                     <TableCell className="text-left font-semibold">{data.reduce((acc, item) => {
-                        return item.type === "income" ? acc + item.amount : acc - item.amount 
+                        return item.type === "income" ? acc + item.amount : acc - item.amount
                     }, 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                 </TableRow>
             </TableBody>

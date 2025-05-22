@@ -1,12 +1,27 @@
 import { ApiService } from "./base.service";
 
+export type TransactionFilters = {
+    date?: Date;
+    type?: "income" | "outcome";
+    sort?: {
+        sortBy: "description" | "date" | "amount" | "type" | "category" | "payment_status";
+        sortOrder: "asc" | "desc";
+    }
+    status?: string;
+}
+
 export class TransactionService extends ApiService {
-    static async getTransactions(pagination: Pagination, date?: Date, type?: "income" | "outcome") {
+    static async getTransactions(pagination: Pagination, filters?: TransactionFilters) {
         const params = new URLSearchParams();
         params.append("page", pagination.page.toString());
         params.append("limit", pagination.limit.toString());
-        if (date) params.append("date", date.toISOString());
-        if (type) params.append("type", type);
+        if (filters?.date) params.append("date", filters?.date.toISOString());
+        if (filters?.type) params.append("type", filters?.type);
+        if (filters?.status) params.append("status", filters?.status);
+        if (filters?.sort) {
+            params.append("sortBy", filters.sort.sortBy);
+            params.append("sortOrder", filters.sort.sortOrder);
+        }
 
         return this.request<{ message: string; data: Transaction[]; pagination: Pagination }>(
             `/transaction?${params.toString()}`

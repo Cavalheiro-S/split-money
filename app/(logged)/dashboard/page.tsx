@@ -27,7 +27,7 @@ export default function Page() {
     const getIncomes = useCallback(async () => {
         try {
             setLoadingIncome(true)
-            const data = await TransactionService.getTransactions(paginationIncome, dateIncome, "income")
+            const data = await TransactionService.getTransactions(paginationIncome, { date: dateIncome, type: "income" })
             setIncomes(data.data)
             setPaginationIncome(data.pagination)
         }
@@ -42,7 +42,7 @@ export default function Page() {
     const getOutcomes = useCallback(async () => {
         try {
             setLoadingOutcome(true)
-            const data = await TransactionService.getTransactions(paginationOutcome, dateOutcome, "outcome")
+            const data = await TransactionService.getTransactions(paginationOutcome, { date: dateOutcome, type: "outcome" })
             setOutcomes(data.data)
             setPaginationOutcome(data.pagination)
         }
@@ -58,20 +58,20 @@ export default function Page() {
         if (paginationIncome.page && paginationIncome.limit) {
             getIncomes()
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dateIncome, paginationIncome.page, paginationIncome.limit])
 
     useEffect(() => {
         if (paginationOutcome.page && paginationOutcome.limit) {
             getOutcomes()
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dateOutcome, paginationOutcome.page, paginationOutcome.limit])
 
     return (
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
             <TableTransaction.Container>
-                <TableTransaction.Header onChange={(date) => {
+                <TableTransaction.Header onChangeDate={(date) => {
                     setDateIncome(date)
                     setPaginationIncome({ ...paginationIncome, page: 1 })
                 }} title="Últimos lançamentos" subtitle="Aqui você pode ver os seus lançamentos recentes" />
@@ -87,10 +87,11 @@ export default function Page() {
 
             <TableTransaction.Container>
                 <TableTransaction.Header
-                    onChange={(date) => {
+                    onChangeDate={(date) => {
                         setDateOutcome(date)
                         setPaginationOutcome({ ...paginationOutcome, page: 1 })
                     }}
+                    type="outcome"
                     title="Últimas despesas"
                     subtitle="Aqui você pode ver os suas despesas recentes" />
                 <TableTransaction.Table loading={loadingOutcome} data={outcomes} />

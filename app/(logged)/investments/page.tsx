@@ -7,7 +7,7 @@ import { Dialog } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { InvestmentService } from '@/services/investment.service';
 import { Investment } from '@/types/investment';
-import { Plus, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Loader2, Wallet } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import {
     AlertDialog,
@@ -77,7 +77,15 @@ export default function InvestmentsPage() {
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
             <div className='bg-white w-full p-4 rounded-md mb-6'>
                 <div className="flex justify-between items-center mb-6 w-full">
-                    <h1 className="text-3xl font-semibold">Investimentos</h1>
+                    <div className="flex w-full items-center gap-2">
+                <div className="p-3 rounded-full bg-white border">
+                    <Wallet className="w-6 h-6 text-green-500" />
+                </div>
+                <div className="flex flex-col mr-auto">
+                    <h3 className="text-lg font-semibold">Investimentos</h3>
+                    <span className="text-sm text-muted-foreground">Cadastre seus investimentos e observe seus rendimentos</span>
+                </div>
+            </div>
                     <Button onClick={() => setIsDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />
                         Novo Investimento
