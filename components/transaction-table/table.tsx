@@ -23,6 +23,19 @@ interface TransactionTableProps {
 }
 function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loading, onChangeFilters, filters }: TransactionTableProps) {
 
+    const renderSort = (sort: NonNullable<TransactionFilters["sort"]>["sortBy"]) => {
+
+        if( filters?.sort?.sortBy !== sort) {
+            return null;
+        }
+        if (filters?.sort?.sortBy === sort && filters.sort.sortOrder === "asc") {
+            return <ArrowDown className="w-4 h-4" />
+        }
+        if (filters?.sort?.sortBy === sort && filters.sort.sortOrder === "desc") {
+            return <ArrowUp className="w-4 h-4" />
+        }
+    }
+
     const renderTypeCell = (type: "income" | "outcome") => {
         if (type === "income") {
             return (
@@ -60,7 +73,7 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                 })}
                 className={cn("hover:bg-gray-300/30", style)}>
                 <div className="flex items-center gap-2">
-                    {filters?.sort?.sortBy === sort && filters.sort.sortOrder === "asc" ? <ArrowDown className="w-4 h-4" /> : <ArrowUp className="w-4 h-4" />}
+                    {renderSort(sort)}
                     {title}
                 </div>
             </TableHead>
