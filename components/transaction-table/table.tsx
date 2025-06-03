@@ -109,7 +109,7 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                         <TableCell className="text-center">
                             {renderTypeCell(item.type)}
                         </TableCell>
-                        <TableCell className="flex font-medium items-center gap-2">
+                        <TableCell className="font-medium gap-2">
                             {item.description}
                         </TableCell>
                         {/* <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell> */}

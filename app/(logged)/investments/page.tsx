@@ -1,14 +1,6 @@
 'use client';
 
 import { InvestmentForm } from '@/components/forms/investment-form';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Dialog } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
-import { InvestmentService } from '@/services/investment.service';
-import { Investment } from '@/types/investment';
-import { Plus, Trash2, Loader2, Wallet } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,6 +11,15 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Dialog } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { InvestmentService } from '@/services/investment.service';
+import { Investment } from '@/types/investment';
+import { Loader2, Plus, Wallet } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { CardInvestiment } from './(components)/card-investiment';
 
 export default function InvestmentsPage() {
     const [investments, setInvestments] = useState<Investment[]>([]);
@@ -73,19 +74,28 @@ export default function InvestmentsPage() {
         fetchInvestments();
     };
 
+    const totalInvestments = investments.reduce((acc, investment) => {
+        return acc + (investment.quantity * investment.purchasePrice);
+    }, 0);
+
     return (
         <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
             <div className='bg-white w-full p-4 rounded-md mb-6'>
                 <div className="flex justify-between items-center mb-6 w-full">
                     <div className="flex w-full items-center gap-2">
-                <div className="p-3 rounded-full bg-white border">
-                    <Wallet className="w-6 h-6 text-green-500" />
-                </div>
-                <div className="flex flex-col mr-auto">
-                    <h3 className="text-lg font-semibold">Investimentos</h3>
-                    <span className="text-sm text-muted-foreground">Cadastre seus investimentos e observe seus rendimentos</span>
-                </div>
-            </div>
+                        <div className="p-3 rounded-full bg-white border">
+                            <Wallet className="w-6 h-6 text-green-500" />
+                        </div>
+                        <div className="flex flex-col mr-auto">
+                            <h3 className="text-lg font-semibold">Investimentos</h3>
+                            <span className="text-sm text-muted-foreground">Cadastre seus investimentos e observe seus rendimentos</span>
+                            {investments.length > 0 && (
+                                <span className="text-sm font-semibold text-green-600 mt-1">
+                                    Total investido: R$ {totalInvestments.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                            )}
+                        </div>
+                    </div>
                     <Button onClick={() => setIsDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />
                         Novo Investimento
@@ -109,35 +119,12 @@ export default function InvestmentsPage() {
                     </Card>
                 ) : (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {investments.map((investment) => (
-                            <Card key={investment.id} className="p-4">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h2 className="text-xl font-bold">{investment.ticker}</h2>
-                                        <p className="text-gray-600">
-                                            {investment.quantity} unidades x {investment.currency}{' '}
-                                            {investment.purchasePrice.toFixed(2)}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            Total: R${' '}
-                                            {(investment.quantity * investment.purchasePrice).toFixed(2)}
-                                        </p>
-                                    </div>
-                                    <div className='flex flex-col items-end gap-2'>
-                                        <span className="text-sm text-gray-500">
-                                            {new Date(investment.purchaseDate).toLocaleDateString()}
-                                        </span>
-                                        <Button
-                                            className='bg-white p-2 shadow-none hover:bg-red-100 rounded-full'
-                                            onClick={() => setInvestmentToDelete(investment.id)}
-                                            disabled={isDeleting}
-                                        >
-                                            <Trash2 className="text-red-500 cursor-pointer" size={20} />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))}
+                        {investments.map(investiment =>
+                            <CardInvestiment
+                                key={investiment.id}
+                                investment={investiment}
+                                setInvestmentToDelete={setInvestmentToDelete}
+                                isDeleting={isDeleting} />)}
                     </div>
                 )}
 
