@@ -24,11 +24,6 @@ const itemsApplication: SidebarItem[] = [
         url: "/transactions",
         Icon: PlusCircle,
     },
-    {
-        title: "Investimentos",
-        url: "/investments",
-        Icon: Wallet,
-    },
 ]
 
 export const SidebarItems = () => {
