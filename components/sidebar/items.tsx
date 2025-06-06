@@ -1,7 +1,7 @@
 "use client"
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { Cog, Home, LogOut, PlusCircle, User, Wallet } from "lucide-react";
+import { Cog, Home, LogOut, PlusCircle, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
