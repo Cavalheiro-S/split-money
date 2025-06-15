@@ -158,9 +158,9 @@ export default function Page() {
                                 {paymentStatus?.map((item) => (
                                     <TableRow key={item.id}>
                                         <TableCell>
-                                            <Badge variant="secondary">{item.status}</Badge>
+                                            <Badge variant="secondary">{item.description}</Badge>
                                         </TableCell>
-                                        <TableCell>{format(item.createdAt, "dd/MM/yyyy")}</TableCell>
+                                        <TableCell>{format(item.created_at, "dd/MM/yyyy")}</TableCell>
                                         <TableCell className="text-right">
                                             <AlertDialog open={openDialogId === item.id} onOpenChange={(open) => setOpenDialogId(open ? item.id : null)}>
                                                 <AlertDialogTrigger asChild>
@@ -172,7 +172,7 @@ export default function Page() {
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            Tem certeza que deseja remover o status &quot;{item.status}&quot;? Esta ação não pode ser desfeita.
+                                                            Tem certeza que deseja remover o status &quot;{item.description}&quot;? Esta ação não pode ser desfeita.
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
