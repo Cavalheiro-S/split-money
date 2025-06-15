@@ -5,8 +5,8 @@ import { TransactionService } from "@/services/transaction.service";
 import { useCallback, useEffect, useState } from "react";
 
 export default function Page() {
-    const [incomes, setIncomes] = useState<Transaction[]>([]);
-    const [outcomes, setOutcomes] = useState<Transaction[]>([]);
+    const [incomes, setIncomes] = useState<ResponseGetTransactions[]>([]);
+    const [outcomes, setOutcomes] = useState<ResponseGetTransactions[]>([]);
     const [loadingIncome, setLoadingIncome] = useState(false);
     const [loadingOutcome, setLoadingOutcome] = useState(false);
     const [dateIncome, setDateIncome] = useState<Date | undefined>(new Date());

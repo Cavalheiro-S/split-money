@@ -1,5 +1,8 @@
-import { TransactionCategoryEnum, TransactionFrequencyEnum } from "@/enums/transaction";
+import { TransactionFrequencyEnum } from "@/enums/transaction";
 import { cn } from "@/lib/utils";
+import { CategoryService } from "@/services/category.service";
+import { PaymentStatusService } from "@/services/payment-status.service";
+import { TransactionService } from "@/services/transaction.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -7,6 +10,7 @@ import { CalendarIcon, Info, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import CurrencyInput from "react-currency-input-field";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
@@ -16,9 +20,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Switch } from "../ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
-import { TransactionService } from "@/services/transaction.service";
-import { toast } from "sonner";
-import { PaymentStatusService } from "@/services/payment-status.service";
 const schema = z.object({
   description: z
     .string({ message: "A descrição é obrigatória" })
@@ -58,8 +59,9 @@ interface TransactionFormProps {
 }
 
 export function TransactionForm({ transaction, onOpenChange, updateData }: TransactionFormProps) {
-    const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([])
-    const [isLoading, setIsLoading] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(schema),
@@ -83,7 +85,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
     if (transaction) {
       const amount = transaction.amount.toString().replace(".", ",")
       setValue("amount", amount)
-      setValue("category", transaction.category)
+      setValue("category", "")
       setValue("date", new Date(transaction.date))
       setValue("description", transaction.description)
       setValue("recurrent", transaction.recurrent && { active: true, ...transaction.recurrent })
@@ -95,12 +97,42 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
     }
   }, [transaction, setValue, reset, paymentStatus])
 
+  const getCategories = async () => {
+    try {
+      setIsLoading(true)
+      const res = await CategoryService.getCategories()
+      setCategories(res.data)
+    } catch (error) {
+      toast.error("Erro ao carregar categorias")
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getPaymentStatus = async () => {
+    try {
+      setIsLoading(true)
+      const res = await PaymentStatusService.getPaymentStatus()
+      setPaymentStatus(res.data)
+    }
+    catch (error) {
+      toast.error("Erro ao carregar status de pagamento")
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     setIsLoading(true)
-    PaymentStatusService.getPaymentStatus().then((res) => {
-      setPaymentStatus(res.data)
-      setIsLoading(false)
-    })
+    Promise.all([
+      getPaymentStatus(),
+      getCategories()
+    ]).catch((error) => {
+      toast.error("Erro ao carregar dados")
+      console.error(error)
+    }).finally(() => setIsLoading(false))
   }, [])
 
   async function onSubmit(data: TransactionFormData) {
@@ -116,6 +148,8 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             quantity: data.recurrent.quantity
           }
           : undefined,
+        paymentStatusId: data.paymentStatusId || undefined,
+        categoryId: data.category || undefined,
       }
       if (transaction) {
         await TransactionService.updateTransaction({ ...mapData, id: transaction.id })
@@ -135,7 +169,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
     finally {
       setIsLoading(false)
     }
-  } 
+  }
 
   return (
     <Form {...form}>
@@ -258,9 +292,9 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {Object.entries(TransactionCategoryEnum).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      {value}
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.description}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -282,9 +316,9 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                    {paymentStatus.map((status) => (
+                  {paymentStatus.map((status) => (
                     <SelectItem key={status.id} value={status.id}>
-                      {status.status}
+                      {status.description}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -293,7 +327,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             </FormItem>
           )}
         />
-        
+
 
         <div className="flex flex-col border-t border-gray-200 pt-4 space-y-4">
           <FormField

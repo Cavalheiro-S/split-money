@@ -3,7 +3,7 @@ import { ApiService } from "./base.service";
 export class PaymentStatusService extends ApiService {
     static async getPaymentStatus() {
 
-        return this.request<{ message: string; data: PaymentStatus[]; pagination: Pagination }>(
+        return this.request<{ message: string; data: PaymentStatus[]}>(
             `/payment`
         );
     }

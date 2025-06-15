@@ -23,7 +23,7 @@ export class TransactionService extends ApiService {
             params.append("sortOrder", filters.sort.sortOrder);
         }
 
-        return this.request<{ message: string; data: Transaction[]; pagination: Pagination }>(
+        return this.request<{ message: string; data: ResponseGetTransactions[]; pagination: Pagination }>(
             `/transaction?${params.toString()}`
         );
     }
