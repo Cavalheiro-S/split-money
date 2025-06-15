@@ -22,6 +22,20 @@ type RequestCreateTransaction = {
         quantity: number;
     };
     paymentStatusId?: string;
+    categoryId?: string;
+    tagId?: string;
+}
+
+type ResponseGetTransactions = {
+    id: string;
+    description: string;
+    date: string;
+    amount: number;
+    note?: string;
+    type: "income" | "outcome";
+    payment_status?: Omit<PaymentStatus, "updated_at" | "created_at">;
+    categories: Category;
+    tags: Tag;
 }
 
 type RequestUpdateTransaction = RequestCreateTransaction & {

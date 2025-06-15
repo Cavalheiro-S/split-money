@@ -222,9 +222,9 @@ export default function Page() {
                                 {categories?.map((item) => (
                                     <TableRow key={item.id}>
                                         <TableCell>
-                                            <Badge variant="secondary">{item.name}</Badge>
+                                            <Badge variant="secondary">{item.description}</Badge>
                                         </TableCell>
-                                        <TableCell>{format(item.createdAt, "dd/MM/yyyy")}</TableCell>
+                                        <TableCell>{format(item.created_at, "dd/MM/yyyy")}</TableCell>
                                         <TableCell className="text-right">
                                             <AlertDialog open={openCategoryDialogId === item.id} onOpenChange={(open) => setOpenCategoryDialogId(open ? item.id : null)}>
                                                 <AlertDialogTrigger asChild>
@@ -236,7 +236,7 @@ export default function Page() {
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            Tem certeza que deseja remover a categoria &quot;{item.name}&quot;? Esta ação não pode ser desfeita.
+                                                            Tem certeza que deseja remover a categoria &quot;{item.description}&quot;? Esta ação não pode ser desfeita.
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
@@ -286,9 +286,9 @@ export default function Page() {
                                 {tags?.map((item) => (
                                     <TableRow key={item.id}>
                                         <TableCell>
-                                            <Badge variant="secondary">{item.name}</Badge>
+                                            <Badge variant="secondary">{item.description}</Badge>
                                         </TableCell>
-                                        <TableCell>{format(item.createdAt, "dd/MM/yyyy")}</TableCell>
+                                        <TableCell>{format(item.created_at, "dd/MM/yyyy")}</TableCell>
                                         <TableCell className="text-right">
                                             <AlertDialog open={openTagDialogId === item.id} onOpenChange={(open) => setOpenTagDialogId(open ? item.id : null)}>
                                                 <AlertDialogTrigger asChild>
@@ -300,7 +300,7 @@ export default function Page() {
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            Tem certeza que deseja remover a tag &quot;{item.name}&quot;? Esta ação não pode ser desfeita.
+                                                            Tem certeza que deseja remover a tag &quot;{item.description}&quot;? Esta ação não pode ser desfeita.
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>

@@ -7,9 +7,9 @@ import { toast } from "sonner";
 
 
 export default function Page() {
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [transactions, setTransactions] = useState<ResponseGetTransactions[]>([]);
     const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
-    const [transactionSelected, setTransactionSelected] = useState<Transaction | undefined>(undefined);
+    const [transactionSelected, setTransactionSelected] = useState<ResponseGetTransactions | undefined>(undefined);
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,

@@ -6,14 +6,13 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
-import { TransactionCategoryEnum } from "@/enums/transaction";
 import { cn } from "@/lib/utils";
 import { TransactionFilters } from "@/services/transaction.service";
 import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 
 interface TransactionTableProps {
-    data: Transaction[];
+    data: ResponseGetTransactions[];
     loading?: boolean;
     hasActions?: boolean;
     filters?: TransactionFilters;
@@ -114,8 +113,8 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                         </TableCell>
                         {/* <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell> */}
                         <TableCell>{new Date(item.date).toLocaleDateString("pt-br")}</TableCell>
-                        <TableCell className="text-left">{TransactionCategoryEnum[item.category as keyof typeof TransactionCategoryEnum]}</TableCell>
-                        <TableCell className="text-left">{item.payment_status?.status ?? "Sem status"}</TableCell>
+                        <TableCell className="text-left">{item.categories?.description ?? "Sem categoria"}</TableCell>
+                        <TableCell className="text-left">{item.payment_status?.description ?? "Sem status"}</TableCell>
                         <TableCell className="text-left">{item.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                         {
                             hasActions && (
