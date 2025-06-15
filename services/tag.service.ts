@@ -1,0 +1,36 @@
+import { ApiService } from "./base.service";
+
+export class TagService extends ApiService {
+    static async getTags() {
+        return this.request<{ message: string; data: Tag[]; pagination: Pagination }>(
+            `/tag`
+        );
+    }
+
+    static async createTag(name: string) {
+        return this.request<{ message: string; data: Tag }>(
+            "/tag",
+            {
+                method: "POST",
+                body: JSON.stringify({ name }),
+            }
+        );
+    }
+
+    static async updateTag(name: string, id: string) {
+        return this.request<{ message: string; data: Tag }>(
+            `/tag/${id}`,
+            {
+                method: "PATCH",
+                body: JSON.stringify({ name }),
+            }
+        );
+    }
+
+    static async deleteTag(id: string) {
+        return this.request<{ message: string }>(
+            `/tag/${id}`,
+            { method: "DELETE" }
+        );
+    }
+}
