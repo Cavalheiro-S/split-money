@@ -21,30 +21,41 @@ export async function POST(req: Request) {
                 error: error
             }, { status: 400 });
         }
-        const response = NextResponse.json({
-            message: "Login successful",
-            accessToken: accessToken
-        }, { status: 200 });
 
-        const payload = await validateToken(accessToken);
-        const exp = payload.exp || 0
-        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const expireDate = fromUnixTime(exp);
-        const localDate = toZonedTime(expireDate, timeZone);
+        try {
+            const payload = await validateToken(accessToken);
+            const exp = payload.exp || 0;
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const expireDate = fromUnixTime(exp);
+            const localDate = toZonedTime(expireDate, timeZone);
 
-        const cookiesData = await cookies();
-        cookiesData.set(STORAGE_KEYS.JWT_TOKEN, accessToken, {
-            httpOnly: true, // Segurança extra (não acessível pelo JavaScript no cliente)
-            secure: process.env.NODE_ENV === "production", // Apenas HTTPS em produção
-            sameSite: "strict", // Proteção contra CSRF
-            path: "/", // Disponível em toda a aplicação
-            expires: localDate, // Expira em expiresIn segundos
-        })
-        return response;
+            const response = NextResponse.json({
+                message: "Login successful",
+                accessToken: accessToken
+            }, { status: 200 });
+
+            const cookiesData = await cookies();
+            cookiesData.set(STORAGE_KEYS.JWT_TOKEN, accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                path: "/",
+                expires: localDate,
+            });
+
+            return response;
+        } catch (validationError) {
+            console.error('Token validation failed:', validationError);
+            return NextResponse.json({
+                message: "Invalid token",
+                error: "Token validation failed"
+            }, { status: 401 });
+        }
     } catch (error) {
-        console.log(error);
+        console.error('Sign-in error:', error);
         return NextResponse.json({
-            message: "Login failed"
+            message: "Login failed",
+            error: "Internal server error"
         }, { status: 500 });
     }
 }

@@ -21,6 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const projectId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
+  const isProduction = process.env.NODE_ENV === "production";
   
   return (
     <html lang="pt-br">
@@ -31,7 +32,7 @@ export default function RootLayout({
           {children}
         </UserProvider>
         <Toaster />
-        {projectId && <ClarityProvider projectId={projectId} />}
+        {isProduction && projectId && <ClarityProvider projectId={projectId} />}
       </body>
     </html>
   );
