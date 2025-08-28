@@ -2,8 +2,9 @@
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Cog, Home, LogOut, PlusCircle, User } from "lucide-react";
-import Link from "next/link";
+import { LoadingLink } from "@/components/loading-link";
 import { useRouter } from "next/navigation";
+import { useNavigationLoadingContext } from "@/contexts/navigation-loading-context";
 
 
 type SidebarItem = {
@@ -28,6 +29,8 @@ const itemsApplication: SidebarItem[] = [
 
 export const SidebarItems = () => {
     const router = useRouter()
+    const { startLoading } = useNavigationLoadingContext()
+    
     const itemsProfile: SidebarItem[] = [
         {
             title: "Perfil",
@@ -44,6 +47,7 @@ export const SidebarItems = () => {
             url: "/sign-in",
             Icon: LogOut,
             onClick: async () => {
+                startLoading()
                 await fetch("/api/auth/sign-out")
                 router.replace("/sign-in")
             },
@@ -66,10 +70,10 @@ export const SidebarItems = () => {
         return (
             <SidebarMenuItem key={title}>
                 <SidebarMenuButton asChild>
-                    <Link href={url}>
+                    <LoadingLink href={url}>
                         <Icon />
                         <span>{title}</span>
-                    </Link>
+                    </LoadingLink>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         )

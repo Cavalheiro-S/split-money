@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from "@/contexts/user-context";
+import { NavigationLoadingProvider } from "@/contexts/navigation-loading-context";
+import { NavigationLoader } from "@/components/navigation-loader";
 import ClarityProvider from '@/components/clarity';
 const poppinsSans = Poppins({
   subsets: ["latin"],
@@ -28,10 +30,13 @@ export default function RootLayout({
       <body
         className={`${poppinsSans.variable} antialiased`}
       >
-        <UserProvider>
-          {children}
-        </UserProvider>
-        <Toaster />
+        <NavigationLoadingProvider>
+          <UserProvider>
+            {children}
+          </UserProvider>
+          <NavigationLoader />
+          <Toaster />
+        </NavigationLoadingProvider>
         {isProduction && projectId && <ClarityProvider projectId={projectId} />}
       </body>
     </html>

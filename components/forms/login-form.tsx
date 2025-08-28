@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeClosed, GalleryVerticalEnd, Loader } from "lucide-react"
-import Link from "next/link"
+import { LoadingLink } from "@/components/loading-link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -90,9 +90,9 @@ export function LoginForm({
               <h1 className="text-xl font-bold">Bem vindo(a) ao Split Money</h1>
               <div className="text-center text-sm">
                 Não tem um conta?{" "}
-                <Link href="/sign-up" className="underline underline-offset-4">
+                <LoadingLink href="/sign-up" className="underline underline-offset-4">
                   Cadastre-se
-                </Link>
+                </LoadingLink>
               </div>
             </div>
             <div className="flex flex-col gap-6">

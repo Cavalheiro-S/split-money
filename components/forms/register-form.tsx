@@ -6,7 +6,7 @@ import { AuthExceptions } from "@/enums/exceptions/auth"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeClosed, GalleryVerticalEnd, Loader } from "lucide-react"
-import Link from "next/link"
+import { LoadingLink } from "@/components/loading-link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -113,9 +113,9 @@ export function RegisterForm({
               <h1 className="text-xl font-bold">Criar uma conta</h1>
               <div className="text-center text-sm">
                 Já tem uma conta?{" "}
-                <Link href="/sign-in" className="underline underline-offset-4">
+                <LoadingLink href="/sign-in" className="underline underline-offset-4">
                   Faça login
-                </Link>
+                </LoadingLink>
               </div>
             </div>
             <div className="flex flex-col gap-6">

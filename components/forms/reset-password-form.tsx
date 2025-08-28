@@ -6,7 +6,7 @@ import { AuthExceptions } from "@/enums/exceptions/auth"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeClosed, GalleryVerticalEnd, Loader } from "lucide-react"
-import Link from "next/link"
+import { LoadingLink } from "@/components/loading-link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -173,9 +173,9 @@ export function ResetPasswordForm({
               </Button>
               <div className="text-center text-sm">
                 Não recebeu o código?{" "}
-                <Link href="/forgot-password" className="underline underline-offset-4">
+                <LoadingLink href="/forgot-password" className="underline underline-offset-4">
                   Solicitar novamente
-                </Link>
+                </LoadingLink>
               </div>
             </div>
           </div>
