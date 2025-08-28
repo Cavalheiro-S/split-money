@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode, Suspense } from 'react'
 import { useNavigationLoading } from '@/hooks/use-navigation-loading'
 
 type NavigationLoadingContextType = {
@@ -11,13 +11,23 @@ type NavigationLoadingContextType = {
 
 const NavigationLoadingContext = createContext<NavigationLoadingContextType | undefined>(undefined)
 
-export function NavigationLoadingProvider({ children }: { children: ReactNode }) {
+function NavigationLoadingProviderInner({ children }: { children: ReactNode }) {
   const navigationLoading = useNavigationLoading()
 
   return (
     <NavigationLoadingContext.Provider value={navigationLoading}>
       {children}
     </NavigationLoadingContext.Provider>
+  )
+}
+
+export function NavigationLoadingProvider({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={null}>
+      <NavigationLoadingProviderInner>
+        {children}
+      </NavigationLoadingProviderInner>
+    </Suspense>
   )
 }
 

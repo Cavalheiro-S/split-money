@@ -1,12 +1,11 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 export function useNavigationLoading() {
   const [isLoading, setIsLoading] = useState(false)
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     // Para a loading state quando a rota muda
@@ -15,7 +14,7 @@ export function useNavigationLoading() {
     }, 100) // Pequeno delay para evitar flicker
 
     return () => clearTimeout(timer)
-  }, [pathname, searchParams])
+  }, [pathname])
 
   const startLoading = () => {
     setIsLoading(true)

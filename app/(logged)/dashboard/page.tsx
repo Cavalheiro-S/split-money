@@ -37,7 +37,7 @@ export default function Page() {
         finally {
             setLoadingIncome(false)
         }
-    }, [paginationIncome.page, paginationIncome.limit, dateIncome])
+    }, [paginationIncome, dateIncome])
 
     const getOutcomes = useCallback(async () => {
         try {
@@ -52,7 +52,7 @@ export default function Page() {
         finally {
             setLoadingOutcome(false)
         }
-    }, [paginationOutcome.page, paginationOutcome.limit, dateOutcome])
+    }, [paginationOutcome, dateOutcome])
 
     useEffect(() => {
         if (paginationIncome.page && paginationIncome.limit) {

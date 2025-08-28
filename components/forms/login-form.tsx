@@ -125,12 +125,12 @@ export function LoginForm({
                       </div>
                     </FormControl>
                     <FormMessage />
-                    <Link
+                    <LoadingLink
                       href="/forgot-password"
                       className="ml-auto text-sm underline-offset-2 hover:underline"
                     >
                       Esqueci minha senha
-                    </Link>
+                    </LoadingLink>
                   </FormItem>
                 )}
               />

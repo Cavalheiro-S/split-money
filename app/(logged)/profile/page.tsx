@@ -60,7 +60,7 @@ export default function Page() {
         };
 
         fetchUserData();
-    }, []);
+    }, [form, setUser]);
 
     if (isPageLoading) {
         return (

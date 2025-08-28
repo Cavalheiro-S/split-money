@@ -253,7 +253,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                   placeholder="R$ 0,00"
                   disabled={isLoading || isSubmitting}
                   value={field.value}
-                  onValueChange={(value, name, values) => {
+                  onValueChange={(value) => {
                     const formattedValue = value || "";
                     field.onChange(formattedValue);
                   }}
