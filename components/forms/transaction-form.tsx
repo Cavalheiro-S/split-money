@@ -59,7 +59,7 @@ const schema = z.object({
 export type TransactionFormData = z.infer<typeof schema>;
 
 interface TransactionFormProps {
-  transaction?: Transaction;
+  transaction?: ResponseGetTransactions;
   isSubmitting?: boolean;
   onOpenChange?: (open: boolean) => void;
   updateData?: () => Promise<void>;
@@ -69,6 +69,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isDataLoaded, setIsDataLoaded] = useState(false)
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(schema),
@@ -88,8 +89,9 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
 
   const { setValue, reset, watch, formState: { isSubmitting } } = form
 
+  // Carrega os dados da transação quando disponível e quando as listas estão carregadas
   useEffect(() => {
-    if (transaction) {
+    if (transaction && isDataLoaded) {
       const formattedAmount = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
@@ -98,17 +100,17 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
       }).format(transaction.amount);
       
       setValue("amount", formattedAmount)
-      setValue("category", "")
+      setValue("category", transaction.categories?.id || "")
       setValue("date", new Date(transaction.date))
       setValue("description", transaction.description)
-      setValue("recurrent", transaction.recurrent && { active: true, ...transaction.recurrent })
+      setValue("recurrent", { active: false, frequency: "daily", quantity: 1 })
       setValue("type", transaction.type)
       setValue("paymentStatusId", transaction.payment_status?.id || "")
     }
-    else {
+    else if (!transaction) {
       reset()
     }
-  }, [transaction, setValue, reset])
+  }, [transaction, setValue, reset, isDataLoaded])
 
   const getCategories = async () => {
     try {
@@ -139,13 +141,17 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
 
   useEffect(() => {
     setIsLoading(true)
+    setIsDataLoaded(false)
     Promise.all([
       getPaymentStatus(),
       getCategories()
     ]).catch((error) => {
       toast.error("Erro ao carregar dados")
       console.error(error)
-    }).finally(() => setIsLoading(false))
+    }).finally(() => {
+      setIsLoading(false)
+      setIsDataLoaded(true)
+    })
   }, [])
 
   async function onSubmit(data: TransactionFormData) {
@@ -194,7 +200,11 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             <FormItem>
               <FormLabel>Descrição</FormLabel>
               <FormControl>
-                <Input placeholder="Descrição" {...field} />
+                <Input 
+                  placeholder="Descrição" 
+                  disabled={isLoading || isSubmitting}
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -206,7 +216,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
           render={({ field }) => (
             <FormItem>
               <FormLabel>Tipo</FormLabel>
-              <Select disabled={isLoading} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
+              <Select disabled={isLoading || isSubmitting} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um tipo de transação" />
@@ -241,6 +251,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                   allowDecimals={true}
                   disableGroupSeparators={false}
                   placeholder="R$ 0,00"
+                  disabled={isLoading || isSubmitting}
                   value={field.value}
                   onValueChange={(value, name, values) => {
                     const formattedValue = value || "";
@@ -265,6 +276,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                   <FormControl>
                     <Button
                       variant={"outline"}
+                      disabled={isLoading || isSubmitting}
                       className={cn(
                         "w-[240px] pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
@@ -305,7 +317,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
           render={({ field }) => (
             <FormItem>
               <FormLabel>Categoria</FormLabel>
-              <Select disabled={isLoading} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
+              <Select disabled={isLoading || isSubmitting} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma categoria" />
@@ -329,7 +341,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status de pagamento</FormLabel>
-              <Select value={field.value} disabled={isLoading} onValueChange={field.onChange} defaultValue={field.value}>
+              <Select value={field.value} disabled={isLoading || isSubmitting} onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder={isLoading ? "Carregando..." : "Selecione um status de pagamento"} />
@@ -360,7 +372,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                 </div>
                 <FormControl>
                   <Switch
-                    disabled={!!transaction}
+                    disabled={!!transaction || isLoading || isSubmitting}
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
@@ -389,7 +401,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                           </Tooltip>
                         </TooltipProvider>
                       </div>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select disabled={isLoading || isSubmitting} onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione uma frequência" />
@@ -429,6 +441,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                         <Input
                           type="number"
                           placeholder="Quantidade"
+                          disabled={isLoading || isSubmitting}
                           {...field}
                           value={field.value ?? 1}
                         />
@@ -443,7 +456,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
         </div>
 
         <div className="flex w-full justify-end">
-          <Button disabled={isSubmitting} type="submit">
+          <Button disabled={isSubmitting || isLoading} type="submit">
             {isSubmitting && <Loader2 className="animate-spin" />}
             {isSubmitting ? "Enviando..." : "Enviar"}
           </Button>

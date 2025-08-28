@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { TransactionFilters } from "@/services/transaction.service";
 import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2, Clock } from "lucide-react";
 import { Button } from "../ui/button";
+import { DeleteTransactionConfirmationModal } from "./delete-confirmation-modal";
 
 interface TransactionTableProps {
     data: ResponseGetTransactions[];
@@ -17,10 +18,10 @@ interface TransactionTableProps {
     hasActions?: boolean;
     filters?: TransactionFilters;
     onEditClick?: (id: string) => void;
-    onDeleteClick?: (id: string) => void;
     onChangeFilters?: (filters: TransactionFilters) => void;
+    onDeleteSuccess?: () => Promise<void>;
 }
-function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loading, onChangeFilters, filters }: TransactionTableProps) {
+function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilters, filters, onDeleteSuccess }: TransactionTableProps) {
 
     const renderSort = (sort: NonNullable<TransactionFilters["sort"]>["sortBy"]) => {
 
@@ -151,19 +152,24 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                                         >
                                             <Pencil className="h-4 w-4" />
                                         </Button>
-                                        <Button
-                                            disabled={loading || item.is_virtual}
-                                            onClick={() => { onDeleteClick?.(item.id) }}
-                                            variant="ghost"
-                                            size="icon"
-                                            className={cn(
-                                                "text-red-500 hover:text-red-700",
-                                                item.is_virtual && "opacity-50 cursor-not-allowed"
-                                            )}
-                                            title={item.is_virtual ? "Transações virtuais não podem ser excluídas" : "Excluir transação"}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        <DeleteTransactionConfirmationModal
+                                            transaction={item}
+                                            onDeleteSuccess={onDeleteSuccess}
+                                            trigger={
+                                                <Button
+                                                    disabled={loading || item.is_virtual}
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className={cn(
+                                                        "text-red-500 hover:text-red-700",
+                                                        item.is_virtual && "opacity-50 cursor-not-allowed"
+                                                    )}
+                                                    title={item.is_virtual ? "Transações virtuais não podem ser excluídas" : "Excluir transação"}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            }
+                                        />
                                     </div>
                                 </TableCell>
                             )

@@ -12,7 +12,7 @@ interface TransactionTableActionModalProps {
   trigger: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  transaction?: Transaction;
+  transaction?: ResponseGetTransactions;
   updateData?: () => Promise<void>;
 }
 

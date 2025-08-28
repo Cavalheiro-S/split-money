@@ -56,21 +56,8 @@ export default function Page() {
         setTransactionSelected(transaction)
     }
 
-    const handleDelete = async (id: string) => {
-        try {
-            setLoading(true)
-            await TransactionService.deleteTransaction(id)
-            await getTransactions()
-            toast.success("Transação deletada com sucesso")
-
-        }
-        catch (error) {
-            toast.error("Falha ao deletar transação")
-            console.log({ error });
-        }
-        finally {
-            setLoading(false)
-        }
+    const handleDeleteSuccess = async () => {
+        await getTransactions()
     }
 
     useEffect(() => {
@@ -109,7 +96,7 @@ export default function Page() {
                     onEditClick={handleEdit}
                     data={transactions}
                     loading={loading}
-                    onDeleteClick={handleDelete}
+                    onDeleteSuccess={handleDeleteSuccess}
                     onChangeFilters={(filters) => {
                         setPagination({ ...pagination, page: 1 })
                         setFilters(filters)
