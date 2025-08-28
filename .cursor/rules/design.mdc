@@ -1,0 +1,17 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Projeto: Split Money (Web)
+Objetivo: padronizar geração de código para Next.js 15 (App Router) + TypeScript + ShadCN + RHF + Zod.
+
+## Padrões gerais
+- Sempre usar TypeScript estrito (`noImplicitAny`, `strictNullChecks`).
+- Seguir arquitetura **feature-first**: `app/(routes)`, `src/features/*`, `src/shared/*`.
+- Componentes devem ser **server-first**; usar **client components** só quando necessário (estado, effects, browser APIs).
+
+## UI & Acessibilidade
+- Usar **shadcn/ui** para componentes. 
+- Todos os inputs via **react-hook-form** + **zodResolver**.
+- Garantir `aria-*`, label e foco visível; nenhum componente sem `aria-label` quando aplicável.
