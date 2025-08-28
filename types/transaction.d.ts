@@ -36,6 +36,8 @@ type ResponseGetTransactions = {
     payment_status?: Omit<PaymentStatus, "updated_at" | "created_at">;
     categories: Category;
     tags: Tag;
+    is_virtual?: boolean;
+    is_recurring_generated?: boolean;
 }
 
 type RequestUpdateTransaction = RequestCreateTransaction & {

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { TransactionFilters } from "@/services/transaction.service";
-import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2, Clock } from "lucide-react";
 import { Button } from "../ui/button";
 
 interface TransactionTableProps {
@@ -103,15 +103,33 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                         </TableCell>
                     </TableRow>
                 ) : data?.map((item) => (
-                    <TableRow className={item.type === "income" ? "hover:bg-green-100/30" : "hover:bg-red-100/30"} key={item.id}>
-
+                    <TableRow 
+                        className={cn(
+                            item.type === "income" ? "hover:bg-green-100/30" : "hover:bg-red-100/30",
+                            item.is_virtual && "opacity-60 bg-gray-50"
+                        )} 
+                        key={item.id}
+                    >
                         <TableCell className="text-center">
-                            {renderTypeCell(item.type)}
+                            <div className="flex items-center justify-center gap-1">
+                                {renderTypeCell(item.type)}
+                                {item.is_virtual && (
+                                    <div title="Transação virtual">
+                                        <Clock className="w-4 h-4 text-gray-400" />
+                                    </div>
+                                )}
+                            </div>
                         </TableCell>
                         <TableCell className="font-medium gap-2">
-                            {item.description}
+                            <div className="flex items-center gap-2">
+                                {item.description}
+                                {item.is_virtual && (
+                                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                                        Futura
+                                    </span>
+                                )}
+                            </div>
                         </TableCell>
-                        {/* <TableCell>{item.recurrent ? "Sim" : "Não"}</TableCell> */}
                         <TableCell>{new Date(item.date).toLocaleDateString("pt-br")}</TableCell>
                         <TableCell className="text-left">{item.categories?.description ?? "Sem categoria"}</TableCell>
                         <TableCell className="text-left">{item.payment_status?.description ?? "Sem status"}</TableCell>
@@ -121,20 +139,28 @@ function TransactionTable({ data, onEditClick, hasActions, onDeleteClick, loadin
                                 <TableCell className="text-center">
                                     <div className="flex items-center justify-center gap-2">
                                         <Button
-                                            disabled={loading}
+                                            disabled={loading || item.is_virtual}
                                             onClick={() => { onEditClick?.(item.id) }}
                                             variant="ghost"
                                             size="icon"
-                                            className="text-blue-500 hover:text-blue-700"
+                                            className={cn(
+                                                "text-blue-500 hover:text-blue-700",
+                                                item.is_virtual && "opacity-50 cursor-not-allowed"
+                                            )}
+                                            title={item.is_virtual ? "Transações virtuais não podem ser editadas" : "Editar transação"}
                                         >
                                             <Pencil className="h-4 w-4" />
                                         </Button>
                                         <Button
-                                            disabled={loading}
+                                            disabled={loading || item.is_virtual}
                                             onClick={() => { onDeleteClick?.(item.id) }}
                                             variant="ghost"
                                             size="icon"
-                                            className="text-red-500 hover:text-red-700"
+                                            className={cn(
+                                                "text-red-500 hover:text-red-700",
+                                                item.is_virtual && "opacity-50 cursor-not-allowed"
+                                            )}
+                                            title={item.is_virtual ? "Transações virtuais não podem ser excluídas" : "Excluir transação"}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
