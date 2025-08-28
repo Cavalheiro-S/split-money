@@ -37,8 +37,15 @@ const schema = z.object({
   amount: z
     .string({ message: "O valor é obrigatório" })
     .min(1, "O valor é obrigatório")
-    .transform((val) => val.replace(/\./g, "").replace(",", "."))
-  ,
+    .refine((val) => {
+      const cleanValue = val.replace(/R\$\s?/g, "").trim();
+      const isValid = /^\d{1,3}(\.\d{3})*,\d{2}$|^\d+,\d{2}$|^\d+$/.test(cleanValue);
+      return isValid && parseFloat(cleanValue.replace(/\./g, "").replace(",", ".")) > 0;
+    }, "Valor deve ser maior que zero")
+    .transform((val) => {
+      const cleanValue = val.replace(/R\$\s?/g, "").trim();
+      return cleanValue.replace(/\./g, "").replace(",", ".");
+    }),
   recurrent: z
     .object({
       active: z.boolean(),
@@ -69,7 +76,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
       description: "",
       date: new Date(),
       category: "",
-      amount: "0",
+      amount: "",
       recurrent: {
         active: false,
         frequency: "daily",
@@ -83,19 +90,25 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
 
   useEffect(() => {
     if (transaction) {
-      const amount = transaction.amount.toString().replace(".", ",")
-      setValue("amount", amount)
+      const formattedAmount = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(transaction.amount);
+      
+      setValue("amount", formattedAmount)
       setValue("category", "")
       setValue("date", new Date(transaction.date))
       setValue("description", transaction.description)
       setValue("recurrent", transaction.recurrent && { active: true, ...transaction.recurrent })
       setValue("type", transaction.type)
-      setValue("paymentStatusId", transaction.payment_status?.id)
+      setValue("paymentStatusId", transaction.payment_status?.id || "")
     }
     else {
       reset()
     }
-  }, [transaction, setValue, reset, paymentStatus])
+  }, [transaction, setValue, reset])
 
   const getCategories = async () => {
     try {
@@ -225,9 +238,16 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                   decimalsLimit={2}
                   prefix="R$ "
                   allowNegativeValue={false}
+                  allowDecimals={true}
+                  disableGroupSeparators={false}
+                  placeholder="R$ 0,00"
                   value={field.value}
-                  onValueChange={(value) => field.onChange(value ?? 0)}
+                  onValueChange={(value, name, values) => {
+                    const formattedValue = value || "";
+                    field.onChange(formattedValue);
+                  }}
                   customInput={Input}
+                  className="text-left"
                 />
               </FormControl>
               <FormMessage />
