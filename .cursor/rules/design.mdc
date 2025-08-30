@@ -15,3 +15,7 @@ Objetivo: padronizar geração de código para Next.js 15 (App Router) + TypeScr
 - Usar **shadcn/ui** para componentes. 
 - Todos os inputs via **react-hook-form** + **zodResolver**.
 - Garantir `aria-*`, label e foco visível; nenhum componente sem `aria-label` quando aplicável.
+
+## Geral
+
+- Não deixe comentários explicativos no meio do código , faça apenas um resumo no próprio chat das alterações feitas. Deixe comentários somente em momentos que realmente sejam necessários , para informações que não podem ser obtidas olhando somente para o código.

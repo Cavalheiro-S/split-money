@@ -3,8 +3,9 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Cog, Home, LogOut, PlusCircle, User } from "lucide-react";
 import { LoadingLink } from "@/components/loading-link";
-import { useRouter } from "next/navigation";
 import { useNavigationLoadingContext } from "@/contexts/navigation-loading-context";
+import { useUser } from "@/contexts/user-context";
+import { useLogoutConfirmation } from "@/hooks/use-logout-confirmation";
 
 
 type SidebarItem = {
@@ -28,8 +29,17 @@ const itemsApplication: SidebarItem[] = [
 ]
 
 export const SidebarItems = () => {
-    const router = useRouter()
     const { startLoading } = useNavigationLoadingContext()
+    const { logout } = useUser()
+    const { ConfirmationDialog, confirmLogout } = useLogoutConfirmation()
+    
+    const handleLogout = async () => {
+        const confirmed = await confirmLogout()
+        if (confirmed) {
+            startLoading()
+            logout()
+        }
+    }
     
     const itemsProfile: SidebarItem[] = [
         {
@@ -46,11 +56,7 @@ export const SidebarItems = () => {
             title: "Sair",
             url: "/sign-in",
             Icon: LogOut,
-            onClick: async () => {
-                startLoading()
-                await fetch("/api/auth/sign-out")
-                router.replace("/sign-in")
-            },
+            onClick: handleLogout,
         },
     ]
 
@@ -80,25 +86,28 @@ export const SidebarItems = () => {
     }
 
     return (
-        <Sidebar>
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Aplicação</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {itemsApplication.map(renderNavItem)}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Perfil</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {itemsProfile.map(renderNavItem)}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
-        </Sidebar>
+        <>
+            <Sidebar>
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Aplicação</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {itemsApplication.map(renderNavItem)}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Perfil</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {itemsProfile.map(renderNavItem)}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+            </Sidebar>
+            <ConfirmationDialog />
+        </>
     )
 }

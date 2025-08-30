@@ -6,8 +6,6 @@ export default function LoggedLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    
-
     return (
         <SidebarProvider>
             <SidebarItems />
