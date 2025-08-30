@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input"
 import { AuthExceptions } from "@/enums/exceptions/auth"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { GalleryVerticalEnd, Loader } from "lucide-react"
+import { Loader, DollarSign, Mail, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react"
+import { LoadingLink } from "@/components/loading-link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -81,47 +82,126 @@ export function ConfirmEmailForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6 w-[400px]", className)} {...props}>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col items-center gap-2">
-              <a
-                href="#"
-                className="flex flex-col items-center gap-2 font-medium"
-              >
-                <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                  <GalleryVerticalEnd className="size-6" />
-                </div>
-                <span className="sr-only">Split Money</span>
-              </a>
-              <h1 className="text-xl font-bold">Confirmar E-mail</h1>
-              <div className="text-center text-sm">
-                Digite o código enviado para {email}
-              </div>
-            </div>
-            <div className="flex flex-col gap-6">
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Código de Confirmação</FormLabel>
-                    <FormControl>
-                      <Input placeholder="000000" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={form.formState.isLoading || form.formState.isSubmitting}>
-                {(form.formState.isLoading || form.formState.isSubmitting) && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                Confirmar
-              </Button>
-            </div>
+    <div className={cn("w-full max-w-md mx-auto", className)} {...props}>
+      {/* Header com logo e branding */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4 shadow-sm">
+          <DollarSign className="w-8 h-8 text-primary" />
+        </div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          Split Money
+        </h1>
+        <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+          Confirme seu email para ativar sua conta
+        </p>
+      </div>
+
+      {/* Card do formulário */}
+      <div className="bg-card border border-border rounded-xl p-6 shadow-sm backdrop-blur-sm">
+        <div className="mb-6">
+          <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl mb-4 mx-auto">
+            <Mail className="w-6 h-6 text-primary" />
           </div>
-        </form>
-      </Form>
+          <h2 className="text-xl font-semibold text-foreground mb-2 text-center">
+            Verifique seu email
+          </h2>
+          <p className="text-muted-foreground text-sm text-center">
+            Enviamos um código de 6 dígitos para
+          </p>
+          <p className="text-foreground text-sm font-medium text-center mt-1">
+            {email || "seu email"}
+          </p>
+        </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-foreground">
+                    Código de confirmação
+                  </FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="000000" 
+                      className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20 text-center text-lg font-mono tracking-widest"
+                      maxLength={6}
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button 
+              type="submit" 
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors mt-6"
+              disabled={form.formState.isLoading || form.formState.isSubmitting}
+            >
+              {(form.formState.isLoading || form.formState.isSubmitting) ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Confirmando...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Confirmar email
+                </>
+              )}
+            </Button>
+          </form>
+        </Form>
+
+        <div className="mt-6 pt-6 border-t border-border text-center">
+          <p className="text-sm text-muted-foreground mb-3">
+            Não recebeu o código?
+          </p>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="text-primary border-primary/20 hover:bg-primary/5"
+            onClick={() => {
+              // Aqui você pode implementar a lógica para reenviar o código
+              toast.success("Código reenviado!");
+            }}
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Reenviar código
+          </Button>
+        </div>
+      </div>
+
+      {/* Informações adicionais */}
+      <div className="mt-8 bg-primary/5 border border-primary/20 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <CheckCircle className="w-4 h-4 text-primary" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-medium text-foreground">
+              Quase lá!
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Após confirmar seu email, você poderá fazer login e começar a usar o Split Money.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Botão voltar */}
+      <div className="mt-6 text-center">
+        <LoadingLink 
+          href="/sign-up"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Voltar para cadastro
+        </LoadingLink>
+      </div>
     </div>
   )
 } 
