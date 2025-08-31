@@ -53,7 +53,7 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
 
     if (data && data.length < 1 && !loading) {
         return (
-            <div className="flex flex-col h-full items-center justify-center p-10 gap-2">
+            <div className="flex flex-col h-fit items-center justify-center p-10 gap-2">
                 <ArrowLeftRight />
                 <span className="text-muted-foreground">Nenhuma transação encontrada</span>
             </div>
@@ -81,7 +81,7 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
     }
 
     return (
-        <Table className="min-w-[900px] mt-4">
+        <Table className="min-w-[900px] mt-4 h-fit">
             <TableHeader>
                 <TableRow className="hover:bg-white">
                     {renderTableHead("Tipo", "type", "w-[80px]")}

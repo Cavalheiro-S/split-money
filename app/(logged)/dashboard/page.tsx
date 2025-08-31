@@ -69,7 +69,7 @@ export default function Page() {
     }, [dateOutcome, paginationOutcome.page, paginationOutcome.limit])
 
     return (
-        <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
+        <>
             <TableTransaction.Container>
                 <TableTransaction.Header onChangeDate={(date) => {
                     setDateIncome(date)
@@ -103,6 +103,6 @@ export default function Page() {
                     onChangeLimit={(limit) => setPaginationOutcome({ ...paginationOutcome, limit })}
                 />
             </TableTransaction.Container>
-        </div>
+        </>
     )
 } 
