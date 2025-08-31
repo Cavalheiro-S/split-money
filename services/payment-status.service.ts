@@ -8,22 +8,22 @@ export class PaymentStatusService extends ApiService {
         );
     }
 
-    static async createPaymentStatus(status: string) {
+    static async createPaymentStatus(description: string) {
         return this.request<{ message: string; data: PaymentStatus }>(
             "/payment",
             {
                 method: "POST",
-                body: JSON.stringify({ status }),
+                body: JSON.stringify({ description }),
             }
         );
     }
 
-    static async updatePaymentStatus(status: string, id: string) {
+    static async updatePaymentStatus(description: string, id: string) {
         return this.request<{ message: string; data: PaymentStatus }>(
             `/payment/${id}`,
             {
                 method: "PATCH",
-                body: JSON.stringify({ status }),
+                body: JSON.stringify({ description }),
             }
         );
     }

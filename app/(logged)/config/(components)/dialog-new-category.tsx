@@ -5,10 +5,15 @@ import { Input } from "@/components/ui/input";
 import { CategoryService } from "@/services/category.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { z } from "zod";
 
 const schema = z.object({
-    name: z.string(),
+    name: z.string()
+        .min(1, "Categoria é obrigatória")
+        .min(2, "Categoria deve ter pelo menos 2 caracteres")
+        .max(50, "Categoria deve ter no máximo 50 caracteres")
+        .trim(),
 });
 
 type DialogNewCategoryProps = {
@@ -16,6 +21,8 @@ type DialogNewCategoryProps = {
 }
 
 export const DialogNewCategory = ({ refreshData }: DialogNewCategoryProps) => {
+    const [open, setOpen] = useState(false);
+    
     const form = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -27,13 +34,15 @@ export const DialogNewCategory = ({ refreshData }: DialogNewCategoryProps) => {
         try {
             await CategoryService.createCategory(data.name);
             refreshData();
+            form.reset();
+            setOpen(false);
         }
         catch (error) {
             console.error(error);
         }
     }
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>Adicionar</Button>
             </DialogTrigger>

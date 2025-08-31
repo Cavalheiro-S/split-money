@@ -5,10 +5,15 @@ import { Input } from "@/components/ui/input";
 import { PaymentStatusService } from "@/services/payment-status.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { z } from "zod";
 
 const schema = z.object({
-    status: z.string(),
+    status: z.string()
+        .min(1, "Status é obrigatório")
+        .min(2, "Status deve ter pelo menos 2 caracteres")
+        .max(50, "Status deve ter no máximo 50 caracteres")
+        .trim(),
 });
 
 type DialogNewStatusProps = {
@@ -16,6 +21,8 @@ type DialogNewStatusProps = {
 }
 
 export const DialogNewStatus = ({ refreshData }: DialogNewStatusProps) => {
+    const [open, setOpen] = useState(false);
+    
     const form = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -27,13 +34,15 @@ export const DialogNewStatus = ({ refreshData }: DialogNewStatusProps) => {
         try {
             await PaymentStatusService.createPaymentStatus(data.status);
             refreshData();
+            form.reset();
+            setOpen(false);
         }
         catch (error) {
             console.error(error);
         }
     }
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button> Adicionar</Button>
             </DialogTrigger>

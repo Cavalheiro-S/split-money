@@ -5,10 +5,15 @@ import { Input } from "@/components/ui/input";
 import { TagService } from "@/services/tag.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { z } from "zod";
 
 const schema = z.object({
-    name: z.string(),
+    name: z.string()
+        .min(1, "Tag é obrigatória")
+        .min(2, "Tag deve ter pelo menos 2 caracteres")
+        .max(50, "Tag deve ter no máximo 50 caracteres")
+        .trim(),
 });
 
 type DialogNewTagProps = {
@@ -16,6 +21,8 @@ type DialogNewTagProps = {
 }
 
 export const DialogNewTag = ({ refreshData }: DialogNewTagProps) => {
+    const [open, setOpen] = useState(false);
+    
     const form = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -27,13 +34,15 @@ export const DialogNewTag = ({ refreshData }: DialogNewTagProps) => {
         try {
             await TagService.createTag(data.name);
             refreshData();
+            form.reset();
+            setOpen(false);
         }
         catch (error) {
             console.error(error);
         }
     }
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>Adicionar</Button>
             </DialogTrigger>
