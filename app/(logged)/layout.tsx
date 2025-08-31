@@ -1,5 +1,5 @@
 import { SidebarItems } from "@/components/sidebar/items";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 
 export default function LoggedLayout({
     children,
@@ -9,10 +9,14 @@ export default function LoggedLayout({
     return (
         <SidebarProvider>
             <SidebarItems />
-            <main className="min-h-screen w-full">
-                <SidebarTrigger className="m-2" />
-                {children}
-            </main>
+            <SidebarInset>
+                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+                    <SidebarTrigger className="-ml-1" />
+                </header>
+                <main className="flex flex-1 flex-col gap-4 p-4">
+                    {children}
+                </main>
+            </SidebarInset>
         </SidebarProvider>
     );
 }
