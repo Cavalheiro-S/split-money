@@ -1,5 +1,11 @@
 import { Page, expect } from '@playwright/test';
 
+// Credenciais de teste - carregadas de variáveis de ambiente
+export const TEST_CREDENTIALS = {
+  email: process.env.TEST_USER_EMAIL || 'usuario.teste@exemplo.com',
+  password: process.env.TEST_USER_PASSWORD || 'SenhaSegura123'
+};
+
 export class TestHelpers {
   constructor(private page: Page) {}
 
@@ -43,9 +49,8 @@ export class TestHelpers {
   /**
    * Faz login com credenciais de teste
    */
-  async login(email: string = 'test@example.com', password: string = 'password123') {
+  async login(email: string = TEST_CREDENTIALS.email, password: string = TEST_CREDENTIALS.password) {
     await this.page.goto('/sign-in');
-    
     await this.fillField('input[name="email"]', email);
     await this.fillField('input[name="password"]', password);
     
