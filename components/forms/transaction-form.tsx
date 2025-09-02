@@ -8,8 +8,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, Info, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import CurrencyInput from "react-currency-input-field";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -35,17 +35,9 @@ const schema = z.object({
     .string({ message: "A categoria é obrigatória" })
     .nonempty("A categoria é obrigatória"),
   amount: z
-    .string({ message: "O valor é obrigatório" })
-    .min(1, "O valor é obrigatório")
-    .refine((val) => {
-      const cleanValue = val.replace(/R\$\s?/g, "").trim();
-      const isValid = /^\d{1,3}(\.\d{3})*,\d{2}$|^\d+,\d{2}$|^\d+$/.test(cleanValue);
-      return isValid && parseFloat(cleanValue.replace(/\./g, "").replace(",", ".")) > 0;
-    }, "Valor deve ser maior que zero")
-    .transform((val) => {
-      const cleanValue = val.replace(/R\$\s?/g, "").trim();
-      return cleanValue.replace(/\./g, "").replace(",", ".");
-    }),
+    .number({ message: "O valor é obrigatório" })
+    .positive("O valor deve ser maior que zero")
+    .min(0.01, "O valor mínimo é R$ 0,01"),
   recurrent: z
     .object({
       active: z.boolean(),
@@ -77,7 +69,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
       description: "",
       date: new Date(),
       category: "",
-      amount: "",
+      amount: 0,
       recurrent: {
         active: false,
         frequency: "daily",
@@ -92,14 +84,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
   // Carrega os dados da transação quando disponível e quando as listas estão carregadas
   useEffect(() => {
     if (transaction && isDataLoaded) {
-      const formattedAmount = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(transaction.amount);
-      
-      setValue("amount", formattedAmount)
+      setValue("amount", transaction.amount)
       setValue("category", transaction.categories?.id || "")
       setValue("date", new Date(transaction.date))
       setValue("description", transaction.description)
@@ -160,7 +145,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
       setIsLoading(true)
       const mapData: RequestCreateTransaction = {
         ...data,
-        amount: parseFloat(data.amount),
+        amount: data.amount,
         recurrent: data.recurrent?.active
           ? {
             frequency: data.recurrent.frequency ?? TransactionFrequencyEnum.DAILY,
@@ -235,33 +220,40 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
+        <Controller
           name="amount"
-          render={({ field }) => (
+          control={form.control}
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>Valor</FormLabel>
               <FormControl>
-                <CurrencyInput
+                <NumericFormat
+                  customInput={Input}
+                  thousandSeparator="."
                   decimalSeparator=","
-                  groupSeparator="."
-                  decimalsLimit={2}
                   prefix="R$ "
-                  allowNegativeValue={false}
-                  allowDecimals={true}
-                  disableGroupSeparators={false}
+                  decimalScale={2}
+                  fixedDecimalScale
+                  allowNegative={false}
                   placeholder="R$ 0,00"
                   disabled={isLoading || isSubmitting}
-                  value={field.value}
-                  onValueChange={(value) => {
-                    const formattedValue = value || "";
-                    field.onChange(formattedValue);
-                  }}
-                  customInput={Input}
                   className="text-left"
+                  onValueChange={(values) => {
+                    // Atualiza o valor numérico no formulário
+                    field.onChange(values.floatValue || 0);
+                  }}
+                  value={field.value}
+                  aria-label="Campo de valor da transação"
                 />
               </FormControl>
-              <FormMessage />
+              <FormDescription>
+                Digite o valor da transação em reais
+              </FormDescription>
+              {fieldState.error && (
+                <p className="text-sm font-medium text-destructive">
+                  {fieldState.error.message}
+                </p>
+              )}
             </FormItem>
           )}
         />
