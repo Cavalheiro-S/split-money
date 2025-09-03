@@ -6,6 +6,8 @@ import { UserProvider } from "@/contexts/user-context";
 import { NavigationLoadingProvider } from "@/contexts/navigation-loading-context";
 import { NavigationLoader } from "@/components/navigation-loader";
 import ClarityProvider from '@/components/clarity';
+import { SessionInitializer } from "@/components/session-initializer";
+
 const poppinsSans = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -32,6 +34,7 @@ export default function RootLayout({
       >
         <NavigationLoadingProvider>
           <UserProvider>
+            <SessionInitializer />
             {children}
           </UserProvider>
           <NavigationLoader />

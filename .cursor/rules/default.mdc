@@ -1,0 +1,190 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Guia de Boas Práticas — Next.js + shadcn/ui + Tailwind
+
+Siga **estas regras SEMPRE** ao gerar, refatorar ou explicar código neste repositório.
+
+## 1) Padrões de projeto (App Router + RSC)
+- **Default = Server Components**. Só use `"use client"` quando necessário (interatividade, hooks de estado/efeito, browser APIs).
+- **Estrutura** (feature-first):
+  - `app/` (rotas, layouts, páginas, route handlers)
+  - `components/ui/` (**somente** componentes do shadcn/ui gerados; importe como `@/components/ui/button` etc.)
+  - `components/` (components app-específicos e compostos)
+  - `lib/` (utils, clients, schemas, server actions)
+  - `hooks/` (React hooks reutilizáveis — arquivos **client** se usam estado/efeito)
+  - `styles/` (globals.css e estilos pontuais se preciso)
+- Sempre que possível, **server actions** em vez de APIs ad-hoc. Organize-as em `lib/actions/*` e tipa com Zod.
+- **Naming:** arquivos e pastas em `kebab-case`; componentes em `PascalCase`; utilitários em `camelCase`.
+- Forneça **tipagem explícita** para props, retornos e loaders.
+
+## 2) Tailwind CSS
+- **Não** use `style={{...}}` para layout; prefira utilitários do Tailwind.
+- Use `prettier-plugin-tailwindcss` (ordena classes automaticamente). Não reordene manualmente.
+- Use `dark` **via classe** (config: `darkMode: ["class"]`).
+- Use a helper `cn()` para mesclar classes de forma segura (evita conflitos):
+
+```ts
+// lib/utils.ts
+import { type ClassValue } from "clsx";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+- Tokens: respeite variáveis CSS do tema shadcn (`--background`, `--foreground`, etc.) e **não** duplique cores ad hoc.
+
+## 3) shadcn/ui
+- **Nunca** copie código inline do Radix sem estilização: sempre use os componentes prontos em `@/components/ui/*`.
+- Para compor, crie **wrappers** em `components/` e **não** modifique os arquivos em `components/ui/` (eles são fonte única do design system).
+- Use `asChild` quando combinar com `next/link` (`<Button asChild><Link href="/"/></Button>`).
+- Formulários: use o **Form** do shadcn + **React Hook Form** + **Zod** (resolver) conforme o snippet abaixo.
+
+### Snippet — Form com RHF + Zod + shadcn
+```tsx
+"use client";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+const schema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2)
+});
+
+type FormValues = z.infer<typeof schema>;
+
+export default function ProfileForm() {
+  const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { email: "", name: "" } });
+
+  function onSubmit(values: FormValues) {
+    // chamar server action ou mutation
+    console.log(values);
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome</FormLabel>
+              <FormControl>
+                <Input placeholder="Seu nome" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="voce@exemplo.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Salvar</Button>
+      </form>
+    </Form>
+  );
+}
+```
+
+## 4) Data fetching, cache e revalidação
+- Para dados públicos/estáveis, use `fetch(url, { next: { revalidate: N } })` em **Server Components**.
+- Para dados por-usuário ou sensíveis, use `noStore()` ou `cache: "no-store"`.
+- Em **Route Handlers** (`app/api/**/route.ts`), retorne `Response` tipado e **não** faça lógica de UI.
+- Se usar **server actions**, valide entrada com Zod e trate erros com `try/catch` e mensagens amigáveis.
+
+### Snippets
+```ts
+// Revalidação
+const data = await fetch("https://api.example.com/posts", { next: { revalidate: 60 } }).then(r => r.json());
+```
+```ts
+// Sem cache
+import { unstable_noStore as noStore } from "next/cache";
+noStore();
+```
+
+## 5) Roteamento e metadados
+- Use `generateMetadata` para título/descrição dinâmicos e Open Graph.
+- Nas rotas dinâmicas (`[slug]`), valide params e trate `notFound()` quando aplicável.
+- Forneça `error.tsx` e `not-found.tsx` por segmento relevante.
+
+## 6) Acessibilidade (A11y)
+- Prefira elementos semânticos (e.g., `button`, `nav`, `main`, `section`).
+- Garanta foco visível; não remova `outline` sem substituição adequada.
+- Forneça `aria-*` coerentes e rótulos (`FormLabel`, `aria-label` quando necessário).
+- Ícones **decorativos** devem ter `aria-hidden`.
+
+## 7) Convenções de código
+- **Import paths** via alias `@/*`.
+- **ESLint** com `next/core-web-vitals` + regras para hooks e a11y.
+- **Prettier** + `prettier-plugin-tailwindcss`.
+- Evite utilitários ad hoc quando houver componente do design system.
+- Exporte componentes **default** se forem de página/rota e **named** se forem unidades reutilizáveis.
+
+## 8) Performance
+- Imagens: use `next/image` com `fill` ou `sizes` adequados.
+- Divida clientes pesados com `dynamic(() => import("..."), { ssr: false })` **somente quando** necessário.
+- Limite providers no topo da árvore; mantenha o React Context enxuto.
+
+## 9) Estrutura sugerida (exemplo)
+```
+app/
+  layout.tsx
+  page.tsx
+  (dashboard)/
+    layout.tsx
+    page.tsx
+  api/
+    hello/route.ts
+components/
+  header.tsx
+  nav.tsx
+components/ui/  # gerados via shadcn/ui
+hooks/
+  use-media-query.ts
+lib/
+  utils.ts  # cn()
+  actions/
+    update-profile.ts
+styles/
+  globals.css
+```
+
+## 10) PRs e manutenção
+- Inclua descrição clara do que foi alterado e **porque**.
+- Se criar componente novo, adicione **story/usage** em comentário ou README curto.
+- Garanta lint, typecheck e build locais antes de abrir PR.
+
+---
+
+## Checklists para o Cursor (aplicar antes de finalizar)
+1. O componente precisa ser `client`? Se **não**, remova `"use client"`.
+2. Importei de `@/components/ui/*` quando for componente do design system?
+3. Classes do Tailwind estão limpas e ordenadas (Prettier plugin)?
+4. Props e retornos estão **tipados**? Zod aplicado onde há entrada de usuário?
+5. Há acessibilidade mínima (semântica + labels)?
+6. Cache/revalidação definidos corretamente ou `noStore()` quando sensível?
+7. Sem estilos in-line desnecessários; use utilitários ou variações do componente.
+
+> Sempre que eu (Cursor) gerar código, **tenho que obedecer a estas regras** e explicar brevemente decisões quando relevante (ex.: por que é Server Component, por que usei `asChild`, etc.).

@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { useToast } from "@/hooks/use-toast"
+import { useSession } from "@/hooks/use-session"
 
 const formSchema = z.object({
   email: z
@@ -35,6 +36,7 @@ export function LoginForm({
   const router = useRouter()
   const { toast } = useToast()
   const { setUser } = useUser()
+  const { saveSession } = useSession()
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,11 +52,17 @@ export function LoginForm({
         method: "POST",
       })
       
-      const data = await response.json() as ResponseSignIn
+      const data = await response.json() as ResponseSignIn & { expiresAt?: number }
       
       if (data.accessToken) {
         const user = await UserService.getMe()
         setUser(user.data)
+        
+        // Salva a sessão persistente
+        if (data.expiresAt) {
+          saveSession(data.accessToken, user.data, data.expiresAt)
+        }
+        
         router.push("/dashboard")
         return;
       }

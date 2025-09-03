@@ -1,13 +1,31 @@
 let tokenCache: string | null = null;
 let tokenPromise: Promise<string> | null = null;
+let lastTokenCheck = 0;
+const TOKEN_CHECK_INTERVAL = 60000;
 
 async function getToken(): Promise<string> {
-  if (tokenCache) {
+  const now = Date.now();
+  
+  if (tokenCache && (now - lastTokenCheck) < TOKEN_CHECK_INTERVAL) {
     return tokenCache;
   }
 
   if (tokenPromise) {
     return tokenPromise;
+  }
+
+  try {
+    const sessionData = localStorage.getItem('split-money-session');
+    if (sessionData) {
+      const session = JSON.parse(sessionData);
+      if (session.expiresAt > now) {
+        tokenCache = session.accessToken;
+        lastTokenCheck = now;
+        return session.accessToken;
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao verificar sessão persistente:', error);
   }
 
   tokenPromise = fetch("/api/auth/get-token")
@@ -20,6 +38,7 @@ async function getToken(): Promise<string> {
         throw new Error('No token received');
       }
       tokenCache = accessToken;
+      lastTokenCheck = now;
       return accessToken;
     })
     .finally(() => {
@@ -32,6 +51,13 @@ async function getToken(): Promise<string> {
 export function clearTokenCache() {
   tokenCache = null;
   tokenPromise = null;
+  lastTokenCheck = 0;
+  
+  try {
+    localStorage.removeItem('split-money-session');
+  } catch (error) {
+    console.error('Erro ao limpar sessão persistente:', error);
+  }
 }
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {

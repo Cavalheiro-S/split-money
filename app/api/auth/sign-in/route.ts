@@ -31,7 +31,8 @@ export async function POST(req: Request) {
 
             const response = NextResponse.json({
                 message: "Login successful",
-                accessToken: accessToken
+                accessToken: accessToken,
+                expiresAt: exp * 1000 // Convertendo para timestamp em milissegundos
             }, { status: 200 });
 
             const cookiesData = await cookies();
