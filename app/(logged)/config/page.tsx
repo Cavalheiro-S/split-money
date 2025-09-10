@@ -80,8 +80,8 @@ export default function Page() {
 
     const handleDeleteStatus = async (id: string) => {
         try {
-            setDeletingId(id);
             await PaymentStatusService.deletePaymentStatus(id);
+            setDeletingId(id);
             await getPaymentStatus();
             setOpenDialogId(null);
         } catch (error) {
@@ -93,8 +93,8 @@ export default function Page() {
 
     const handleDeleteCategory = async (id: string) => {
         try {
-            setDeletingCategoryId(id);
             await CategoryService.deleteCategory(id);
+            setDeletingCategoryId(id);
             await getCategories();
             setOpenCategoryDialogId(null);
         } catch (error) {
@@ -106,8 +106,8 @@ export default function Page() {
 
     const handleDeleteTag = async (id: string) => {
         try {
-            setDeletingTagId(id);
             await TagService.deleteTag(id);
+            setDeletingTagId(id);
             await getTags();
             setOpenTagDialogId(null);
         } catch (error) {

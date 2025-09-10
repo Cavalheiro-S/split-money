@@ -185,12 +185,12 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             name="description"
             render={({ field }) => (
               <FormItem className="md:col-span-2">
-                <FormLabel className="text-sm sm:text-base font-medium">Descrição</FormLabel>
+                <FormLabel className="text-sm font-medium">Descrição</FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="Ex: Salário, Aluguel, Compras..." 
                     disabled={isLoading || isSubmitting}
-                    className="h-10 sm:h-11 text-sm sm:text-base"
+                    className="h-10 sm:h-11 text-sm"
                     {...field} 
                   />
                 </FormControl>
@@ -204,10 +204,10 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm sm:text-base font-medium">Tipo</FormLabel>
+                <FormLabel className="text-sm font-medium">Tipo</FormLabel>
                 <Select disabled={isLoading || isSubmitting} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
+                    <SelectTrigger className="h-10 sm:h-11 text-sm">
                       <SelectValue placeholder="Selecione um tipo" />
                     </SelectTrigger>
                   </FormControl>
@@ -236,7 +236,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             control={form.control}
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel className="text-sm sm:text-base font-medium">Valor</FormLabel>
+                <FormLabel className="text-sm font-medium">Valor</FormLabel>
                 <FormControl>
                   <NumericFormat
                     customInput={Input}
@@ -248,7 +248,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                     allowNegative={false}
                     placeholder="R$ 0,00"
                     disabled={isLoading || isSubmitting}
-                    className="h-10 sm:h-11 text-sm sm:text-base text-left font-medium"
+                    className="h-10 sm:h-11 text-sm text-left font-medium"
                     onValueChange={(values) => {
                       field.onChange(values.floatValue || 0);
                     }}
@@ -276,7 +276,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             name="date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel className="text-sm sm:text-base font-medium">Data da transação</FormLabel>
+                <FormLabel className="text-sm font-medium">Data da transação</FormLabel>
                 <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -284,7 +284,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                         variant={"outline"}
                         disabled={isLoading || isSubmitting}
                         className={cn(
-                          "h-10 sm:h-11 text-sm sm:text-base text-left font-normal justify-start",
+                          "h-10 sm:h-11 text-sm text-left font-normal justify-start",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -323,10 +323,10 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm sm:text-base font-medium">Categoria</FormLabel>
+                <FormLabel className="text-sm font-medium">Categoria</FormLabel>
                 <Select disabled={isLoading || isSubmitting} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
+                    <SelectTrigger className="h-10 sm:h-11 text-sm">
                       <SelectValue placeholder="Selecione uma categoria" />
                     </SelectTrigger>
                   </FormControl>
@@ -350,10 +350,10 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
           name="paymentStatusId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm sm:text-base font-medium">Status de pagamento</FormLabel>
+              <FormLabel className="text-sm font-medium">Status de pagamento</FormLabel>
               <Select value={field.value} disabled={isLoading || isSubmitting} onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
+                  <SelectTrigger className="h-10 sm:h-11 text-sm">
                     <SelectValue placeholder={isLoading ? "Carregando..." : "Selecione um status de pagamento"} />
                   </SelectTrigger>
                 </FormControl>
@@ -374,7 +374,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
         <div className="space-y-3 sm:space-y-4 border-t border-gray-200 pt-4 sm:pt-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <FormLabel className="text-sm sm:text-base font-medium">Recorrente</FormLabel>
+              <FormLabel className="text-sm font-medium">Recorrente</FormLabel>
               <p className="text-xs sm:text-sm text-muted-foreground">
                 Marque se esta transação se repete periodicamente
               </p>
@@ -404,7 +404,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex gap-2 items-center">
-                      <FormLabel className="text-sm sm:text-base font-medium">Frequência</FormLabel>
+                      <FormLabel className="text-sm font-medium">Frequência</FormLabel>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -418,7 +418,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                     </div>
                     <Select disabled={isLoading || isSubmitting} onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
+                        <SelectTrigger className="h-10 sm:h-11 text-sm">
                           <SelectValue placeholder="Selecione uma frequência" />
                         </SelectTrigger>
                       </FormControl>
@@ -441,7 +441,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex gap-2 items-center">
-                      <FormLabel className="text-sm sm:text-base font-medium">Quantidade</FormLabel>
+                      <FormLabel className="text-sm font-medium">Quantidade</FormLabel>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -458,7 +458,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                         type="number"
                         placeholder="Quantidade"
                         disabled={isLoading || isSubmitting}
-                        className="h-10 sm:h-11 text-sm sm:text-base"
+                        className="h-10 sm:h-11 text-sm"
                         {...field}
                         value={field.value ?? 1}
                       />
@@ -477,7 +477,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             disabled={isSubmitting || isLoading} 
             type="submit"
             size="lg"
-            className="min-w-[100px] sm:min-w-[120px] h-10 sm:h-11 text-sm sm:text-base font-medium"
+            className="min-w-[100px] sm:min-w-[120px] h-10 sm:h-11 text-sm font-medium"
           >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSubmitting ? "Enviando..." : "Enviar"}
