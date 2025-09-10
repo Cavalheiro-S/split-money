@@ -28,9 +28,14 @@ export class CategoryService extends ApiService {
     }
 
     static async deleteCategory(id: string) {
-        return this.request<{ message: string }>(
-            `/category/${id}`,
-            { method: "DELETE" }
-        );
+        try {
+            return await this.request<{ message: string }>(
+                `/category/${id}`,
+                { method: "DELETE" }
+            );
+        } catch (error) {
+            // Repassar o erro original para que seja tratado adequadamente na UI
+            throw error;
+        }
     }
 }

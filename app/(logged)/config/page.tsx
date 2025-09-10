@@ -2,7 +2,6 @@
 
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -17,9 +16,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PaymentStatusService } from "@/services/payment-status.service";
 import { CategoryService } from "@/services/category.service";
 import { TagService } from "@/services/tag.service";
+import { ApiConflictError } from "@/lib/errors";
 import { format } from "date-fns";
 import { Cog, LoaderCircle, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { DialogNewStatus } from "./(components)/dialog-new-status";
 import { DialogNewCategory } from "./(components)/dialog-new-category";
 import { DialogNewTag } from "./(components)/dialog-new-tag";
@@ -80,12 +81,18 @@ export default function Page() {
 
     const handleDeleteStatus = async (id: string) => {
         try {
-            await PaymentStatusService.deletePaymentStatus(id);
             setDeletingId(id);
+            await PaymentStatusService.deletePaymentStatus(id);
             await getPaymentStatus();
             setOpenDialogId(null);
+            toast.success("Status de pagamento removido com sucesso");
         } catch (error) {
-            console.error(error);
+            if (error instanceof ApiConflictError) {
+                toast.error(error.userMessage);
+            } else {
+                console.error(error);
+                toast.error("Erro ao remover status de pagamento. Tente novamente.");
+            }
         } finally {
             setDeletingId(null);
         }
@@ -93,12 +100,18 @@ export default function Page() {
 
     const handleDeleteCategory = async (id: string) => {
         try {
-            await CategoryService.deleteCategory(id);
             setDeletingCategoryId(id);
+            await CategoryService.deleteCategory(id);
             await getCategories();
             setOpenCategoryDialogId(null);
+            toast.success("Categoria removida com sucesso");
         } catch (error) {
-            console.error(error);
+            if (error instanceof ApiConflictError) {
+                toast.error(error.userMessage);
+            } else {
+                console.error(error);
+                toast.error("Erro ao remover categoria. Tente novamente.");
+            }
         } finally {
             setDeletingCategoryId(null);
         }
@@ -106,12 +119,18 @@ export default function Page() {
 
     const handleDeleteTag = async (id: string) => {
         try {
-            await TagService.deleteTag(id);
             setDeletingTagId(id);
+            await TagService.deleteTag(id);
             await getTags();
             setOpenTagDialogId(null);
+            toast.success("Tag removida com sucesso");
         } catch (error) {
-            console.error(error);
+            if (error instanceof ApiConflictError) {
+                toast.error(error.userMessage);
+            } else {
+                console.error(error);
+                toast.error("Erro ao remover tag. Tente novamente.");
+            }
         } finally {
             setDeletingTagId(null);
         }
@@ -177,7 +196,7 @@ export default function Page() {
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel disabled={deletingId === item.id}>Cancelar</AlertDialogCancel>
-                                                        <AlertDialogAction 
+                                                        <Button 
                                                             onClick={() => handleDeleteStatus(item.id)} 
                                                             className="bg-red-500 hover:bg-red-600"
                                                             disabled={deletingId === item.id}
@@ -190,7 +209,7 @@ export default function Page() {
                                                             ) : (
                                                                 "Remover"
                                                             )}
-                                                        </AlertDialogAction>
+                                                        </Button>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
@@ -241,7 +260,7 @@ export default function Page() {
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel disabled={deletingCategoryId === item.id}>Cancelar</AlertDialogCancel>
-                                                        <AlertDialogAction
+                                                        <Button
                                                             onClick={() => handleDeleteCategory(item.id)}
                                                             className="bg-red-500 hover:bg-red-600"
                                                             disabled={deletingCategoryId === item.id}
@@ -254,7 +273,7 @@ export default function Page() {
                                                             ) : (
                                                                 "Remover"
                                                             )}
-                                                        </AlertDialogAction>
+                                                        </Button>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
@@ -305,7 +324,7 @@ export default function Page() {
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel disabled={deletingTagId === item.id}>Cancelar</AlertDialogCancel>
-                                                        <AlertDialogAction
+                                                        <Button
                                                             onClick={() => handleDeleteTag(item.id)}
                                                             className="bg-red-500 hover:bg-red-600"
                                                             disabled={deletingTagId === item.id}
@@ -318,7 +337,7 @@ export default function Page() {
                                                             ) : (
                                                                 "Remover"
                                                             )}
-                                                        </AlertDialogAction>
+                                                        </Button>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
