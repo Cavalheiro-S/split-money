@@ -1,36 +1,277 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💰 Split Money
 
-## Getting Started
+> **Aplicação completa de gestão financeira pessoal** desenvolvida com Next.js 15, TypeScript e as melhores práticas de desenvolvimento web.
 
-First, run the development server:
+[![Deploy Status](https://img.shields.io/badge/Deploy-Vercel-00C7B7?style=for-the-badge&logo=vercel)](https://split-money.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
+## 🚀 **Demo**
+
+Acesse a aplicação em produção: **[split-money.vercel.app](https://split-money.vercel.app)**
+
+## 📋 **Funcionalidades**
+
+### 🔐 **Sistema de Autenticação Completo**
+- ✅ Login/Logout com validação de credenciais
+- ✅ Registro de usuários com validação de email
+- ✅ Recuperação de senha (esqueci minha senha)
+- ✅ Confirmação de email para ativação de conta
+- ✅ Redefinição de senha via token
+- ✅ Middleware de autenticação para proteção de rotas
+- ✅ Gerenciamento de sessão com refresh automático
+
+### 💰 **Gestão Avançada de Transações**
+- ✅ **CRUD completo** de transações (Create, Read, Update, Delete)
+- ✅ **Tipos de transação**: Entradas (income) e Saídas (outcome)
+- ✅ **Valores monetários** formatados em Real brasileiro (R$)
+- ✅ **Transações recorrentes** com frequências:
+  - Diária, Semanal, Mensal, Anual
+- ✅ **Categorização** personalizável de transações
+- ✅ **Tags** para organização adicional
+- ✅ **Status de pagamento** customizáveis
+- ✅ **Filtros avançados** por data, tipo, status e ordenação
+- ✅ **Paginação** inteligente para grandes volumes
+- ✅ **Validação robusta** com mensagens em português
+
+### 📈 **Dashboard Inteligente**
+- ✅ **Visão geral** das últimas transações
+- ✅ **Separação visual** entre entradas e saídas
+- ✅ **Filtros independentes** por data para cada seção
+- ✅ **Interface responsiva** e intuitiva
+
+### ⚙️ **Sistema de Configurações**
+- ✅ **Gerenciamento de categorias** (criar/deletar)
+- ✅ **Gerenciamento de status de pagamento** (criar/deletar)
+- ✅ **Gerenciamento de tags** (criar/deletar)
+- ✅ **Validações completas** com mensagens de erro
+- ✅ **Confirmações** para ações destrutivas
+
+### 👤 **Perfil do Usuário**
+- ✅ **Visualização** de dados pessoais
+- ✅ **Edição de email** com validação
+- ✅ **Alteração de senha**
+- ✅ **Interface** limpa e organizada
+
+### 🧪 **Testes Automatizados**
+- ✅ **Testes E2E** com Playwright
+- ✅ **Cobertura completa** de funcionalidades
+- ✅ **Testes** em múltiplos navegadores
+- ✅ **Testes responsivos** (mobile/desktop)
+- ✅ **Validações** de formulários e cenários de erro
+
+## 🛠️ **Tecnologias Utilizadas**
+
+### **Frontend**
+- **[Next.js 15](https://nextjs.org/)** - Framework React com App Router
+- **[React 18](https://react.dev/)** - Biblioteca de interface com Server Components
+- **[TypeScript](https://www.typescriptlang.org/)** - Tipagem estática
+- **[Tailwind CSS](https://tailwindcss.com/)** - Framework CSS utilitário
+- **[shadcn/ui](https://ui.shadcn.com/)** - Componentes acessíveis
+- **[Radix UI](https://www.radix-ui.com/)** - Primitivos de interface
+
+### **Formulários e Validação**
+- **[React Hook Form](https://react-hook-form.com/)** - Gerenciamento de formulários
+- **[Zod](https://zod.dev/)** - Validação de schemas
+- **[@hookform/resolvers](https://github.com/react-hook-form/resolvers)** - Integração
+
+### **UI/UX e Acessibilidade**
+- **[Lucide React](https://lucide.dev/)** - Ícones
+- **[Sonner](https://sonner.emilkowal.ski/)** - Notificações toast
+- **[React Number Format](https://s-yadav.github.io/react-number-format/)** - Formatação monetária
+- **[Date-fns](https://date-fns.org/)** - Manipulação de datas
+- **[React Day Picker](https://react-day-picker.js.org/)** - Seletor de datas
+
+### **HTTP e API**
+- **[Axios](https://axios-http.com/)** - Cliente HTTP
+- **[JWT (jose)](https://github.com/panva/jose)** - Autenticação
+- **API Routes** - Endpoints do Next.js
+
+### **Testes**
+- **[Playwright](https://playwright.dev/)** - Testes E2E
+- **Testes** em Chrome, Firefox, Safari
+- **Testes responsivos** (mobile/desktop)
+
+### **Ferramentas de Desenvolvimento**
+- **[ESLint](https://eslint.org/)** - Linting de código
+- **[Prettier](https://prettier.io/)** - Formatação de código
+- **[Turbopack](https://turbo.build/pack)** - Build tool ultra-rápido
+- **[Microsoft Clarity](https://clarity.microsoft.com/)** - Analytics
+
+## 🚀 **Como Executar**
+
+### **Pré-requisitos**
+- Node.js 18+ 
+- npm, yarn, pnpm ou bun
+
+### **Instalação**
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/Cavalheiro-S/split-money.git
+cd split-money
+```
+
+2. **Instale as dependências**
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+# ou
+bun install
+```
+
+3. **Configure as variáveis de ambiente**
+```bash
+cp .env.example .env.local
+```
+
+Edite o arquivo `.env.local` com suas configurações:
+```env
+# API Base URL
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# JWT Secret
+JWT_SECRET=your-secret-key
+
+# Clarity (opcional)
+NEXT_PUBLIC_CLARITY_PROJECT_ID=your-clarity-id
+```
+
+4. **Execute o servidor de desenvolvimento**
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
+# ou
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. **Acesse a aplicação**
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧪 **Testes**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **Executar testes E2E**
+```bash
+# Instalar dependências do Playwright
+npx playwright install
 
-## Learn More
+# Executar testes
+npm run test
 
-To learn more about Next.js, take a look at the following resources:
+# Executar com interface
+npm run test:ui
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Executar em modo headed
+npm run test:headed
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Debug
+npm run test:debug
 
-## Deploy on Vercel
+# Ver relatório
+npm run test:report
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### **Linting e Formatação**
+```bash
+# Linting
+npm run lint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Build
+npm run build
+
+# Iniciar produção
+npm run start
+```
+
+## 📁 **Estrutura do Projeto**
+
+```
+split-money/
+├── app/                    # App Router (Next.js 15)
+│   ├── (auth)/            # Rotas de autenticação
+│   ├── (logged)/          # Rotas protegidas
+│   └── api/               # API Routes
+├── components/            # Componentes React
+│   ├── forms/            # Formulários
+│   ├── ui/               # Componentes shadcn/ui
+│   └── transaction-table/ # Tabela de transações
+├── contexts/             # React Contexts
+├── hooks/                # Hooks customizados
+├── lib/                  # Utilitários e configurações
+├── services/             # Serviços de API
+├── types/                # Definições TypeScript
+├── utils/                # Funções utilitárias
+├── tests/                # Testes E2E
+└── public/               # Arquivos estáticos
+```
+
+## 🎯 **Arquitetura**
+
+- **Server Components** por padrão
+- **Client Components** apenas quando necessário
+- **Feature-first** organization
+- **Middleware** para autenticação
+- **Validação** com Zod em todas as entradas
+- **Tipagem** TypeScript estrita
+- **Acessibilidade** completa (ARIA, navegação por teclado)
+
+## 🌟 **Destaques**
+
+- ✅ **Interface moderna** e responsiva
+- ✅ **Acessibilidade** completa
+- ✅ **Validação robusta** com mensagens em português
+- ✅ **Testes abrangentes** com Playwright
+- ✅ **Performance otimizada** com Server Components
+- ✅ **Segurança** com JWT e middleware
+- ✅ **Código bem estruturado** e tipado
+- ✅ **Deploy automático** na Vercel
+
+## 📱 **Responsividade**
+
+A aplicação é totalmente responsiva e funciona perfeitamente em:
+- 📱 **Mobile** (iOS/Android)
+- 📱 **Tablet** (iPad/Android)
+- 💻 **Desktop** (Windows/macOS/Linux)
+
+## 🔒 **Segurança**
+
+- **Autenticação JWT** segura
+- **Middleware** de proteção de rotas
+- **Validação** de entrada com Zod
+- **Sanitização** de dados
+- **HTTPS** em produção
+
+## 📊 **Analytics**
+
+- **Microsoft Clarity** para insights de uso
+- **Métricas** de performance
+- **Análise** de comportamento do usuário
+
+## 🤝 **Contribuição**
+
+Contribuições são bem-vindas! Sinta-se à vontade para:
+
+1. **Fork** o projeto
+2. **Criar** uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** para a branch (`git push origin feature/AmazingFeature`)
+5. **Abrir** um Pull Request
+
+## 📄 **Licença**
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 👨‍💻 **Autor**
+
+**Cavalheiro-S**
+- GitHub: [@Cavalheiro-S](https://github.com/Cavalheiro-S)
+- LinkedIn: [Lucas Cavalheiro](https://www.linkedin.com/in/cavalheirolucas/)
+
+⭐ **Se este projeto te ajudou, considere dar uma estrela!** ⭐
