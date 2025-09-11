@@ -29,9 +29,14 @@ export class PaymentStatusService extends ApiService {
     }
 
     static async deletePaymentStatus(id: string) {
-        return this.request<{ message: string }>(
-            `/payment/${id}`,
-            { method: "DELETE" }
-        );
+        try {
+            return await this.request<{ message: string }>(
+                `/payment/${id}`,
+                { method: "DELETE" }
+            );
+        } catch (error) {
+            // Repassar o erro original para que seja tratado adequadamente na UI
+            throw error;
+        }
     }
 }

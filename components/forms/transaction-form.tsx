@@ -163,8 +163,8 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
         await TransactionService.createTransaction(mapData)
         toast("Transação criada com sucesso")
       }
-      onOpenChange?.(false)
       await updateData?.()
+      onOpenChange?.(false)
     }
     catch (error) {
       toast(`Falha ao ${action} transação`)

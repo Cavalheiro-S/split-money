@@ -2,7 +2,6 @@
 
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -11,6 +10,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { TransactionService } from "@/services/transaction.service";
 import { DollarSign, Landmark, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -43,8 +43,8 @@ export function DeleteTransactionConfirmationModal({
       setIsDeleting(true);
       await TransactionService.deleteTransaction(transaction.id);
       toast.success("Transação excluída com sucesso");
-      onOpenChange?.(false);
       await onDeleteSuccess?.();
+      onOpenChange?.(false);
     } catch (error) {
       toast.error("Erro ao excluir transação");
       console.error("Erro ao excluir transação:", error);
@@ -141,14 +141,15 @@ export function DeleteTransactionConfirmationModal({
           <AlertDialogCancel disabled={isDeleting}>
             Cancelar
           </AlertDialogCancel>
-          <AlertDialogAction
+          <Button
             onClick={handleDelete}
             disabled={isDeleting}
+            variant="destructive"
             className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
           >
             {isDeleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {isDeleting ? "Excluindo..." : "Excluir"}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

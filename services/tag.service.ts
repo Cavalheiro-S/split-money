@@ -28,9 +28,14 @@ export class TagService extends ApiService {
     }
 
     static async deleteTag(id: string) {
-        return this.request<{ message: string }>(
-            `/tag/${id}`,
-            { method: "DELETE" }
-        );
+        try {
+            return await this.request<{ message: string }>(
+                `/tag/${id}`,
+                { method: "DELETE" }
+            );
+        } catch (error) {
+            // Repassar o erro original para que seja tratado adequadamente na UI
+            throw error;
+        }
     }
 }

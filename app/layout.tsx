@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { UserProvider } from "@/contexts/user-context";
 import { NavigationLoadingProvider } from "@/contexts/navigation-loading-context";
 import { NavigationLoader } from "@/components/navigation-loader";
@@ -39,6 +40,7 @@ export default function RootLayout({
           </UserProvider>
           <NavigationLoader />
           <Toaster />
+          <SonnerToaster />
         </NavigationLoadingProvider>
         {isProduction && projectId && <ClarityProvider projectId={projectId} />}
       </body>
