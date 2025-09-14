@@ -71,12 +71,18 @@ export default function Page() {
         }
     }, [modalTransactionOpen])
 
+    const totalAmount = transactions.reduce((acc, item) => {
+        return item.type === "income" ? acc + item.amount : acc - item.amount
+    }, 0);
+
     return (
-        <div className="flex flex-col min-h-screen col-start-2 gap-4 px-10 mt-10 bg-gray-100 py-10">
+        <div className="flex flex-col min-h-screen col-start-2 gap-6 px-6 lg:px-10 mt-6 lg:mt-10 bg-gray-50 py-6 lg:py-10">
             <TableTransaction.Container>
                 <TableTransaction.Header
                     title="Transações"
-                    subtitle="Aqui você pode ver os seus lançamentos"
+                    subtitle="Gerencie seus lançamentos financeiros"
+                    totalTransactions={transactions.length}
+                    totalAmount={totalAmount}
                     onChangeDate={(date) => {
                         setPagination({ ...pagination, page: 1 })
                         setDate(date)
@@ -87,10 +93,16 @@ export default function Page() {
                         open={modalTransactionOpen}
                         onOpenChange={open => setModalTransactionOpen(open)}
                         updateData={getTransactions}
-                        trigger={<Button className="place-self-end">
-                            Adicionar
-                        </Button>} />
+                        trigger={
+                            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                                Adicionar Transação
+                            </Button>
+                        } 
+                    />
                 </TableTransaction.Header>
+                
+                <TableTransaction.StatsCards transactions={transactions} />
+                
                 <TableTransaction.Table
                     hasActions
                     onEditClick={handleEdit}
@@ -102,16 +114,17 @@ export default function Page() {
                         setFilters(filters)
                     }}
                     filters={filters}
-                />
-                <TableTransaction.Pagination
-                    page={pagination.page}
-                    totalPages={pagination.totalPages}
-                    onChange={(page) => setPagination({ ...pagination, page })}
-                    limit={pagination.limit}
-                    onChangeLimit={(limit) => setPagination({ ...pagination, limit })}
+                    showSearch={true}
+                    pagination={{
+                        page: pagination.page,
+                        totalPages: pagination.totalPages,
+                        limit: pagination.limit,
+                        totalItems: pagination.total,
+                        onChange: (page) => setPagination({ ...pagination, page }),
+                        onChangeLimit: (limit) => setPagination({ ...pagination, limit })
+                    }}
                 />
             </TableTransaction.Container>
-
         </div>
     )
 }

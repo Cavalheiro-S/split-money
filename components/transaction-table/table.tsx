@@ -8,9 +8,15 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { TransactionFilters } from "@/services/transaction.service";
-import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2, Clock } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2, Clock, Search, Filter } from "lucide-react";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Badge } from "../ui/badge";
 import { DeleteTransactionConfirmationModal } from "./delete-confirmation-modal";
+import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import MobileTransactionCard from "./mobile-transaction-card";
+import TransactionTablePagination from "./pagination";
 
 interface TransactionTableProps {
     data: ResponseGetTransactions[];
@@ -20,8 +26,19 @@ interface TransactionTableProps {
     onEditClick?: (id: string) => void;
     onChangeFilters?: (filters: TransactionFilters) => void;
     onDeleteSuccess?: () => Promise<void>;
+    showSearch?: boolean;
+    pagination?: {
+        page: number;
+        totalPages: number;
+        limit: number;
+        totalItems?: number;
+        onChange?: (page: number) => void;
+        onChangeLimit?: (limit: number) => void;
+    };
 }
-function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilters, filters, onDeleteSuccess }: TransactionTableProps) {
+function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilters, filters, onDeleteSuccess, showSearch = true, pagination }: TransactionTableProps) {
+    const [searchTerm, setSearchTerm] = useState("");
+    const isMobile = useIsMobile();
 
     const renderSort = (sort: NonNullable<TransactionFilters["sort"]>["sortBy"]) => {
 
@@ -40,22 +57,38 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
         if (type === "income") {
             return (
                 <div className="p-1 bg-green-100 rounded-full w-8 h-8 flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-green-500" />
+                    <DollarSign className="w-5 h-5 text-green-600" />
                 </div>
             )
         }
         return (
             <div className="p-1 bg-red-100 rounded-full w-8 h-8 flex items-center justify-center">
-                <Landmark className="w-5 h-5 text-red-500" />
+                <Landmark className="w-5 h-5 text-red-600" />
             </div>
         )
     }
 
-    if (data && data.length < 1 && !loading) {
+    const filteredData = data?.filter(item => 
+        !searchTerm || item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
+
+    if (filteredData.length < 1 && !loading) {
         return (
-            <div className="flex flex-col h-fit items-center justify-center p-10 gap-2">
-                <ArrowLeftRight />
-                <span className="text-muted-foreground">Nenhuma transação encontrada</span>
+            <div className="flex flex-col items-center justify-center p-12 gap-4">
+                <div className="p-4 bg-gray-100 rounded-full">
+                    <ArrowLeftRight className="w-8 h-8 text-gray-400" />
+                </div>
+                <div className="text-center space-y-2">
+                    <h3 className="text-lg font-medium text-gray-900">
+                        {searchTerm ? "Nenhuma transação encontrada" : "Nenhuma transação cadastrada"}
+                    </h3>
+                    <p className="text-sm text-gray-500 max-w-sm">
+                        {searchTerm 
+                            ? `Não encontramos transações com "${searchTerm}". Tente outro termo de busca.`
+                            : "Comece adicionando sua primeira transação para ter um controle melhor das suas finanças."
+                        }
+                    </p>
+                </div>
             </div>
         )
     }
@@ -80,30 +113,114 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
         )
     }
 
-    return (
-        <Table className="min-w-[900px] mt-4 h-fit">
-            <TableHeader>
-                <TableRow className="hover:bg-white">
-                    {renderTableHead("Tipo", "type", "w-[80px]")}
-                    {renderTableHead("Descrição", "description")}
-                    {renderTableHead("Data", "date")}
-                    {renderTableHead("Categoria", "category")}
-                    {renderTableHead("Status de pagamento", "payment_status")}
-                    {renderTableHead("Valor", "amount")}
-                    {hasActions && <TableHead className="text-center">Ações</TableHead>}
-                </TableRow>
-            </TableHeader>
-            <TableBody>
+    if (isMobile) {
+        return (
+            <div className="space-y-4">
+                {showSearch && (
+                    <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg">
+                        <Search className="w-4 h-4 text-gray-400" />
+                        <Input
+                            placeholder="Buscar por descrição..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                        {searchTerm && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSearchTerm("")}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                Limpar
+                            </Button>
+                        )}
+                    </div>
+                )}
+                
                 {loading ? (
-                    <TableRow>
-                        <TableCell colSpan={6}>
-                            <div className="p-6 flex items-center justify-center gap-2">
-                                < Loader2 className="animate-spin" />
-                                Carregando transações
+                    <div className="space-y-3">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                            <div key={index} className="p-4 bg-gray-100 rounded-lg animate-pulse">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                                    </div>
+                                    <div className="h-6 bg-gray-200 rounded w-16"></div>
+                                </div>
                             </div>
-                        </TableCell>
-                    </TableRow>
-                ) : data?.map((item) => (
+                        ))}
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {filteredData.map((transaction) => (
+                            <MobileTransactionCard
+                                key={transaction.id}
+                                transaction={transaction}
+                                onEditClick={onEditClick}
+                                onDeleteSuccess={onDeleteSuccess}
+                                loading={loading}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            {showSearch && (
+                <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg">
+                    <Search className="w-4 h-4 text-gray-400" />
+                    <Input
+                        placeholder="Buscar por descrição..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                    {searchTerm && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSearchTerm("")}
+                            className="text-gray-500 hover:text-gray-700"
+                        >
+                            Limpar
+                        </Button>
+                    )}
+                </div>
+            )}
+            
+            <div className="overflow-x-auto">
+                <Table className="min-w-[900px]">
+                    <TableHeader>
+                        <TableRow className="hover:bg-transparent border-b-2">
+                            {renderTableHead("Tipo", "type", "w-[80px]")}
+                            {renderTableHead("Descrição", "description")}
+                            {renderTableHead("Data", "date")}
+                            {renderTableHead("Categoria", "category")}
+                            {renderTableHead("Status", "payment_status")}
+                            {renderTableHead("Valor", "amount")}
+                            {hasActions && <TableHead className="text-center w-[120px]">Ações</TableHead>}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {loading ? (
+                            Array.from({ length: 5 }).map((_, index) => (
+                                <TableRow key={index} className="animate-pulse">
+                                    <TableCell><div className="w-8 h-8 bg-gray-200 rounded-full"></div></TableCell>
+                                    <TableCell><div className="h-4 bg-gray-200 rounded w-3/4"></div></TableCell>
+                                    <TableCell><div className="h-4 bg-gray-200 rounded w-20"></div></TableCell>
+                                    <TableCell><div className="h-4 bg-gray-200 rounded w-24"></div></TableCell>
+                                    <TableCell><div className="h-4 bg-gray-200 rounded w-20"></div></TableCell>
+                                    <TableCell><div className="h-4 bg-gray-200 rounded w-16"></div></TableCell>
+                                    {hasActions && <TableCell><div className="h-8 bg-gray-200 rounded w-16 mx-auto"></div></TableCell>}
+                                </TableRow>
+                            ))
+                        ) : filteredData?.map((item) => (
                     <TableRow 
                         className={cn(
                             item.type === "income" ? "hover:bg-green-100/30" : "hover:bg-red-100/30",
@@ -121,31 +238,61 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
                                 )}
                             </div>
                         </TableCell>
-                        <TableCell className="font-medium gap-2">
+                        <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
-                                {item.description}
+                                <span className="truncate max-w-[200px]">{item.description}</span>
                                 {item.is_virtual && (
-                                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                                    <Badge variant="secondary" className="text-xs">
                                         Futura
-                                    </span>
+                                    </Badge>
                                 )}
                             </div>
                         </TableCell>
-                        <TableCell>{new Date(item.date).toLocaleDateString("pt-br")}</TableCell>
-                        <TableCell className="text-left">{item.categories?.description ?? "Sem categoria"}</TableCell>
-                        <TableCell className="text-left">{item.payment_status?.description ?? "Sem status"}</TableCell>
-                        <TableCell className="text-left">{item.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
+                        <TableCell>
+                            <span className="text-sm text-gray-600">
+                                {new Date(item.date).toLocaleDateString("pt-br")}
+                            </span>
+                        </TableCell>
+                        <TableCell>
+                            {item.categories?.description ? (
+                                <Badge variant="outline" className="text-xs">
+                                    {item.categories.description}
+                                </Badge>
+                            ) : (
+                                <span className="text-sm text-gray-400">Sem categoria</span>
+                            )}
+                        </TableCell>
+                        <TableCell>
+                            {item.payment_status?.description ? (
+                                <Badge 
+                                    variant={item.payment_status.description === "Pago" ? "default" : "secondary"}
+                                    className="text-xs"
+                                >
+                                    {item.payment_status.description}
+                                </Badge>
+                            ) : (
+                                <span className="text-sm text-gray-400">Sem status</span>
+                            )}
+                        </TableCell>
+                        <TableCell>
+                            <span className={cn(
+                                "font-semibold",
+                                item.type === "income" ? "text-green-600" : "text-red-600"
+                            )}>
+                                {item.type === "income" ? "+" : "-"}{item.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                            </span>
+                        </TableCell>
                         {
                             hasActions && (
                                 <TableCell className="text-center">
-                                    <div className="flex items-center justify-center gap-2">
+                                    <div className="flex items-center justify-center gap-1">
                                         <Button
                                             disabled={loading || item.is_virtual}
                                             onClick={() => { onEditClick?.(item.id) }}
                                             variant="ghost"
-                                            size="icon"
+                                            size="sm"
                                             className={cn(
-                                                "text-blue-500 hover:text-blue-700",
+                                                "h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50",
                                                 item.is_virtual && "opacity-50 cursor-not-allowed"
                                             )}
                                             title={item.is_virtual ? "Transações virtuais não podem ser editadas" : "Editar transação"}
@@ -159,9 +306,9 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
                                                 <Button
                                                     disabled={loading || item.is_virtual}
                                                     variant="ghost"
-                                                    size="icon"
+                                                    size="sm"
                                                     className={cn(
-                                                        "text-red-500 hover:text-red-700",
+                                                        "h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50",
                                                         item.is_virtual && "opacity-50 cursor-not-allowed"
                                                     )}
                                                     title={item.is_virtual ? "Transações virtuais não podem ser excluídas" : "Excluir transação"}
@@ -176,14 +323,38 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
                         }
                     </TableRow>
                 ))}
-                <TableRow>
-                    <TableCell colSpan={5} className="text-right font-semibold">Total</TableCell>
-                    <TableCell className="text-left font-semibold">{data.reduce((acc, item) => {
-                        return item.type === "income" ? acc + item.amount : acc - item.amount
-                    }, 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
-                </TableRow>
-            </TableBody>
-        </Table>
+                        <TableRow className="bg-gray-50 border-t-2">
+                            <TableCell colSpan={hasActions ? 6 : 5} className="text-right font-semibold text-gray-700">
+                                Total {searchTerm ? `(${filteredData.length} de ${data.length})` : `(${data.length})`}
+                            </TableCell>
+                            <TableCell className="text-left">
+                                <span className="font-bold text-lg">
+                                    {filteredData.reduce((acc, item) => {
+                                        return item.type === "income" ? acc + item.amount : acc - item.amount
+                                    }, 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                                </span>
+                            </TableCell>
+                            {hasActions && <TableCell></TableCell>}
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </div>
+            
+            {pagination && (
+                <div className="mt-4">
+                    <TransactionTablePagination
+                        page={pagination.page}
+                        totalPages={pagination.totalPages}
+                        limit={pagination.limit}
+                        onChange={pagination.onChange}
+                        onChangeLimit={pagination.onChangeLimit}
+                        filteredDataLength={filteredData.length}
+                        totalItems={pagination.totalItems}
+                        showAlways={true}
+                    />
+                </div>
+            )}
+        </div>
     )
 }
 

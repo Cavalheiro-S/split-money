@@ -7,8 +7,10 @@ interface TransactionTableContainerProps {
 
 function TransactionTableContainer({ children, className }: Readonly<TransactionTableContainerProps>) {
     return (
-        <div className={cn("w-full bg-white rounded-lg shadow-md p-4 h-fit", className)}>
-            {children}
+        <div className={cn("w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden", className)}>
+            <div className="p-6">
+                {children}
+            </div>
         </div>
     )
 }

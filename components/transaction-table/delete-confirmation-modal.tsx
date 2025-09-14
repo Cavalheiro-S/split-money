@@ -17,15 +17,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 interface DeleteTransactionConfirmationModalProps {
-  /** Elemento que vai disparar o modal */
   trigger: React.ReactNode;
-  /** Dados da transação a ser excluída */
   transaction: ResponseGetTransactions;
-  /** Função chamada após a exclusão bem-sucedida */
   onDeleteSuccess?: () => Promise<void>;
-  /** Controla se o modal está aberto externamente */
   open?: boolean;
-  /** Função para controlar o estado de abertura externamente */
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -68,13 +63,13 @@ export function DeleteTransactionConfirmationModal({
     if (type === "income") {
       return (
         <div className="p-1 bg-green-100 rounded-full w-6 h-6 flex items-center justify-center">
-          <DollarSign className="w-4 h-4 text-green-500" />
+          <DollarSign className="w-4 h-4 text-green-600" />
         </div>
       );
     }
     return (
       <div className="p-1 bg-red-100 rounded-full w-6 h-6 flex items-center justify-center">
-        <Landmark className="w-4 h-4 text-red-500" />
+        <Landmark className="w-4 h-4 text-red-600" />
       </div>
     );
   };
@@ -99,7 +94,6 @@ export function DeleteTransactionConfirmationModal({
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        {/* Detalhes da transação */}
         <div className="bg-gray-50 rounded-lg p-4 space-y-3">
           <div className="flex items-center gap-3">
             {getTypeIcon(transaction.type)}
@@ -117,7 +111,7 @@ export function DeleteTransactionConfirmationModal({
               <span className={`font-medium ${
                 transaction.type === "income" ? "text-green-600" : "text-red-600"
               }`}>
-                {formatCurrency(transaction.amount)}
+                {transaction.type === "income" ? "+" : "-"}{formatCurrency(transaction.amount)}
               </span>
             </div>
             
