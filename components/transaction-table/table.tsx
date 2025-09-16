@@ -6,15 +6,15 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { TransactionFilters } from "@/services/transaction.service";
-import { ArrowDown, ArrowLeftRight, ArrowUp, DollarSign, Landmark, Loader2, Pencil, Trash2, Clock, Search, Filter } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, ArrowUp, Clock, DollarSign, Landmark, Pencil, Search, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Badge } from "../ui/badge";
 import { DeleteTransactionConfirmationModal } from "./delete-confirmation-modal";
-import { useState } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import MobileTransactionCard from "./mobile-transaction-card";
 import TransactionTablePagination from "./pagination";
 
