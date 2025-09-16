@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Executando verificações pré-push..."
+
+# Verificar se há mudanças não commitadas
+if [ -n "$(git status --porcelain)" ]; then
+  echo "❌ Erro: Há mudanças não commitadas. Faça commit antes de fazer push."
+  exit 1
+fi
+
+# Executar linting
+echo "📝 Executando ESLint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ Erro: ESLint encontrou problemas. Corrija-os antes de fazer push."
+  exit 1
+fi
+
+# Verificar tipos TypeScript
+echo "🔧 Verificando tipos TypeScript..."
+npx tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo "❌ Erro: TypeScript encontrou erros de tipo. Corrija-os antes de fazer push."
+  exit 1
+fi
+
+# Executar build para verificar se tudo compila
+echo "🏗️ Executando build..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo "❌ Erro: Build falhou. Corrija os problemas antes de fazer push."
+  exit 1
+fi
+
+echo "✅ Todas as verificações passaram! Fazendo push..."
