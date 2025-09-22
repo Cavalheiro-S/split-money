@@ -27,16 +27,8 @@ interface TransactionTableProps {
     onChangeFilters?: (filters: TransactionFilters) => void;
     onDeleteSuccess?: () => Promise<void>;
     showSearch?: boolean;
-    pagination?: {
-        page: number;
-        totalPages: number;
-        limit: number;
-        totalItems?: number;
-        onChange?: (page: number) => void;
-        onChangeLimit?: (limit: number) => void;
-    };
 }
-function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilters, filters, onDeleteSuccess, showSearch = true, pagination }: TransactionTableProps) {
+function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilters, filters, onDeleteSuccess, showSearch = true }: TransactionTableProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const isMobile = useIsMobile();
 
@@ -339,21 +331,6 @@ function TransactionTable({ data, onEditClick, hasActions, loading, onChangeFilt
                     </TableBody>
                 </Table>
             </div>
-            
-            {pagination && (
-                <div className="mt-4">
-                    <TransactionTablePagination
-                        page={pagination.page}
-                        totalPages={pagination.totalPages}
-                        limit={pagination.limit}
-                        onChange={pagination.onChange}
-                        onChangeLimit={pagination.onChangeLimit}
-                        filteredDataLength={filteredData.length}
-                        totalItems={pagination.totalItems}
-                        showAlways={true}
-                    />
-                </div>
-            )}
         </div>
     )
 }

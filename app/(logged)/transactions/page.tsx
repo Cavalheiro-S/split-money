@@ -115,14 +115,16 @@ export default function Page() {
                     }}
                     filters={filters}
                     showSearch={true}
-                    pagination={{
-                        page: pagination.page,
-                        totalPages: pagination.totalPages,
-                        limit: pagination.limit,
-                        totalItems: pagination.total,
-                        onChange: (page) => setPagination({ ...pagination, page }),
-                        onChangeLimit: (limit) => setPagination({ ...pagination, limit })
-                    }}
+                />
+                <TableTransaction.Pagination
+                    page={pagination.page}
+                    totalPages={pagination.totalPages}
+                    limit={pagination.limit}
+                    totalItems={pagination.total}
+                    onChange={(page) => setPagination({ ...pagination, page })}
+                    onChangeLimit={(limit) => setPagination({ ...pagination, limit })}
+                    filteredDataLength={transactions.length}
+                    showAlways
                 />
             </TableTransaction.Container>
         </div>
