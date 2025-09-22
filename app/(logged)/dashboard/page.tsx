@@ -78,14 +78,16 @@ export default function Page() {
                 <TableTransaction.Table 
                     loading={loadingIncome} 
                     data={incomes}
-                    pagination={{
-                        page: paginationIncome.page,
-                        totalPages: paginationIncome.totalPages,
-                        limit: paginationIncome.limit,
-                        totalItems: paginationIncome.total,
-                        onChange: (page) => setPaginationIncome({ ...paginationIncome, page }),
-                        onChangeLimit: (limit) => setPaginationIncome({ ...paginationIncome, limit })
-                    }}
+                />
+                <TableTransaction.Pagination
+                    page={paginationIncome.page}
+                    totalPages={paginationIncome.totalPages}
+                    limit={paginationIncome.limit}
+                    totalItems={paginationIncome.total}
+                    onChange={(page) => setPaginationIncome({ ...paginationIncome, page })}
+                    onChangeLimit={(limit) => setPaginationIncome({ ...paginationIncome, limit })}
+                    filteredDataLength={incomes.length}
+                    showAlways
                 />
             </TableTransaction.Container>
 
@@ -101,14 +103,16 @@ export default function Page() {
                 <TableTransaction.Table 
                     loading={loadingOutcome} 
                     data={outcomes}
-                    pagination={{
-                        page: paginationOutcome.page,
-                        totalPages: paginationOutcome.totalPages,
-                        limit: paginationOutcome.limit,
-                        totalItems: paginationOutcome.total,
-                        onChange: (page) => setPaginationOutcome({ ...paginationOutcome, page }),
-                        onChangeLimit: (limit) => setPaginationOutcome({ ...paginationOutcome, limit })
-                    }}
+                />
+                <TableTransaction.Pagination
+                    page={paginationOutcome.page}
+                    totalPages={paginationOutcome.totalPages}
+                    limit={paginationOutcome.limit}
+                    totalItems={paginationOutcome.total}
+                    onChange={(page) => setPaginationOutcome({ ...paginationOutcome, page })}
+                    onChangeLimit={(limit) => setPaginationOutcome({ ...paginationIncome, limit })}
+                    filteredDataLength={outcomes.length}
+                    showAlways
                 />
             </TableTransaction.Container>
         </>
