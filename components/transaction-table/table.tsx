@@ -16,7 +16,6 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { DeleteTransactionConfirmationModal } from "./delete-confirmation-modal";
 import MobileTransactionCard from "./mobile-transaction-card";
-import TransactionTablePagination from "./pagination";
 
 interface TransactionTableProps {
     data: ResponseGetTransactions[];
