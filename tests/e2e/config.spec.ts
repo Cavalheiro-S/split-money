@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { TestHelpers } from "./utils/test-helpers";
+import { TestHelpers } from "../utils/test-helpers";
 
 test.describe("Página de Configurações", () => {
   let helpers: TestHelpers;
