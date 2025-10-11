@@ -36,7 +36,7 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
 
   // Função para obter o ID correto (recurrent_transaction_id para transações virtuais)
   const getItemId = (item: T): string => {
-    const transaction = item as any; // Type assertion para acessar propriedades opcionais
+    const transaction = item as unknown as ResponseGetTransactions;
     return transaction.is_virtual && transaction.recurrent_transaction_id 
       ? transaction.recurrent_transaction_id 
       : transaction.id;
@@ -52,7 +52,7 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
       const transaction = transactions.find(t => getItemId(t) === selectedId);
       
       if (transaction) {
-        const tx = transaction as any; // Type assertion para acessar propriedades opcionais
+        const tx = transaction as unknown as ResponseGetTransactions;
         // Se é uma transação virtual ou foi gerada por transação recorrente
         if (tx.is_virtual || tx.is_recurring_generated) {
           recurringIds.push(selectedId);
