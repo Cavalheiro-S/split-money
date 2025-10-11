@@ -38,8 +38,40 @@ type ResponseGetTransactions = {
     tags: Tag;
     is_virtual?: boolean;
     is_recurring_generated?: boolean;
+    recurrent_transaction_id?: string;
 }
 
 type RequestUpdateTransaction = RequestCreateTransaction & {
     id: string;
+}
+
+type BulkDeleteRequest = {
+    ids: string[];
+}
+
+type BulkDeleteFailedItem = {
+    id: string;
+    reason: string;
+}
+
+type BulkDeleteSummary = {
+    total: number;
+    succeeded: number;
+    failed: number;
+}
+
+type BulkDeleteResults = {
+    success: string[];
+    failed: BulkDeleteFailedItem[];
+}
+
+type BulkDeleteResponse = {
+    message: string;
+    summary: BulkDeleteSummary;
+    results: BulkDeleteResults;
+    info?: string;
+}
+
+type BulkDeleteRecurringResponse = BulkDeleteResponse & {
+    info: string;
 }

@@ -5,6 +5,8 @@ import TransactionTablePagination from "./pagination";
 import TransactionTable from "./table";
 import StatsCards from "./stats-cards";
 import MobileTransactionCard from "./mobile-transaction-card";
+import { BulkActionsBar } from "./bulk-actions-bar";
+import { BulkDeleteConfirmationModal } from "./bulk-delete-confirmation-modal";
 
 
 export const TableTransaction = {
@@ -14,5 +16,7 @@ export const TableTransaction = {
     ActionModal: TransactionActionModal,
     Pagination: TransactionTablePagination,
     StatsCards: StatsCards,
-    MobileCard: MobileTransactionCard
+    MobileCard: MobileTransactionCard,
+    BulkActionsBar: BulkActionsBar,
+    BulkDeleteModal: BulkDeleteConfirmationModal
 }

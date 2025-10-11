@@ -54,4 +54,24 @@ export class TransactionService extends ApiService {
             { method: "DELETE" }
         );
     }
+
+    static async bulkDeleteTransactions(ids: string[]) {
+        return this.request<BulkDeleteResponse>(
+            "/transaction/bulk-delete",
+            {
+                method: "POST",
+                body: JSON.stringify({ ids }),
+            }
+        );
+    }
+
+    static async bulkDeleteRecurringTransactions(ids: string[]) {
+        return this.request<BulkDeleteRecurringResponse>(
+            "/recurring-transaction/bulk-delete",
+            {
+                method: "POST",
+                body: JSON.stringify({ ids }),
+            }
+        );
+    }
 }

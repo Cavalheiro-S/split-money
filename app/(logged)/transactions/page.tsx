@@ -10,6 +10,7 @@ export default function Page() {
     const [transactions, setTransactions] = useState<ResponseGetTransactions[]>([]);
     const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
     const [transactionSelected, setTransactionSelected] = useState<ResponseGetTransactions | undefined>(undefined);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -58,6 +59,11 @@ export default function Page() {
 
     const handleDeleteSuccess = async () => {
         await getTransactions()
+        setSelectedIds([])
+    }
+
+    const handleClearSelection = () => {
+        setSelectedIds([])
     }
 
     useEffect(() => {
@@ -103,6 +109,13 @@ export default function Page() {
                 
                 <TableTransaction.StatsCards transactions={transactions} />
                 
+                <TableTransaction.BulkActionsBar
+                    selectedIds={selectedIds}
+                    transactions={transactions}
+                    onClearSelection={handleClearSelection}
+                    onDeleteSuccess={handleDeleteSuccess}
+                />
+                
                 <TableTransaction.Table
                     hasActions
                     onEditClick={handleEdit}
@@ -115,6 +128,9 @@ export default function Page() {
                     }}
                     filters={filters}
                     showSearch={true}
+                    enableBulkSelection={true}
+                    selectedIds={selectedIds}
+                    onSelectionChange={setSelectedIds}
                 />
                 <TableTransaction.Pagination
                     page={pagination.page}

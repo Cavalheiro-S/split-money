@@ -23,6 +23,7 @@ import {
 import { useMemo, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { DeleteTransactionConfirmationModal } from "./delete-confirmation-modal";
 import MobileTransactionCard from "./mobile-transaction-card";
@@ -36,6 +37,9 @@ interface TransactionTableProps {
   onChangeFilters?: (filters: TransactionFilters) => void;
   onDeleteSuccess?: () => Promise<void>;
   showSearch?: boolean;
+  enableBulkSelection?: boolean;
+  selectedIds?: string[];
+  onSelectionChange?: (selectedIds: string[]) => void;
 }
 function TransactionTable({
   data,
@@ -46,9 +50,64 @@ function TransactionTable({
   filters,
   onDeleteSuccess,
   showSearch = true,
+  enableBulkSelection = false,
+  selectedIds = [],
+  onSelectionChange,
 }: TransactionTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const isMobile = useIsMobile();
+
+  const filteredData = useMemo(
+    () =>
+      data?.filter(
+        (item) =>
+          !searchTerm ||
+          item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      ) || [],
+    [data, searchTerm]
+  );
+
+  // Função utilitária para obter o ID correto (recurrent_transaction_id para transações virtuais)
+  const getItemId = (item: ResponseGetTransactions): string => {
+    return item.is_virtual && item.recurrent_transaction_id 
+      ? item.recurrent_transaction_id 
+      : item.id;
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const selectableIds = filteredData.map((item) => getItemId(item));
+      onSelectionChange?.(selectableIds);
+    } else {
+      onSelectionChange?.([]);
+    }
+  };
+
+  const handleSelectItem = (item: ResponseGetTransactions, checked: boolean) => {
+    const itemId = getItemId(item);
+      
+    if (checked) {
+      onSelectionChange?.([...selectedIds, itemId]);
+    } else {
+      onSelectionChange?.(
+        selectedIds.filter((selectedId) => selectedId !== itemId)
+      );
+    }
+  };
+
+  const isAllSelected = useMemo(() => {
+    return (
+      filteredData.length > 0 &&
+      filteredData.every((item) => selectedIds.includes(getItemId(item)))
+    );
+  }, [filteredData, selectedIds]);
+
+  const isIndeterminate = useMemo(() => {
+    const selectedCount = filteredData.filter((item) => 
+      selectedIds.includes(getItemId(item))
+    ).length;
+    return selectedCount > 0 && selectedCount < filteredData.length;
+  }, [filteredData, selectedIds]);
 
   const renderSort = (
     sort: NonNullable<TransactionFilters["sort"]>["sortBy"]
@@ -105,16 +164,6 @@ function TransactionTable({
       </TableHead>
     );
   };
-
-  const filteredData = useMemo(
-    () =>
-      data?.filter(
-        (item) =>
-          !searchTerm ||
-          item.description.toLowerCase().includes(searchTerm.toLowerCase())
-      ) || [],
-    [data, searchTerm]
-  );
 
   const total = useMemo(() => {
     return filteredData.reduce((acc, item) => {
@@ -232,6 +281,21 @@ function TransactionTable({
         <Table className="min-w-[900px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent border-b-2">
+              {enableBulkSelection && (
+                <TableHead className="w-[50px] text-center">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onCheckedChange={handleSelectAll}
+                    ref={(el: HTMLButtonElement | null) => {
+                      if (el) {
+                        (el as HTMLInputElement).indeterminate =
+                          isIndeterminate;
+                      }
+                    }}
+                    aria-label="Selecionar todas as transações"
+                  />
+                </TableHead>
+              )}
               {renderTableHead("Tipo", "type", "w-[80px]")}
               {renderTableHead("Descrição", "description")}
               {renderTableHead("Data", "date")}
@@ -251,6 +315,11 @@ function TransactionTable({
                     key={index}
                     className="animate-pulse"
                   >
+                    {enableBulkSelection && (
+                      <TableCell>
+                        <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
                     </TableCell>
@@ -282,10 +351,20 @@ function TransactionTable({
                       item.type === "income"
                         ? "hover:bg-green-100/30"
                         : "hover:bg-red-100/30",
-                      item.is_virtual && "opacity-60 bg-gray-50"
                     )}
                     key={item.id}
                   >
+                    {enableBulkSelection && (
+                      <TableCell className="text-center">
+                        <Checkbox
+                          checked={selectedIds.includes(getItemId(item))}
+                          onCheckedChange={(checked: boolean) =>
+                            handleSelectItem(item, checked)
+                          }
+                          aria-label={`Selecionar transação ${item.description}`}
+                        />
+                      </TableCell>
+                    )}
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1">
                         {renderTypeCell(item.type)}
@@ -362,7 +441,7 @@ function TransactionTable({
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1">
                           <Button
-                            disabled={loading || item.is_virtual}
+                            disabled={loading}
                             onClick={() => {
                               onEditClick?.(item.id);
                             }}
@@ -370,13 +449,8 @@ function TransactionTable({
                             size="sm"
                             className={cn(
                               "h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50",
-                              item.is_virtual && "opacity-50 cursor-not-allowed"
                             )}
-                            title={
-                              item.is_virtual
-                                ? "Transações virtuais não podem ser editadas"
-                                : "Editar transação"
-                            }
+                            title={"Editar transação"}
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -385,19 +459,13 @@ function TransactionTable({
                             onDeleteSuccess={onDeleteSuccess}
                             trigger={
                               <Button
-                                disabled={loading || item.is_virtual}
+                                disabled={loading}
                                 variant="ghost"
                                 size="sm"
                                 className={cn(
                                   "h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50",
-                                  item.is_virtual &&
-                                    "opacity-50 cursor-not-allowed"
                                 )}
-                                title={
-                                  item.is_virtual
-                                    ? "Transações virtuais não podem ser excluídas"
-                                    : "Excluir transação"
-                                }
+                                title={"Excluir transação"}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -408,26 +476,36 @@ function TransactionTable({
                     )}
                   </TableRow>
                 ))}
-            {!loading && <TableRow className="bg-gray-50 border-t-2">
-              <TableCell
-                colSpan={hasActions ? 6 : 5}
-                className="text-right font-semibold text-gray-700"
-              >
-                Total{" "}
-                {searchTerm
-                  ? `(${filteredData.length} de ${data.length})`
-                  : `(${data.length})`}
-              </TableCell>
-              <TableCell className="text-left">
-                <span className="font-bold text-lg">
-                  {total.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </span>
-              </TableCell>
-              {hasActions && <TableCell />}
-            </TableRow>}
+            {!loading && (
+              <TableRow className="bg-gray-50 border-t-2">
+                <TableCell
+                  colSpan={
+                    enableBulkSelection
+                      ? hasActions
+                        ? 7
+                        : 6
+                      : hasActions
+                      ? 6
+                      : 5
+                  }
+                  className="text-right font-semibold text-gray-700"
+                >
+                  Total{" "}
+                  {searchTerm
+                    ? `(${filteredData.length} de ${data.length})`
+                    : `(${data.length})`}
+                </TableCell>
+                <TableCell className="text-left">
+                  <span className="font-bold text-lg">
+                    {total.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </span>
+                </TableCell>
+                {hasActions && <TableCell />}
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
