@@ -23,7 +23,9 @@
     "test:e2e:install": "playwright install",
     "test:all": "npm run test:unit:run && npm run test:e2e",
     "prepare": "husky",
-    "pre-push": "npm run lint && npm run typecheck && npm run build && npm run test:all"
+    "pre-push": "npm run lint && npm run typecheck && npm run build && npm run test:all",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -63,8 +65,13 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.1.2",
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.55.0",
+    "@storybook/addon-a11y": "^10.0.1",
+    "@storybook/addon-docs": "^10.0.1",
+    "@storybook/addon-vitest": "^10.0.1",
+    "@storybook/nextjs": "^10.0.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
@@ -72,12 +79,18 @@
     "@types/node": "^20",
     "@types/react": "^19.1.13",
     "@vitejs/plugin-react": "^5.0.3",
+    "@vitest/browser": "3.2.4",
+    "@vitest/coverage-v8": "3.2.4",
+    "ajv": "^8.17.1",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "eslint-plugin-storybook": "^10.0.1",
     "husky": "^9.1.7",
     "jsdom": "^27.0.0",
+    "playwright": "^1.56.1",
     "postcss": "^8",
     "shadcn": "^3.0.0",
+    "storybook": "^10.0.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "vite-tsconfig-paths": "^5.1.4",
