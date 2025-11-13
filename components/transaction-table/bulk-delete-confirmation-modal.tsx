@@ -1,7 +1,5 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { AlertTriangle, Trash2 } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,17 +9,19 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { TransactionService } from "@/services/transaction.service"
-import { RecurringTransactionService } from "@/services/recurring-transaction.service"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { RecurringTransactionService } from "@/services/recurring-transaction.service";
+import { TransactionService } from "@/services/transaction.service";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 interface BulkDeleteConfirmationModalProps<T = ResponseGetTransactions> {
-  selectedIds: string[]
-  transactions: T[]
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: () => Promise<void>
+  selectedIds: string[];
+  transactions: T[];
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => Promise<void>;
 }
 
 export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
@@ -31,29 +31,25 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
   onClose,
   onSuccess,
 }: BulkDeleteConfirmationModalProps<T>) {
-  const [isDeleting, setIsDeleting] = useState(false)
-  const { toast } = useToast()
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
 
-  // Função para obter o ID correto (recurrent_transaction_id para transações virtuais)
   const getItemId = (item: T): string => {
     const transaction = item as unknown as ResponseGetTransactions;
-    return transaction.is_virtual && transaction.recurrent_transaction_id 
-      ? transaction.recurrent_transaction_id 
+    return transaction.is_virtual && transaction.recurrent_transaction_id
+      ? transaction.recurrent_transaction_id
       : transaction.id;
   };
 
-  // Separar transações por tipo baseado nos IDs selecionados
   const getTransactionGroups = () => {
     const recurringIds: string[] = [];
     const regularIds: string[] = [];
 
-    selectedIds.forEach(selectedId => {
-      // Encontrar a transação correspondente
-      const transaction = transactions.find(t => getItemId(t) === selectedId);
-      
+    selectedIds.forEach((selectedId) => {
+      const transaction = transactions.find((t) => getItemId(t) === selectedId);
+
       if (transaction) {
         const tx = transaction as unknown as ResponseGetTransactions;
-        // Se é uma transação virtual ou foi gerada por transação recorrente
         if (tx.is_virtual || tx.is_recurring_generated) {
           recurringIds.push(selectedId);
         } else {
@@ -66,19 +62,21 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
   };
 
   const handleDelete = async () => {
-    if (selectedIds.length === 0) return
+    if (selectedIds.length === 0) return;
 
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
       const { recurringIds, regularIds } = getTransactionGroups();
       let totalSucceeded = 0;
       let totalFailed = 0;
       let totalProcessed = 0;
 
-      // Processar transações recorrentes
       if (recurringIds.length > 0) {
         try {
-          const recurringResponse = await RecurringTransactionService.bulkDeleteRecurringTransactions(recurringIds);
+          const recurringResponse =
+            await RecurringTransactionService.bulkDeleteRecurringTransactions(
+              recurringIds
+            );
           totalSucceeded += recurringResponse.summary.succeeded;
           totalFailed += recurringResponse.summary.failed;
           totalProcessed += recurringResponse.summary.total;
@@ -89,10 +87,10 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
         }
       }
 
-      // Processar transações regulares
       if (regularIds.length > 0) {
         try {
-          const regularResponse = await TransactionService.bulkDeleteTransactions(regularIds);
+          const regularResponse =
+            await TransactionService.bulkDeleteTransactions(regularIds);
           totalSucceeded += regularResponse.summary.succeeded;
           totalFailed += regularResponse.summary.failed;
           totalProcessed += regularResponse.summary.total;
@@ -103,12 +101,11 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
         }
       }
 
-      // Mostrar feedback consolidado
       if (totalSucceeded > 0) {
         toast({
           title: "Deleção concluída",
           description: `${totalSucceeded} de ${totalProcessed} transações foram excluídas com sucesso.`,
-        })
+        });
       }
 
       if (totalFailed > 0) {
@@ -116,44 +113,55 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
           title: "Algumas deleções falharam",
           description: `${totalFailed} transações não puderam ser excluídas. Verifique os detalhes.`,
           variant: "destructive",
-        })
+        });
       }
 
-      await onSuccess()
-      onClose()
+      await onSuccess();
+      onClose();
     } catch (error) {
-      console.error("Erro na deleção em massa:", error)
+      console.error("Erro na deleção em massa:", error);
       toast({
         title: "Erro na deleção",
-        description: "Ocorreu um erro ao excluir as transações. Tente novamente.",
+        description:
+          "Ocorreu um erro ao excluir as transações. Tente novamente.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   const getTitle = () => {
     const { recurringIds, regularIds } = getTransactionGroups();
-    
+
     if (recurringIds.length > 0 && regularIds.length > 0) {
       return `Excluir ${selectedIds.length} transações (${recurringIds.length} recorrentes + ${regularIds.length} regulares)?`;
     } else if (recurringIds.length > 0) {
-      return `Excluir ${recurringIds.length} transação${recurringIds.length > 1 ? "ões" : ""} recorrente${recurringIds.length > 1 ? "s" : ""}?`;
+      return `Excluir ${recurringIds.length} ${
+        recurringIds.length > 1 ? "transações" : "transação"
+      } recorrente${recurringIds.length > 1 ? "s" : ""}?`;
     } else {
-      return `Excluir ${regularIds.length} transação${regularIds.length > 1 ? "ões" : ""}?`;
+      return `Excluir ${regularIds.length} ${
+        regularIds.length > 1 ? "transações" : "transação"
+      }?`;
     }
   };
 
   const getDescription = () => {
     const { recurringIds, regularIds } = getTransactionGroups();
-    
+
     if (recurringIds.length > 0 && regularIds.length > 0) {
       return `Esta ação irá excluir ${recurringIds.length} transações recorrentes e ${regularIds.length} transações regulares. As transações reais já criadas permanecerão intactas, mas novas transações virtuais não serão mais geradas. Esta ação não pode ser desfeita.`;
     } else if (recurringIds.length > 0) {
-      return `Esta ação irá excluir ${recurringIds.length} transação${recurringIds.length > 1 ? "ões" : ""} recorrente${recurringIds.length > 1 ? "s" : ""}. As transações reais já criadas permanecerão intactas, mas novas transações virtuais não serão mais geradas. Esta ação não pode ser desfeita.`;
+      return `Esta ação irá excluir ${recurringIds.length} ${
+        recurringIds.length > 1 ? "transações" : "transação"
+      } recorrente${
+        recurringIds.length > 1 ? "s" : ""
+      }. As transações reais já criadas permanecerão intactas, mas novas transações virtuais não serão mais geradas. Esta ação não pode ser desfeita.`;
     } else {
-      return `Esta ação irá excluir permanentemente ${regularIds.length} transação${regularIds.length > 1 ? "ões" : ""}. Se alguma transação for a última vinculada a uma transação recorrente, a transação recorrente órfã também será excluída automaticamente. Esta ação não pode ser desfeita.`;
+      return `Esta ação irá excluir permanentemente ${regularIds.length} ${
+        regularIds.length > 1 ? "transações" : "transação"
+      }. Se alguma transação for a última vinculada a uma transação recorrente, a transação recorrente órfã também será excluída automaticamente. Esta ação não pode ser desfeita.`;
     }
   };
 
@@ -182,10 +190,7 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
         </div>
 
         <AlertDialogFooter className="gap-2">
-          <AlertDialogCancel 
-            disabled={isDeleting}
-            className="flex-1"
-          >
+          <AlertDialogCancel disabled={isDeleting} className="flex-1">
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction
@@ -208,5 +213,5 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
