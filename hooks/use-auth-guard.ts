@@ -13,7 +13,6 @@ export function useAuthGuard(redirectTo: string = '/sign-in') {
   useEffect(() => {
     if (loading) return;
 
-    // Se não há usuário e não há sessão válida, redireciona
     if (!user && !isSessionValid()) {
       router.push(redirectTo);
     }

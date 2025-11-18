@@ -21,15 +21,12 @@ export const useErrorHandler = () => {
         fallbackMessage = "Ocorreu um erro inesperado",
       } = options;
 
-      // Normalizar o erro
       const normalizedError = error instanceof Error ? error : new Error(String(error));
       
-      // Log do erro
       if (logError) {
         logUIError(normalizedError);
       }
 
-      // Mostrar toast de erro
       if (showToast) {
         toast({
           title: "Erro",

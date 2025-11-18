@@ -1,31 +1,32 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname } = request.nextUrl;
+  const publicRoutes = [
+    "/sign-in",
+    "/sign-up",
+    "/forgot-password",
+    "/reset-password",
+    "/confirm-email",
+  ];
+  const isPublicRoute = publicRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
 
-  // Rotas que não precisam de autenticação
-  const publicRoutes = ['/sign-in', '/sign-up', '/forgot-password', '/reset-password', '/confirm-email']
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
-
-  // Se for rota pública, permite acesso
   if (isPublicRoute) {
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
-  // Verifica se há token nos cookies
-  const token = request.cookies.get('split-money-token')?.value
+  const token = request.cookies.get("split-money-token")?.value;
 
-  // Se não há token nos cookies, redireciona para login
   if (!token) {
-    return NextResponse.redirect(new URL('/sign-in', request.url))
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-}
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};

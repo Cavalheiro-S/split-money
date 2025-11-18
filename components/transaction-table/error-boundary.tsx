@@ -58,7 +58,6 @@ export const TransactionTableErrorBoundary: React.FC<TransactionTableErrorBounda
       fallback={TransactionTableErrorFallback}
       onError={(error, errorInfo) => {
         console.error("Transaction table error:", error, errorInfo);
-        // Aqui você pode enviar para serviços de monitoramento
       }}
     >
       {children}

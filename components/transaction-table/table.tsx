@@ -67,7 +67,6 @@ function TransactionTable({
     [data, searchTerm]
   );
 
-  // Função utilitária para obter o ID correto (recurrent_transaction_id para transações virtuais)
   const getItemId = (item: ResponseGetTransactions): string => {
     return item.is_virtual && item.recurrent_transaction_id 
       ? item.recurrent_transaction_id 

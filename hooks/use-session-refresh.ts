@@ -46,7 +46,6 @@ export function useSessionRefresh() {
       
       const data = await response.json();
       if (data.accessToken && user) {
-        const newExpiresAt = Date.now() + (24 * 60 * 60 * 1000);
         console.log('Token renovado com sucesso');
       }
     } catch (error) {

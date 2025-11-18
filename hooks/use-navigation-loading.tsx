@@ -8,10 +8,9 @@ export function useNavigationLoading() {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Para a loading state quando a rota muda
     const timer = setTimeout(() => {
       setIsLoading(false)
-    }, 100) // Pequeno delay para evitar flicker
+    }, 100)
 
     return () => clearTimeout(timer)
   }, [pathname])

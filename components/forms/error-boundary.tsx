@@ -60,7 +60,6 @@ export const FormErrorBoundary: React.FC<FormErrorBoundaryProps> = ({
       fallback={FormErrorFallback}
       onError={(error, errorInfo) => {
         console.error(`Form error (${formName}):`, error, errorInfo);
-        // Aqui você pode enviar para serviços de monitoramento
       }}
     >
       {children}

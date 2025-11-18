@@ -16,12 +16,10 @@ export function LoadingLink({ href, children, onClick, className, ...props }: Lo
   const pathname = usePathname()
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // Só ativa loading se estiver navegando para uma página diferente
     if (href !== pathname) {
       startLoading()
     }
     
-    // Chama o onClick original se existir
     onClick?.(e)
   }
 

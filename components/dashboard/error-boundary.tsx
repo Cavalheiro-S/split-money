@@ -1,7 +1,13 @@
 "use client";
 
 import { ErrorBoundary } from "@/components/error-boundary";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw, TrendingUp } from "lucide-react";
 
@@ -37,14 +43,14 @@ const DashboardErrorFallback: React.FC<DashboardErrorFallbackProps> = ({
               </pre>
             </details>
           )}
-          
+
           <Button onClick={resetError} className="w-full">
             <RefreshCw className="mr-2 h-4 w-4" />
             Tentar novamente
           </Button>
         </CardContent>
       </Card>
-      
+
       {/* Placeholder para manter layout */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -80,7 +86,6 @@ export const DashboardErrorBoundary: React.FC<DashboardErrorBoundaryProps> = ({
       fallback={DashboardErrorFallback}
       onError={(error, errorInfo) => {
         console.error("Dashboard error:", error, errorInfo);
-        // Aqui você pode enviar para serviços de monitoramento
       }}
     >
       {children}
