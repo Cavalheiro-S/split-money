@@ -58,6 +58,7 @@ export const MonthPicker = ({ onChange }: MonthPickerProps) => {
             onValueChange={(value) => {
               setYear(Number(value));
               setDate(new Date(Number(value), month, 1));
+              onChange?.(new Date(Number(value), month, 1));
             }}
             value={year.toString()}
           >
