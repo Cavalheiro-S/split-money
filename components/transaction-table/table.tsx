@@ -67,15 +67,9 @@ function TransactionTable({
     [data, searchTerm]
   );
 
-  const getItemId = (item: ResponseGetTransactions): string => {
-    return item.is_virtual && item.recurrent_transaction_id 
-      ? item.recurrent_transaction_id 
-      : item.id;
-  };
-
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const selectableIds = filteredData.map((item) => getItemId(item));
+      const selectableIds = filteredData.map((item) => item.id);
       onSelectionChange?.(selectableIds);
     } else {
       onSelectionChange?.([]);
@@ -83,7 +77,7 @@ function TransactionTable({
   };
 
   const handleSelectItem = (item: ResponseGetTransactions, checked: boolean) => {
-    const itemId = getItemId(item);
+    const itemId = item.id;
       
     if (checked) {
       onSelectionChange?.([...selectedIds, itemId]);
@@ -97,13 +91,13 @@ function TransactionTable({
   const isAllSelected = useMemo(() => {
     return (
       filteredData.length > 0 &&
-      filteredData.every((item) => selectedIds.includes(getItemId(item)))
+      filteredData.every((item) => selectedIds.includes(item.id))
     );
   }, [filteredData, selectedIds]);
 
   const isIndeterminate = useMemo(() => {
     const selectedCount = filteredData.filter((item) => 
-      selectedIds.includes(getItemId(item))
+      selectedIds.includes(item.id)
     ).length;
     return selectedCount > 0 && selectedCount < filteredData.length;
   }, [filteredData, selectedIds]);
@@ -356,7 +350,7 @@ function TransactionTable({
                     {enableBulkSelection && (
                       <TableCell className="text-center">
                         <Checkbox
-                          checked={selectedIds.includes(getItemId(item))}
+                          checked={selectedIds.includes(item.id)}
                           onCheckedChange={(checked: boolean) =>
                             handleSelectItem(item, checked)
                           }

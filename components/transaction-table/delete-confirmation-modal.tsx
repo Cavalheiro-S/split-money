@@ -11,6 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { RecurringTransactionService } from "@/services/recurring-transaction.service";
 import { TransactionService } from "@/services/transaction.service";
 import { DollarSign, Landmark, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -36,7 +37,13 @@ export function DeleteTransactionConfirmationModal({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await TransactionService.deleteTransaction(transaction.id);
+      if (transaction.is_virtual && transaction.recurrent_transaction_id) {
+        await RecurringTransactionService.deleteRecurringTransaction(
+          transaction.recurrent_transaction_id
+        );
+      } else {
+        await TransactionService.deleteTransaction(transaction.id);
+      }
       toast.success("Transação excluída com sucesso");
       await onDeleteSuccess?.();
       onOpenChange?.(false);
@@ -49,9 +56,9 @@ export function DeleteTransactionConfirmationModal({
   };
 
   const formatCurrency = (amount: number) => {
-    return amount.toLocaleString("pt-BR", { 
-      style: "currency", 
-      currency: "BRL" 
+    return amount.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     });
   };
 
@@ -80,9 +87,7 @@ export function DeleteTransactionConfirmationModal({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogTrigger asChild>
-        {trigger}
-      </AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2 text-red-600">
@@ -90,7 +95,8 @@ export function DeleteTransactionConfirmationModal({
             Confirmar exclusão
           </AlertDialogTitle>
           <AlertDialogDescription className="text-left">
-            Você tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.
+            Você tem certeza que deseja excluir esta transação? Esta ação não
+            pode ser desfeita.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -100,41 +106,49 @@ export function DeleteTransactionConfirmationModal({
             <div className="flex-1">
               <p className="font-medium text-sm">{transaction.description}</p>
               <p className="text-xs text-gray-600">
-                {getTypeLabel(transaction.type)} • {formatDate(transaction.date)}
+                {getTypeLabel(transaction.type)} •{" "}
+                {formatDate(transaction.date)}
               </p>
             </div>
           </div>
-          
+
           <div className="border-t pt-3 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Valor:</span>
-              <span className={`font-medium ${
-                transaction.type === "income" ? "text-green-600" : "text-red-600"
-              }`}>
-                {transaction.type === "income" ? "+" : "-"}{formatCurrency(transaction.amount)}
+              <span
+                className={`font-medium ${
+                  transaction.type === "income"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {transaction.type === "income" ? "+" : "-"}
+                {formatCurrency(transaction.amount)}
               </span>
             </div>
-            
+
             {transaction.categories && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Categoria:</span>
-                <span className="font-medium">{transaction.categories.description}</span>
+                <span className="font-medium">
+                  {transaction.categories.description}
+                </span>
               </div>
             )}
-            
+
             {transaction.payment_status && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Status:</span>
-                <span className="font-medium">{transaction.payment_status.description}</span>
+                <span className="font-medium">
+                  {transaction.payment_status.description}
+                </span>
               </div>
             )}
           </div>
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
-            Cancelar
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
           <Button
             onClick={handleDelete}
             disabled={isDeleting}
