@@ -1,23 +1,16 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/sonner";
+import ClarityTag from "@/components/clarity";
+import { SessionInitializer } from "@/components/session-initializer";
+import { NavigationLoader } from "@/components/navigation-loader";
+import { QueryProvider } from "@/providers/query-provider";
 import { UserProvider } from "@/contexts/user-context";
 import { NavigationLoadingProvider } from "@/contexts/navigation-loading-context";
-import { NavigationLoader } from "@/components/navigation-loader";
-import ClarityProvider from '@/components/clarity';
-import { SessionInitializer } from "@/components/session-initializer";
-
-const poppinsSans = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
-});
 
 export const metadata: Metadata = {
   title: "Split Money",
-  description: "Aplication to control your transactions",
+  description: "Gerencie suas despesas compartilhadas",
 };
 
 export default function RootLayout({
@@ -25,26 +18,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const projectId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
-  const isProduction = process.env.NODE_ENV === "production";
-  
   return (
-    <html lang="pt-br">
-      <body
-        className={`${poppinsSans.variable} antialiased`}
-      >
-        <NavigationLoadingProvider>
-          <UserProvider>
-            <SessionInitializer />
-            {children}
-          </UserProvider>
-          <NavigationLoader />
-          <Toaster />
-          <SonnerToaster />
-        </NavigationLoadingProvider>
-        {isProduction && projectId && <ClarityProvider projectId={projectId} />}
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <ClarityTag />
+      </head>
+      <body className="antialiased">
+        <UserProvider>
+          <NavigationLoadingProvider>
+            <QueryProvider>
+              <SessionInitializer />
+              <NavigationLoader />
+              {children}
+              <Toaster />
+            </QueryProvider>
+          </NavigationLoadingProvider>
+        </UserProvider>
       </body>
     </html>
   );
 }
-

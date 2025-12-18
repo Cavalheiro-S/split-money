@@ -1,17 +1,11 @@
 "use client";
 import { TableTransaction } from "@/components/transaction-table";
 import { Button } from "@/components/ui/button";
-import {
-  type TransactionFilters,
-  TransactionService,
-} from "@/services/transaction.service";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useTransactions } from "@/hooks/queries";
+import { type TransactionFilters } from "@/services/transaction.service";
+import { useState } from "react";
 
 export default function Page() {
-  const [transactions, setTransactions] = useState<ResponseGetTransactions[]>(
-    []
-  );
   const [modalTransactionOpen, setModalTransactionOpen] = useState(false);
   const [transactionSelected, setTransactionSelected] = useState<
     ResponseGetTransactions | undefined
@@ -34,27 +28,13 @@ export default function Page() {
     },
   });
 
-  const [loading, setLoading] = useState(true);
+  const { data: transactionsData, isLoading: loading } = useTransactions(
+    pagination,
+    filters
+  );
 
-  const getTransactions = async (
-    pagination: Pagination,
-    filters: TransactionFilters
-  ) => {
-    try {
-      setLoading(true);
-      const data = await TransactionService.getTransactions(
-        pagination,
-        filters
-      );
-      setTransactions(data.data);
-      setPagination(data.pagination);
-    } catch (error) {
-      toast.error("Falha ao buscar transações");
-      console.log({ error });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const transactions = transactionsData?.data || [];
+  const paginationData = transactionsData?.pagination || pagination;
 
   const handleEdit = (id: string) => {
     setModalTransactionOpen(true);
@@ -65,23 +45,12 @@ export default function Page() {
   };
 
   const handleDeleteSuccess = async () => {
-    await getTransactions(pagination, filters);
     setSelectedIds([]);
   };
 
   const handleClearSelection = () => {
     setSelectedIds([]);
   };
-
-  useEffect(() => {
-    getTransactions(pagination, filters);
-  }, []);
-
-  useEffect(() => {
-    if (!modalTransactionOpen) {
-      setTransactionSelected(undefined);
-    }
-  }, [modalTransactionOpen]);
 
   const totalAmount = transactions.reduce((acc, item) => {
     return item.type === "income" ? acc + item.amount : acc - item.amount;
@@ -96,18 +65,20 @@ export default function Page() {
           totalTransactions={transactions.length}
           totalAmount={totalAmount}
           onChangeDate={(date) => {
-            const newFilters = { ...filters, date };
-            const newPagination = { ...pagination, page: 1 };
-            getTransactions(newPagination, newFilters);
-            setPagination(newPagination);
+            setFilters({ ...filters, date });
+            setPagination({ ...pagination, page: 1 });
             setDate(date);
           }}
         >
           <TableTransaction.ActionModal
             transaction={transactionSelected}
             open={modalTransactionOpen}
-            onOpenChange={(open) => setModalTransactionOpen(open)}
-            updateData={() => getTransactions(pagination, filters)}
+            onOpenChange={(open) => {
+              if (!open) {
+                setTransactionSelected(undefined);
+              }
+              setModalTransactionOpen(open);
+            }}
             trigger={
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 Adicionar Transação
@@ -131,11 +102,9 @@ export default function Page() {
           data={transactions}
           loading={loading}
           onDeleteSuccess={handleDeleteSuccess}
-          onChangeFilters={(filters) => {
-            const newPagination = { ...pagination, page: 1 };
-            setPagination(newPagination);
-            setFilters(filters);
-            getTransactions(newPagination, filters);
+          onChangeFilters={(newFilters) => {
+            setPagination({ ...pagination, page: 1 });
+            setFilters(newFilters);
           }}
           filters={filters}
           showSearch={true}
@@ -144,19 +113,15 @@ export default function Page() {
           onSelectionChange={setSelectedIds}
         />
         <TableTransaction.Pagination
-          page={pagination.page}
-          totalPages={pagination.totalPages}
-          limit={pagination.limit}
-          totalItems={pagination.total}
+          page={paginationData.page}
+          totalPages={paginationData.totalPages}
+          limit={paginationData.limit}
+          totalItems={paginationData.total}
           onChange={(page) => {
-            const newPagination = { ...pagination, page };
-            setPagination(newPagination);
-            getTransactions(newPagination, filters);
+            setPagination({ ...paginationData, page });
           }}
           onChangeLimit={(limit) => {
-            const newPagination = { ...pagination, limit };
-            setPagination(newPagination);
-            getTransactions(newPagination, filters);
+            setPagination({ ...paginationData, limit, page: 1 });
           }}
           filteredDataLength={transactions.length}
           showAlways

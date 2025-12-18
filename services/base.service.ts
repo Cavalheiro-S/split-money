@@ -1,12 +1,22 @@
 import { DELETE_CONFLICT_MESSAGES } from "@/enums/exceptions/delete-conflicts";
 import { ApiConflictError, ApiErrorResponse } from "@/lib/errors";
 import { fetchWithAuth } from "@/utils/data";
+import { globalRateLimiter } from "@/lib/rate-limiter";
 
 export class ApiService {
   protected static async request<T>(
     endpoint: string,
     options?: RequestInit
   ): Promise<T> {
+    // Verifica rate limit
+    if (!globalRateLimiter.canMakeRequest(endpoint)) {
+      const timeUntilReset = globalRateLimiter.getTimeUntilReset(endpoint);
+      const secondsUntilReset = Math.ceil(timeUntilReset / 1000);
+      throw new Error(
+        `Muitas requisições. Aguarde ${secondsUntilReset} segundos e tente novamente.`
+      );
+    }
+
     try {
       const response = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`,

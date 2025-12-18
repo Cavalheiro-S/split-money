@@ -1,105 +1,79 @@
 "use client";
 
 import { TableTransaction } from "@/components/transaction-table";
-import { TransactionService } from "@/services/transaction.service";
-import { useCallback, useEffect, useState } from "react";
+import { useTransactions } from "@/hooks/queries";
+import { useState } from "react";
 
 export default function Page() {
-  const [incomes, setIncomes] = useState<ResponseGetTransactions[]>([]);
-  const [outcomes, setOutcomes] = useState<ResponseGetTransactions[]>([]);
-  const [loadingIncome, setLoadingIncome] = useState(false);
-  const [loadingOutcome, setLoadingOutcome] = useState(false);
   const [dateIncome, setDateIncome] = useState<Date>(new Date());
   const [dateOutcome, setDateOutcome] = useState<Date>(new Date());
   const [paginationIncome, setPaginationIncome] = useState<Pagination>({
     page: 1,
+    limit: 10,
     totalPages: 1,
     total: 0,
-    limit: 10,
   });
   const [paginationOutcome, setPaginationOutcome] = useState<Pagination>({
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    total: 0,
+  });
+
+  const { data: incomesData, isLoading: loadingIncome } = useTransactions(
+    paginationIncome,
+    {
+      date: dateIncome,
+      type: "income",
+    }
+  );
+
+  const { data: outcomesData, isLoading: loadingOutcome } = useTransactions(
+    paginationOutcome,
+    {
+      date: dateOutcome,
+      type: "outcome",
+    }
+  );
+
+  const incomes = incomesData?.data || [];
+  const incomePagination = incomesData?.pagination || {
     page: 1,
     totalPages: 1,
     total: 0,
     limit: 10,
-  });
+  };
 
-  const getIncomes = useCallback(
-    async (paginationIncome: Pagination, dateIncome: Date) => {
-      try {
-        setLoadingIncome(true);
-        const data = await TransactionService.getTransactions(
-          paginationIncome,
-          {
-            date: dateIncome,
-            type: "income",
-          }
-        );
-        setIncomes(data.data);
-        setPaginationIncome(data.pagination);
-      } catch (error) {
-        console.log({ error });
-      } finally {
-        setLoadingIncome(false);
-      }
-    },
-    []
-  );
-
-  const getOutcomes = useCallback(
-    async (paginationOutcome: Pagination, dateOutcome: Date) => {
-      try {
-        setLoadingOutcome(true);
-        const data = await TransactionService.getTransactions(
-          paginationOutcome,
-          {
-            date: dateOutcome,
-            type: "outcome",
-          }
-        );
-        setOutcomes(data.data);
-        setPaginationOutcome(data.pagination);
-      } catch (error) {
-        console.log({ error });
-      } finally {
-        setLoadingOutcome(false);
-      }
-    },
-    []
-  );
-
-  useEffect(() => {
-    getIncomes(paginationIncome, dateIncome);
-  }, []);
-
-  useEffect(() => {
-    getOutcomes(paginationOutcome, dateOutcome);
-  }, []);
+  const outcomes = outcomesData?.data || [];
+  const outcomePagination = outcomesData?.pagination || {
+    page: 1,
+    totalPages: 1,
+    total: 0,
+    limit: 10,
+  };
 
   return (
     <>
       <TableTransaction.Container>
         <TableTransaction.Header
           onChangeDate={(date) => {
-            getIncomes(paginationIncome, date);
             setDateIncome(date);
+            setPaginationIncome({ ...paginationIncome, page: 1 }); // Reset para página 1
           }}
           title="Últimos lançamentos"
           subtitle="Aqui você pode ver os seus lançamentos recentes"
         />
         <TableTransaction.Table loading={loadingIncome} data={incomes} />
         <TableTransaction.Pagination
-          page={paginationIncome.page}
-          totalPages={paginationIncome.totalPages}
-          limit={paginationIncome.limit}
-          totalItems={paginationIncome.total}
+          page={incomePagination.page}
+          totalPages={incomePagination.totalPages}
+          limit={incomePagination.limit}
+          totalItems={incomePagination.total}
           onChange={(page) => {
-            const newPagination = { ...paginationIncome, page };
-            getIncomes(newPagination, dateIncome);
+            setPaginationIncome({ ...paginationIncome, page });
           }}
           onChangeLimit={(limit) => {
-            const newPagination = { ...paginationIncome, limit };
-            getIncomes(newPagination, dateIncome);
+            setPaginationIncome({ ...paginationIncome, limit, page: 1 });
           }}
           filteredDataLength={incomes.length}
           showAlways
@@ -109,8 +83,8 @@ export default function Page() {
       <TableTransaction.Container>
         <TableTransaction.Header
           onChangeDate={(date) => {
-            getOutcomes(paginationOutcome, date);
             setDateOutcome(date);
+            setPaginationOutcome({ ...paginationOutcome, page: 1 });
           }}
           type="outcome"
           title="Últimas despesas"
@@ -118,17 +92,15 @@ export default function Page() {
         />
         <TableTransaction.Table loading={loadingOutcome} data={outcomes} />
         <TableTransaction.Pagination
-          page={paginationOutcome.page}
-          totalPages={paginationOutcome.totalPages}
-          limit={paginationOutcome.limit}
-          totalItems={paginationOutcome.total}
+          page={outcomePagination.page}
+          totalPages={outcomePagination.totalPages}
+          limit={outcomePagination.limit}
+          totalItems={outcomePagination.total}
           onChange={(page) => {
-            const newPagination = { ...paginationOutcome, page };
-            getOutcomes(newPagination, dateOutcome);
+            setPaginationOutcome({ ...paginationOutcome, page });
           }}
           onChangeLimit={(limit) => {
-            const newPagination = { ...paginationOutcome, limit };
-            getOutcomes(newPagination, dateOutcome);
+            setPaginationOutcome({ ...paginationOutcome, limit, page: 1 });
           }}
           filteredDataLength={outcomes.length}
           showAlways
