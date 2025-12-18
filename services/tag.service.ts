@@ -7,22 +7,22 @@ export class TagService extends ApiService {
         );
     }
 
-    static async createTag(description: string) {
+    static async createTag(data: RequestCreateTag) {
         return this.request<{ message: string; data: Tag }>(
             "/tag",
             {
                 method: "POST",
-                body: JSON.stringify({ description }),
+                body: JSON.stringify(data),
             }
         );
     }
 
-    static async updateTag(description: string, id: string) {
+    static async updateTag(data: RequestUpdateTag) {
         return this.request<{ message: string; data: Tag }>(
-            `/tag/${id}`,
+            `/tag/${data.id}`,
             {
                 method: "PATCH",
-                body: JSON.stringify({ description }),
+                body: JSON.stringify({ description: data.description }),
             }
         );
     }

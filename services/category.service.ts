@@ -7,22 +7,22 @@ export class CategoryService extends ApiService {
         );
     }
 
-    static async createCategory(description: string) {
+    static async createCategory(data: RequestCreateCategory) {
         return this.request<{ message: string; data: Category }>(
             "/category",
             {
                 method: "POST",
-                body: JSON.stringify({ description }),
+                body: JSON.stringify(data),
             }
         );
     }
 
-    static async updateCategory(description: string, id: string) {
+    static async updateCategory(data: RequestUpdateCategory) {
         return this.request<{ message: string; data: Category }>(
-            `/category/${id}`,
+            `/category/${data.id}`,
             {
                 method: "PATCH",
-                body: JSON.stringify({ description }),
+                body: JSON.stringify({ description: data.description }),
             }
         );
     }
