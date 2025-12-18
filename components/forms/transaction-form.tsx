@@ -7,30 +7,44 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, Info, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Switch } from "../ui/switch";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 const schema = z.object({
   description: z
     .string({ message: "A descrição é obrigatória" })
     .nonempty("A descrição é obrigatória"),
-  type: z
-    .enum(["income", "outcome"], { message: "O tipo é obrigatório" }),
-  date: z
-    .coerce
-    .date()
-    .default(() => new Date())
-  ,
+  type: z.enum(["income", "outcome"], { message: "O tipo é obrigatório" }),
+  date: z.coerce.date().default(() => new Date()),
   category: z
     .string({ message: "A categoria é obrigatória" })
     .nonempty("A categoria é obrigatória"),
@@ -46,7 +60,7 @@ const schema = z.object({
     })
     .optional(),
   paymentStatusId: z.string().optional(),
-})
+});
 
 export type TransactionFormData = z.infer<typeof schema>;
 
@@ -57,11 +71,15 @@ interface TransactionFormProps {
   updateData?: () => Promise<void>;
 }
 
-export function TransactionForm({ transaction, onOpenChange, updateData }: TransactionFormProps) {
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [isDataLoaded, setIsDataLoaded] = useState(false)
+export function TransactionForm({
+  transaction,
+  onOpenChange,
+  updateData,
+}: TransactionFormProps) {
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(schema),
@@ -73,111 +91,135 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
       recurrent: {
         active: false,
         frequency: "daily",
-        quantity: 1
+        quantity: 1,
       },
-      paymentStatusId: ""
+      paymentStatusId: "",
     },
   });
 
-  const { setValue, reset, watch, formState: { isSubmitting } } = form
+  const {
+    setValue,
+    reset,
+    watch,
+    formState: { isSubmitting },
+  } = form;
 
   // Carrega os dados da transação quando disponível e quando as listas estão carregadas
   useEffect(() => {
     if (transaction && isDataLoaded) {
-      setValue("amount", transaction.amount)
-      setValue("category", transaction.categories?.id || "")
-      setValue("date", new Date(transaction.date))
-      setValue("description", transaction.description)
-      setValue("recurrent", { active: false, frequency: "daily", quantity: 1 })
-      setValue("type", transaction.type)
-      setValue("paymentStatusId", transaction.payment_status?.id || "")
+      setValue("amount", transaction.amount);
+      setValue("category", transaction.categories?.id || "");
+      setValue("date", new Date(transaction.date));
+      setValue("description", transaction.description);
+      setValue("recurrent", { active: false, frequency: "daily", quantity: 1 });
+      setValue("type", transaction.type);
+      setValue("paymentStatusId", transaction.payment_status?.id || "");
+    } else if (!transaction) {
+      reset();
     }
-    else if (!transaction) {
-      reset()
-    }
-  }, [transaction, setValue, reset, isDataLoaded])
+  }, [transaction, setValue, reset, isDataLoaded]);
 
   const getCategories = async () => {
     try {
-      setIsLoading(true)
-      const res = await CategoryService.getCategories()
-      setCategories(res.data)
+      setIsLoading(true);
+      const res = await CategoryService.getCategories();
+      setCategories(res.data);
     } catch (error) {
-      toast.error("Erro ao carregar categorias")
-      console.error(error)
+      toast.error("Erro ao carregar categorias");
+      console.error(error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const getPaymentStatus = async () => {
     try {
-      setIsLoading(true)
-      const res = await PaymentStatusService.getPaymentStatus()
-      setPaymentStatus(res.data)
-    }
-    catch (error) {
-      toast.error("Erro ao carregar status de pagamento")
-      console.error(error)
+      setIsLoading(true);
+      const res = await PaymentStatusService.getPaymentStatus();
+      setPaymentStatus(res.data);
+    } catch (error) {
+      toast.error("Erro ao carregar status de pagamento");
+      console.error(error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    setIsLoading(true)
-    setIsDataLoaded(false)
-    Promise.all([
-      getPaymentStatus(),
-      getCategories()
-    ]).catch((error) => {
-      toast.error("Erro ao carregar dados")
-      console.error(error)
-    }).finally(() => {
-      setIsLoading(false)
-      setIsDataLoaded(true)
-    })
-  }, [])
+    setIsLoading(true);
+    setIsDataLoaded(false);
+    Promise.all([getPaymentStatus(), getCategories()])
+      .catch((error) => {
+        toast.error("Erro ao carregar dados");
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setIsDataLoaded(true);
+      });
+  }, []);
 
-  async function onSubmit(data: TransactionFormData) {
-    const action = transaction ? "atualizar" : "criar"
-    try {
-      setIsLoading(true)
-      const mapData: RequestCreateTransaction = {
-        ...data,
-        amount: data.amount,
-        recurrent: data.recurrent?.active
-          ? {
-            frequency: data.recurrent.frequency ?? TransactionFrequencyEnum.DAILY,
-            quantity: data.recurrent.quantity
-          }
-          : undefined,
-        paymentStatusId: data.paymentStatusId || undefined,
-        categoryId: data.category || undefined,
+  const onSubmit = useCallback(
+    async (data: TransactionFormData) => {
+      const action = transaction ? "atualizar" : "criar";
+      try {
+        setIsLoading(true);
+        const mapData: RequestCreateTransaction = {
+          ...data,
+          amount: data.amount,
+          recurrent: data.recurrent?.active
+            ? {
+                frequency:
+                  data.recurrent.frequency ?? TransactionFrequencyEnum.DAILY,
+                quantity: data.recurrent.quantity,
+              }
+            : undefined,
+          paymentStatusId: data.paymentStatusId || undefined,
+          categoryId: data.category || undefined,
+        };
+        if (transaction) {
+          await TransactionService.updateTransaction({
+            ...mapData,
+            id: transaction.id,
+          });
+          toast("Transação atualizada com sucesso");
+        } else {
+          await TransactionService.createTransaction(mapData);
+          toast("Transação criada com sucesso");
+        }
+        await updateData?.();
+        onOpenChange?.(false);
+      } catch (error) {
+        toast(`Falha ao ${action} transação`);
+        console.log({ error });
+      } finally {
+        setIsLoading(false);
       }
-      if (transaction) {
-        await TransactionService.updateTransaction({ ...mapData, id: transaction.id })
-        toast("Transação atualizada com sucesso")
+    },
+    [transaction, updateData, onOpenChange]
+  );
+
+  // Atalho de teclado para salvar (Ctrl+S / Cmd+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        if (!isSubmitting && !isLoading) {
+          form.handleSubmit(onSubmit)();
+        }
       }
-      else {
-        await TransactionService.createTransaction(mapData)
-        toast("Transação criada com sucesso")
-      }
-      await updateData?.()
-      onOpenChange?.(false)
-    }
-    catch (error) {
-      toast(`Falha ao ${action} transação`)
-      console.log({ error });
-    }
-    finally {
-      setIsLoading(false)
-    }
-  }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [form, isSubmitting, isLoading, onSubmit]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4 sm:space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-full space-y-4 sm:space-y-6"
+      >
         {/* Campos principais em grid responsivo */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <FormField
@@ -187,25 +229,30 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
               <FormItem className="md:col-span-2">
                 <FormLabel className="text-sm font-medium">Descrição</FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder="Ex: Salário, Aluguel, Compras..." 
+                  <Input
+                    placeholder="Ex: Salário, Aluguel, Compras..."
                     disabled={isLoading || isSubmitting}
                     className="h-10 sm:h-11 text-sm"
-                    {...field} 
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="type"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium">Tipo</FormLabel>
-                <Select disabled={isLoading || isSubmitting} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  disabled={isLoading || isSubmitting}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger className="h-10 sm:h-11 text-sm">
                       <SelectValue placeholder="Selecione um tipo" />
@@ -276,7 +323,9 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             name="date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel className="text-sm font-medium">Data da transação</FormLabel>
+                <FormLabel className="text-sm font-medium">
+                  Data da transação
+                </FormLabel>
                 <Popover modal={true}>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -303,9 +352,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date("1900-01-01")
-                      }
+                      disabled={(date) => date < new Date("1900-01-01")}
                       initialFocus
                     />
                   </PopoverContent>
@@ -324,7 +371,12 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium">Categoria</FormLabel>
-                <Select disabled={isLoading || isSubmitting} value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  disabled={isLoading || isSubmitting}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger className="h-10 sm:h-11 text-sm">
                       <SelectValue placeholder="Selecione uma categoria" />
@@ -350,11 +402,24 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
           name="paymentStatusId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium">Status de pagamento</FormLabel>
-              <Select value={field.value} disabled={isLoading || isSubmitting} onValueChange={field.onChange} defaultValue={field.value}>
+              <FormLabel className="text-sm font-medium">
+                Status de pagamento
+              </FormLabel>
+              <Select
+                value={field.value}
+                disabled={isLoading || isSubmitting}
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
                 <FormControl>
                   <SelectTrigger className="h-10 sm:h-11 text-sm">
-                    <SelectValue placeholder={isLoading ? "Carregando..." : "Selecione um status de pagamento"} />
+                    <SelectValue
+                      placeholder={
+                        isLoading
+                          ? "Carregando..."
+                          : "Selecione um status de pagamento"
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="z-50">
@@ -395,7 +460,7 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
               )}
             />
           </div>
-          
+
           {watch("recurrent.active") && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 pl-3 sm:pl-4 border-l-2 border-primary/20 bg-primary/5 rounded-r-lg p-3 sm:p-4">
               <FormField
@@ -404,44 +469,56 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex gap-2 items-center">
-                      <FormLabel className="text-sm font-medium">Frequência</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        Frequência
+                      </FormLabel>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Info className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <span>Frequência que a ocorrência vai acontecer</span>
+                            <span>
+                              Frequência que a ocorrência vai acontecer
+                            </span>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    <Select disabled={isLoading || isSubmitting} onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      disabled={isLoading || isSubmitting}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger className="h-10 sm:h-11 text-sm">
                           <SelectValue placeholder="Selecione uma frequência" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="z-50">
-                        {Object.entries(TransactionFrequencyEnum).map(([key, value]) => (
-                          <SelectItem key={key} value={key.toLowerCase()}>
-                            {value}
-                          </SelectItem>
-                        ))}
+                        {Object.entries(TransactionFrequencyEnum).map(
+                          ([key, value]) => (
+                            <SelectItem key={key} value={key.toLowerCase()}>
+                              {value}
+                            </SelectItem>
+                          )
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="recurrent.quantity"
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex gap-2 items-center">
-                      <FormLabel className="text-sm font-medium">Quantidade</FormLabel>
+                      <FormLabel className="text-sm font-medium">
+                        Quantidade
+                      </FormLabel>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -473,8 +550,8 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
 
         {/* Botão de envio com melhor posicionamento */}
         <div className="flex w-full justify-end pt-3 sm:pt-4 border-t border-gray-200">
-          <Button 
-            disabled={isSubmitting || isLoading} 
+          <Button
+            disabled={isSubmitting || isLoading}
             type="submit"
             size="lg"
             className="min-w-[100px] sm:min-w-[120px] h-10 sm:h-11 text-sm font-medium"
@@ -485,5 +562,5 @@ export function TransactionForm({ transaction, onOpenChange, updateData }: Trans
         </div>
       </form>
     </Form>
-  )
+  );
 }

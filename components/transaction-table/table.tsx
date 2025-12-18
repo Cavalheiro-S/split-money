@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 import { TransactionFilters } from "@/services/transaction.service";
 import {
@@ -20,7 +21,7 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -57,36 +58,45 @@ function TransactionTable({
   const [searchTerm, setSearchTerm] = useState("");
   const isMobile = useIsMobile();
 
+  // Debounce search para evitar filtrar a cada tecla digitada
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
   const filteredData = useMemo(
     () =>
       data?.filter(
         (item) =>
-          !searchTerm ||
-          item.description.toLowerCase().includes(searchTerm.toLowerCase())
+          !debouncedSearch ||
+          item.description.toLowerCase().includes(debouncedSearch.toLowerCase())
       ) || [],
-    [data, searchTerm]
+    [data, debouncedSearch]
   );
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const selectableIds = filteredData.map((item) => item.id);
-      onSelectionChange?.(selectableIds);
-    } else {
-      onSelectionChange?.([]);
-    }
-  };
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      if (checked) {
+        const selectableIds = filteredData.map((item) => item.id);
+        onSelectionChange?.(selectableIds);
+      } else {
+        onSelectionChange?.([]);
+      }
+    },
+    [filteredData, onSelectionChange]
+  );
 
-  const handleSelectItem = (item: ResponseGetTransactions, checked: boolean) => {
-    const itemId = item.id;
-      
-    if (checked) {
-      onSelectionChange?.([...selectedIds, itemId]);
-    } else {
-      onSelectionChange?.(
-        selectedIds.filter((selectedId) => selectedId !== itemId)
-      );
-    }
-  };
+  const handleSelectItem = useCallback(
+    (item: ResponseGetTransactions, checked: boolean) => {
+      const itemId = item.id;
+
+      if (checked) {
+        onSelectionChange?.([...selectedIds, itemId]);
+      } else {
+        onSelectionChange?.(
+          selectedIds.filter((selectedId) => selectedId !== itemId)
+        );
+      }
+    },
+    [selectedIds, onSelectionChange]
+  );
 
   const isAllSelected = useMemo(() => {
     return (
@@ -96,7 +106,7 @@ function TransactionTable({
   }, [filteredData, selectedIds]);
 
   const isIndeterminate = useMemo(() => {
-    const selectedCount = filteredData.filter((item) => 
+    const selectedCount = filteredData.filter((item) =>
       selectedIds.includes(item.id)
     ).length;
     return selectedCount > 0 && selectedCount < filteredData.length;
@@ -136,24 +146,42 @@ function TransactionTable({
     sort: NonNullable<TransactionFilters["sort"]>["sortBy"],
     style?: string
   ) => {
+    const isSorted = filters?.sort?.sortBy === sort;
+    const sortOrder = isSorted
+      ? filters?.sort?.sortOrder === "asc"
+        ? "ascending"
+        : "descending"
+      : "none";
+
     return (
       <TableHead
-        onClick={() =>
-          onChangeFilters?.({
-            ...filters,
-            sort: {
-              ...filters?.sort,
-              sortBy: sort,
-              sortOrder: filters?.sort?.sortOrder === "asc" ? "desc" : "asc",
-            },
-          })
-        }
-        className={cn("hover:bg-gray-300/30", style)}
+        aria-sort={sortOrder}
+        className={cn(isSorted && "bg-gray-100", style)}
       >
-        <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() =>
+            onChangeFilters?.({
+              ...filters,
+              sort: {
+                ...filters?.sort,
+                sortBy: sort,
+                sortOrder: filters?.sort?.sortOrder === "asc" ? "desc" : "asc",
+              },
+            })
+          }
+          className="flex items-center gap-2 w-full h-full hover:bg-gray-200/50 p-2 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label={`Ordenar por ${title} ${
+            isSorted
+              ? filters?.sort?.sortOrder === "asc"
+                ? "decrescente"
+                : "crescente"
+              : ""
+          }`}
+        >
           {renderSort(sort)}
-          {title}
-        </div>
+          <span>{title}</span>
+        </button>
       </TableHead>
     );
   };
@@ -256,6 +284,7 @@ function TransactionTable({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+            aria-label="Filtrar transações por descrição"
           />
           {searchTerm && (
             <Button
@@ -343,7 +372,7 @@ function TransactionTable({
                     className={cn(
                       item.type === "income"
                         ? "hover:bg-green-100/30"
-                        : "hover:bg-red-100/30",
+                        : "hover:bg-red-100/30"
                     )}
                     key={item.id}
                   >
@@ -441,7 +470,7 @@ function TransactionTable({
                             variant="ghost"
                             size="sm"
                             className={cn(
-                              "h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50",
+                              "h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                             )}
                             title={"Editar transação"}
                           >
@@ -456,7 +485,7 @@ function TransactionTable({
                                 variant="ghost"
                                 size="sm"
                                 className={cn(
-                                  "h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50",
+                                  "h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                 )}
                                 title={"Excluir transação"}
                               >
