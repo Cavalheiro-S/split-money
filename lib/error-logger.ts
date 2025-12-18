@@ -7,8 +7,8 @@ interface ErrorLog {
   url: string;
   userId?: string;
   sessionId?: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  category: 'ui' | 'api' | 'auth' | 'data' | 'network' | 'unknown';
+  severity: "low" | "medium" | "high" | "critical";
+  category: "ui" | "api" | "auth" | "data" | "network" | "unknown";
 }
 
 interface ErrorLoggerConfig {
@@ -24,12 +24,14 @@ class ErrorLogger {
   private sessionId: string;
   private userId?: string;
 
-  constructor(config: ErrorLoggerConfig = {
-    enableConsoleLog: true,
-    enableRemoteLogging: false,
-    enableUserTracking: false,
-    enableSessionTracking: true,
-  }) {
+  constructor(
+    config: ErrorLoggerConfig = {
+      enableConsoleLog: true,
+      enableRemoteLogging: false,
+      enableUserTracking: false,
+      enableSessionTracking: true,
+    }
+  ) {
     this.config = config;
     this.sessionId = this.generateSessionId();
   }
@@ -45,16 +47,17 @@ class ErrorLogger {
   private createErrorLog(
     error: Error,
     errorInfo?: React.ErrorInfo,
-    category: ErrorLog['category'] = 'unknown',
-    severity: ErrorLog['severity'] = 'medium'
+    category: ErrorLog["category"] = "unknown",
+    severity: ErrorLog["severity"] = "medium"
   ): ErrorLog {
     return {
       message: error.message,
       stack: error.stack || undefined,
       componentStack: errorInfo?.componentStack || undefined,
       timestamp: new Date().toISOString(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
-      url: typeof window !== 'undefined' ? window.location.href : 'server',
+      userAgent:
+        typeof window !== "undefined" ? window.navigator.userAgent : "server",
+      url: typeof window !== "undefined" ? window.location.href : "server",
       userId: this.config.enableUserTracking ? this.userId : undefined,
       sessionId: this.config.enableSessionTracking ? this.sessionId : undefined,
       severity,
@@ -65,26 +68,26 @@ class ErrorLogger {
   private logToConsole(errorLog: ErrorLog) {
     if (!this.config.enableConsoleLog) return;
 
-    const logMethod = errorLog.severity === 'critical' ? 'error' : 'warn';
-    
+    const logMethod = errorLog.severity === "critical" ? "error" : "warn";
+
     console.group(`🚨 Error Logger - ${errorLog.severity.toUpperCase()}`);
-    console[logMethod]('Message:', errorLog.message);
-    console[logMethod]('Category:', errorLog.category);
-    console[logMethod]('Timestamp:', errorLog.timestamp);
-    console[logMethod]('URL:', errorLog.url);
-    
+    console[logMethod]("Message:", errorLog.message);
+    console[logMethod]("Category:", errorLog.category);
+    console[logMethod]("Timestamp:", errorLog.timestamp);
+    console[logMethod]("URL:", errorLog.url);
+
     if (errorLog.stack) {
-      console[logMethod]('Stack:', errorLog.stack);
+      console[logMethod]("Stack:", errorLog.stack);
     }
-    
+
     if (errorLog.componentStack) {
-      console[logMethod]('Component Stack:', errorLog.componentStack);
+      console[logMethod]("Component Stack:", errorLog.componentStack);
     }
-    
+
     if (errorLog.userId) {
-      console[logMethod]('User ID:', errorLog.userId);
+      console[logMethod]("User ID:", errorLog.userId);
     }
-    
+
     console.groupEnd();
   }
 
@@ -93,65 +96,117 @@ class ErrorLogger {
 
     try {
       await fetch(this.config.remoteEndpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(errorLog),
       });
     } catch (remoteError) {
-      console.error('Failed to send error to remote logging service:', remoteError);
+      console.error(
+        "Failed to send error to remote logging service:",
+        remoteError
+      );
+    }
+  }
+
+  private async logToSentry(errorLog: ErrorLog, error: Error) {
+    // Apenas enviar para Sentry em produção
+    if (process.env.NODE_ENV !== "production") return;
+
+    try {
+      const Sentry = await import("@sentry/nextjs");
+
+      // Mapear categoria para tag
+      Sentry.setTag("error_category", errorLog.category);
+      Sentry.setTag("severity", errorLog.severity);
+
+      // Adicionar contexto de usuário
+      if (errorLog.userId) {
+        Sentry.setUser({ id: errorLog.userId });
+      }
+
+      // Adicionar contexto adicional
+      Sentry.setContext("error_details", {
+        url: errorLog.url,
+        userAgent: errorLog.userAgent,
+        sessionId: errorLog.sessionId,
+      });
+
+      // Mapear severity para Sentry level
+      const sentryLevel =
+        errorLog.severity === "critical"
+          ? "fatal"
+          : errorLog.severity === "high"
+          ? "error"
+          : errorLog.severity === "medium"
+          ? "warning"
+          : "info";
+
+      // Capturar exceção no Sentry
+      Sentry.captureException(error, {
+        level: sentryLevel,
+      });
+    } catch (sentryError) {
+      console.error("Failed to send error to Sentry:", sentryError);
     }
   }
 
   async logError(
     error: Error,
     errorInfo?: React.ErrorInfo,
-    category: ErrorLog['category'] = 'unknown',
-    severity: ErrorLog['severity'] = 'medium'
+    category: ErrorLog["category"] = "unknown",
+    severity: ErrorLog["severity"] = "medium"
   ) {
     const errorLog = this.createErrorLog(error, errorInfo, category, severity);
-    
+
     this.logToConsole(errorLog);
     await this.logToRemote(errorLog);
+    await this.logToSentry(errorLog, error);
   }
 
   // Métodos específicos para diferentes tipos de erro
   async logUIError(error: Error, errorInfo?: React.ErrorInfo) {
-    await this.logError(error, errorInfo, 'ui', 'medium');
+    await this.logError(error, errorInfo, "ui", "medium");
   }
 
   async logAPIError(error: Error, endpoint?: string) {
-    const enhancedError = new Error(`${error.message}${endpoint ? ` (Endpoint: ${endpoint})` : ''}`);
+    const enhancedError = new Error(
+      `${error.message}${endpoint ? ` (Endpoint: ${endpoint})` : ""}`
+    );
     enhancedError.stack = error.stack;
-    await this.logError(enhancedError, undefined, 'api', 'high');
+    await this.logError(enhancedError, undefined, "api", "high");
   }
 
   async logAuthError(error: Error) {
-    await this.logError(error, undefined, 'auth', 'high');
+    await this.logError(error, undefined, "auth", "high");
   }
 
   async logDataError(error: Error, operation?: string) {
-    const enhancedError = new Error(`${error.message}${operation ? ` (Operation: ${operation})` : ''}`);
+    const enhancedError = new Error(
+      `${error.message}${operation ? ` (Operation: ${operation})` : ""}`
+    );
     enhancedError.stack = error.stack;
-    await this.logError(enhancedError, undefined, 'data', 'high');
+    await this.logError(enhancedError, undefined, "data", "high");
   }
 
   async logNetworkError(error: Error, url?: string) {
-    const enhancedError = new Error(`${error.message}${url ? ` (URL: ${url})` : ''}`);
+    const enhancedError = new Error(
+      `${error.message}${url ? ` (URL: ${url})` : ""}`
+    );
     enhancedError.stack = error.stack;
-    await this.logError(enhancedError, undefined, 'network', 'medium');
+    await this.logError(enhancedError, undefined, "network", "medium");
   }
 
   async logCriticalError(error: Error, errorInfo?: React.ErrorInfo) {
-    await this.logError(error, errorInfo, 'unknown', 'critical');
+    await this.logError(error, errorInfo, "unknown", "critical");
   }
 }
 
 // Instância singleton
 export const errorLogger = new ErrorLogger({
-  enableConsoleLog: process.env.NODE_ENV === 'development',
-  enableRemoteLogging: process.env.NODE_ENV === 'production',
+  enableConsoleLog: process.env.NODE_ENV === "development",
+  enableRemoteLogging: process.env.NODE_ENV === "production",
   enableUserTracking: true,
   enableSessionTracking: true,
   // Configure seu endpoint de logging aqui
