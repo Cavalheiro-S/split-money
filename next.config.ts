@@ -19,8 +19,11 @@ export default withSentryConfig(nextConfig, {
   // Upload de source maps durante build
   widenClientFileUpload: true,
 
-  // Desabilitar o Sentry SDK durante build
-  disableLogger: true,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
 
   // Ocultar source maps
   sourcemaps: {
