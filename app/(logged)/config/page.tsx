@@ -20,20 +20,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PaymentStatusService } from "@/services/payment-status.service";
 import {
   useCategories,
   useDeleteCategory,
-  useTags,
+  useDeletePaymentStatus,
   useDeleteTag,
   usePaymentStatuses,
-  useDeletePaymentStatus,
+  useTags,
 } from "@/hooks/queries";
 import { format } from "date-fns";
 import { Cog, LoaderCircle, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { DialogNewStatus } from "./(components)/dialog-new-status";
+import { useState } from "react";
 import { DialogNewCategory } from "./(components)/dialog-new-category";
+import { DialogNewStatus } from "./(components)/dialog-new-status";
 import { DialogNewTag } from "./(components)/dialog-new-tag";
 
 export default function Page() {
