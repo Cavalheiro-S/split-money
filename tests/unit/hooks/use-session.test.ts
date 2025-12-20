@@ -124,7 +124,7 @@ describe('hooks/useSession', () => {
 
       const newSession = {
         accessToken: 'new-token',
-        user: { id: 'user-1', email: 'new@test.com', name: 'New User' },
+        user: { id: 'user-1', email: 'new@test.com', name: 'New User', createdAt: new Date(), updatedAt: new Date() },
         expiresAt: Date.now() + 3600000
       };
 
@@ -188,7 +188,7 @@ describe('hooks/useSession', () => {
 
       // Não deve lançar erro
       act(() => {
-        result.current.saveSession('token', { id: '1', name: 'Test', createdAt: new Date(), updatedAt: new Date() }, Date.now() + 1000);
+        result.current.saveSession('token', { id: '1', email: 'test@test.com', name: 'Test', createdAt: new Date(), updatedAt: new Date() }, Date.now() + 1000);
       });
 
       expect(console.error).toHaveBeenCalled();
@@ -391,7 +391,9 @@ describe('hooks/useSession', () => {
         user: {
           id: 'user-123',
           email: 'user@example.com',
-          name: 'John Doe'
+          name: 'John Doe',
+          createdAt: new Date(),
+          updatedAt: new Date()
         },
         expiresAt: Date.now() + 30 * 60 * 1000 // 30 minutos
       };
@@ -466,9 +468,9 @@ describe('hooks/useSession', () => {
       });
 
       act(() => {
-        result.current.saveSession('token1', { id: '1', name: 'User1' }, Date.now() + 1000);
-        result.current.saveSession('token2', { id: '2', name: 'User2' }, Date.now() + 2000);
-        result.current.saveSession('token3', { id: '3', name: 'User3' }, Date.now() + 3000);
+        result.current.saveSession('token1', { id: '1', email: 'user1@test.com', name: 'User1', createdAt: new Date(), updatedAt: new Date() }, Date.now() + 1000);
+        result.current.saveSession('token2', { id: '2', email: 'user2@test.com', name: 'User2', createdAt: new Date(), updatedAt: new Date() }, Date.now() + 2000);
+        result.current.saveSession('token3', { id: '3', email: 'user3@test.com', name: 'User3', createdAt: new Date(), updatedAt: new Date() }, Date.now() + 3000);
       });
 
       // Deve manter apenas a última sessão
