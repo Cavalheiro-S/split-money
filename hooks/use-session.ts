@@ -1,7 +1,14 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { getSession, setSession, clearSession, isSessionValid, SessionData } from '@/utils/session';
+import { STORAGE_KEYS } from "@/consts/storage";
+import {
+  clearSession,
+  getSession,
+  isSessionValid,
+  SessionData,
+  setSession,
+} from "@/utils/session";
+import { useEffect, useRef, useState } from "react";
 
 export function useSession() {
   const [session, setSessionState] = useState<SessionData | null>(null);
@@ -24,25 +31,26 @@ export function useSession() {
         clearSession();
       }
     } catch (error) {
-      console.error('Erro ao carregar sessão:', error);
+      console.error("Erro ao carregar sessão:", error);
       clearSession();
     } finally {
       setIsLoading(false);
     }
   };
 
-  const saveSession = (accessToken: string, user: any, expiresAt: number) => {
+  const saveSession = (accessToken: string, user: User, expiresAt: number) => {
     try {
       const sessionData: SessionData = {
         accessToken,
         user,
-        expiresAt
+        expiresAt,
       };
-      
+
       setSession(sessionData);
       setSessionState(sessionData);
+      localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(sessionData));
     } catch (error) {
-      console.error('Erro ao salvar sessão:', error);
+      console.error("Erro ao salvar sessão:", error);
     }
   };
 
@@ -51,7 +59,7 @@ export function useSession() {
       clearSession();
       setSessionState(null);
     } catch (error) {
-      console.error('Erro ao limpar sessão:', error);
+      console.error("Erro ao limpar sessão:", error);
     }
   };
 
@@ -65,6 +73,6 @@ export function useSession() {
     saveSession,
     clearSession: clearSessionData,
     isSessionValid: isSessionValidData,
-    loadSession
+    loadSession,
   };
 }

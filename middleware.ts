@@ -1,8 +1,12 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { STORAGE_KEYS } from "./consts/storage";
+import { validateToken } from "./utils/auth";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const token = request.cookies.get(STORAGE_KEYS.JWT_TOKEN)?.value;
+  
   const publicRoutes = [
     "/sign-in",
     "/sign-up",
@@ -10,21 +14,46 @@ export function middleware(request: NextRequest) {
     "/reset-password",
     "/confirm-email",
   ];
+  
   const isPublicRoute = publicRoutes.some((route) =>
     pathname.startsWith(route)
   );
 
   if (isPublicRoute) {
+    if (token) {
+      try {
+        const decoded = await validateToken(token);
+        if (decoded) {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        }
+      } catch (error) {
+        console.error("Erro ao validar token:", error);
+      }
+    }
     return NextResponse.next();
   }
-
-  const token = request.cookies.get("split-money-token")?.value;
 
   if (!token) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  return NextResponse.next();
+  try {
+    const decoded = await validateToken(token);
+    
+    if (!decoded) {
+      const response = NextResponse.redirect(new URL("/sign-in", request.url));
+      response.cookies.delete(STORAGE_KEYS.JWT_TOKEN);
+      return response;
+    }
+    
+    return NextResponse.next();
+  } catch (error) {
+    console.error("Erro ao validar token no middleware:", error);
+    
+    const response = NextResponse.redirect(new URL("/sign-in", request.url));
+    response.cookies.delete(STORAGE_KEYS.JWT_TOKEN);
+    return response;
+  }
 }
 
 export const config = {

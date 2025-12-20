@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUser } from "@/contexts/user-context";
+import { useAuth } from "@/contexts/auth-context";
 import { UserService } from "@/services/user.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, Loader2, User, X } from "lucide-react";
@@ -22,12 +22,13 @@ export default function Page() {
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isPageLoading, setIsPageLoading] = useState(true);
-    const { user, setUser } = useUser();
+    const { user } = useAuth();
+    const [localUser, setLocalUser] = useState<User | null>(user);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            email: user?.email || "",
+            email: localUser?.email || "",
         },
     });
 
@@ -35,8 +36,8 @@ export default function Page() {
         setIsLoading(true);
         try {
             const response = await UserService.updateEmail(data.email);
-            if (response.data && user?.id) {
-                setUser({ ...user, email: response.data });
+            if (response.data && localUser?.id) {
+                setLocalUser({ ...localUser, email: response.data });
             }
             setIsEditingEmail(false);
         } catch (error) {
@@ -50,7 +51,7 @@ export default function Page() {
         const fetchUserData = async () => {
             try {
                 const response = await UserService.getMe();
-                setUser(response.data);
+                setLocalUser(response.data);
                 form.reset({ email: response.data.email });
             } catch (error) {
                 console.error("Erro ao carregar dados do usuário:", error);
@@ -60,7 +61,7 @@ export default function Page() {
         };
 
         fetchUserData();
-    }, [form, setUser]);
+    }, [form]);
 
     if (isPageLoading) {
         return (
@@ -104,7 +105,7 @@ export default function Page() {
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <h4 className="font-semibold">Nome</h4>
-                        <p className="text-sm text-muted-foreground">{user?.name}</p>
+                        <p className="text-sm text-muted-foreground">{localUser?.name}</p>
                     </div>
                     <div className="flex flex-col gap-2">
                         <h4 className="font-semibold">Email</h4>
@@ -139,7 +140,7 @@ export default function Page() {
                                 </form>
                             ) : (
                                 <>
-                                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                                    <p className="text-sm text-muted-foreground">{localUser?.email}</p>
                                     {/* <Button
                                         variant="ghost"
                                         size="icon"

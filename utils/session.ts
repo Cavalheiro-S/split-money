@@ -1,9 +1,11 @@
-const SESSION_KEY = 'split-money-session';
+import { STORAGE_KEYS } from "@/consts/storage";
+
+const SESSION_KEY = STORAGE_KEYS.SESSION;
 const SESSION_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutos antes da expiração
 
 export interface SessionData {
   accessToken: string;
-  user: any;
+  user: User;
   expiresAt: number;
 }
 

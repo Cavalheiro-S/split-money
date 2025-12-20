@@ -1,3 +1,5 @@
+import { STORAGE_KEYS } from "@/consts/storage";
+
 let tokenCache: string | null = null;
 let tokenPromise: Promise<string> | null = null;
 let lastTokenCheck = 0;
@@ -15,7 +17,7 @@ async function getToken(): Promise<string> {
   }
 
   try {
-    const sessionData = localStorage.getItem('split-money-session');
+    const sessionData = localStorage.getItem(STORAGE_KEYS.SESSION);
     if (sessionData) {
       const session = JSON.parse(sessionData);
       if (session.expiresAt > now) {
@@ -54,7 +56,7 @@ export function clearTokenCache() {
   lastTokenCheck = 0;
   
   try {
-    localStorage.removeItem('split-money-session');
+    localStorage.removeItem(STORAGE_KEYS.SESSION);
   } catch (error) {
     console.error('Erro ao limpar sessão persistente:', error);
   }

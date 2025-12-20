@@ -32,20 +32,24 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-// Mock do localStorage
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-global.localStorage = localStorageMock as any;
+// Mock do localStorage (apenas se não existir no ambiente de teste)
+if (typeof global !== 'undefined' && typeof global.localStorage === 'undefined') {
+  const localStorageMock = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+  };
+  (global as any).localStorage = localStorageMock;
+}
 
-// Mock do sessionStorage
-const sessionStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-global.sessionStorage = sessionStorageMock as any;
+// Mock do sessionStorage (apenas se não existir no ambiente de teste)
+if (typeof global !== 'undefined' && typeof global.sessionStorage === 'undefined') {
+  const sessionStorageMock = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+  };
+  (global as any).sessionStorage = sessionStorageMock;
+}

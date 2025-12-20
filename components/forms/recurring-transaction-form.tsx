@@ -21,8 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { RecurringTransactionService } from "@/services/recurring-transaction.service"
-import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
+import { toast } from "sonner"
+import { errorLogger } from "@/lib/error-logger"
 
 const recurringTransactionSchema = z.object({
   description: z.string().min(1, "Descrição é obrigatória"),
@@ -57,7 +58,6 @@ export function RecurringTransactionForm({
   tags = [],
 }: RecurringTransactionFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
 
   const form = useForm<RecurringTransactionFormValues>({
     resolver: zodResolver(recurringTransactionSchema),
@@ -82,28 +82,18 @@ export function RecurringTransactionForm({
           ...values,
           date: new Date(transaction.date),
         })
-        toast({
-          title: "Sucesso",
-          description: "Transação recorrente atualizada com sucesso!",
-        })
+        toast.success("Transação recorrente atualizada com sucesso!")
       } else {
         await RecurringTransactionService.createRecurringTransaction({
           ...values,
           date: new Date(),
         })
-        toast({
-          title: "Sucesso",
-          description: "Transação recorrente criada com sucesso!",
-        })
+        toast.success("Transação recorrente criada com sucesso!")
       }
       await onSuccess()
     } catch (error) {
-      console.error("Erro ao salvar transação recorrente:", error)
-      toast({
-        title: "Erro",
-        description: "Erro ao salvar transação recorrente. Tente novamente.",
-        variant: "destructive",
-      })
+      toast.error("Erro ao salvar transação recorrente. Tente novamente.")
+      errorLogger.logAPIError(error as Error, "/api/recurring-transactions")
     } finally {
       setIsSubmitting(false)
     }

@@ -4,6 +4,7 @@ import { createContext, useContext, useState, ReactNode, useEffect, useRef } fro
 import { UserService } from '@/services/user.service';
 import { clearTokenCache } from '@/utils/data';
 import { useSession } from '@/hooks/use-session';
+import { STORAGE_KEYS } from '@/consts/storage';
 
 interface UserContextType {
   user: User | null;
@@ -18,7 +19,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { session, saveSession, clearSession, isSessionValid, loadSession } = useSession();
+  const { session, saveSession, clearSession, isSessionValid } = useSession();
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -26,6 +27,26 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     const initializeUser = async () => {
       try {
+        // Verifica se existe uma sessão no localStorage
+        const storedSession = localStorage.getItem(STORAGE_KEYS.SESSION);
+        
+        // Se existe sessão mas está expirada, força logout e redireciona
+        if (storedSession) {
+          const parsedSession = JSON.parse(storedSession);
+          if (parsedSession.expiresAt && parsedSession.expiresAt < Date.now()) {
+            clearSession();
+            setUser(null);
+            setLoading(false);
+            hasInitialized.current = true;
+            
+            // Redireciona para login imediatamente
+            if (typeof window !== 'undefined') {
+              window.location.href = "/sign-in";
+            }
+            return;
+          }
+        }
+
         if (session && isSessionValid()) {
           setUser(session.user);
           setLoading(false);
@@ -56,13 +77,43 @@ export function UserProvider({ children }: { children: ReactNode }) {
     };
 
     initializeUser();
-  }, [isLoggingOut, session, isSessionValid, saveSession]);
+  }, [isLoggingOut, session, isSessionValid, saveSession, clearSession]);
 
   useEffect(() => {
     if (isLoggingOut) {
       hasInitialized.current = false;
     }
   }, [isLoggingOut]);
+
+  // Monitora se a sessão expirou e força logout
+  useEffect(() => {
+    if (!user || isLoggingOut) return;
+
+    const checkSessionExpiry = () => {
+      const storedSession = localStorage.getItem(STORAGE_KEYS.SESSION);
+      if (storedSession) {
+        try {
+          const parsedSession = JSON.parse(storedSession);
+          if (parsedSession.expiresAt && parsedSession.expiresAt < Date.now()) {
+            // Sessão expirou - força logout sem chamar o endpoint
+            clearSession();
+            setUser(null);
+            window.location.href = "/sign-in";
+          }
+        } catch (error) {
+          console.error('Erro ao verificar expiração da sessão:', error);
+        }
+      }
+    };
+
+    // Verifica imediatamente
+    checkSessionExpiry();
+
+    // Verifica a cada 10 segundos
+    const interval = setInterval(checkSessionExpiry, 10000);
+
+    return () => clearInterval(interval);
+  }, [user, isLoggingOut, clearSession]);
 
   const logout = async () => {
     setIsLoggingOut(true);

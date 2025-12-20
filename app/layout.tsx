@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import ClarityTag from "@/components/clarity";
-import { SessionInitializer } from "@/components/session-initializer";
 import { NavigationLoader } from "@/components/navigation-loader";
 import { QueryProvider } from "@/providers/query-provider";
-import { UserProvider } from "@/contexts/user-context";
+import { AuthProvider } from "@/contexts/auth-context";
 import { NavigationLoadingProvider } from "@/contexts/navigation-loading-context";
 
 export const metadata: Metadata = {
@@ -24,16 +23,15 @@ export default function RootLayout({
         <ClarityTag />
       </head>
       <body className="antialiased">
-        <UserProvider>
+        <Toaster />
+        <AuthProvider>
           <NavigationLoadingProvider>
             <QueryProvider>
-              <SessionInitializer />
               <NavigationLoader />
               {children}
-              <Toaster />
             </QueryProvider>
           </NavigationLoadingProvider>
-        </UserProvider>
+        </AuthProvider>
       </body>
     </html>
   );

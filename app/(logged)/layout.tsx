@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import { useAuthGuard } from "@/hooks/use-auth-guard";
+import { useAuth } from "@/contexts/auth-context";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SidebarItems = dynamic(
@@ -24,9 +24,9 @@ export default function LoggedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { loading, isAuthenticated } = useAuthGuard();
+  const { isLoading, isAuthenticated } = useAuth();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="space-y-4">
@@ -38,7 +38,7 @@ export default function LoggedLayout({
   }
 
   if (!isAuthenticated) {
-    return null; // O hook redirecionará automaticamente
+    return null;
   }
 
   return (
