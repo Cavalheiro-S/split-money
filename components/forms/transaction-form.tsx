@@ -1,13 +1,13 @@
 import { TransactionFrequencyEnum } from "@/enums/transaction";
+import { useCreateTransaction, useUpdateTransaction } from "@/hooks/queries";
 import { cn } from "@/lib/utils";
 import { CategoryService } from "@/services/category.service";
 import { PaymentStatusService } from "@/services/payment-status.service";
-import { TransactionService } from "@/services/transaction.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, Info, Loader2 } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
@@ -80,6 +80,8 @@ export function TransactionForm({
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const { mutate: createTransaction } = useCreateTransaction();
+  const { mutate: updateTransaction } = useUpdateTransaction();
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(schema),
@@ -178,13 +180,13 @@ export function TransactionForm({
           categoryId: data.category || undefined,
         };
         if (transaction) {
-          await TransactionService.updateTransaction({
+          await updateTransaction({
             ...mapData,
             id: transaction.id,
           });
           toast("Transação atualizada com sucesso");
         } else {
-          await TransactionService.createTransaction(mapData);
+          await createTransaction(mapData);
           toast("Transação criada com sucesso");
         }
         await updateData?.();
@@ -196,7 +198,7 @@ export function TransactionForm({
         setIsLoading(false);
       }
     },
-    [transaction, updateData, onOpenChange]
+    [transaction, updateData, onOpenChange, createTransaction, updateTransaction]
   );
 
   // Atalho de teclado para salvar (Ctrl+S / Cmd+S)

@@ -3,8 +3,10 @@
 import { LoadingLink } from "@/components/loading-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { handleCognitoError } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import { AuthService } from "@/services/auth.service";
+import { UserService } from "@/services/user.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
@@ -26,7 +28,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { handleCognitoError } from "@/lib/errors";
 
 const formSchema = z.object({
   code: z
@@ -44,6 +45,8 @@ export function ConfirmEmailForm({
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const name = searchParams.get("name");
+  const id = searchParams.get("id");
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -54,11 +57,14 @@ export function ConfirmEmailForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await AuthService.confirmSignUp(
-        email || "",
-        values.code
-      );
+      if (!email || !name || !id) {
+        toast.error("Dados para confirmação não encontrados");
+        router.push("/sign-in");
+        return;
+      }
+      const response = await AuthService.confirmSignUp(email, values.code);
       if (response.isSignUpComplete) {
+        await createUserOnDatabase(email, name, id);
         toast.success("E-mail confirmado com sucesso!");
         router.push("/sign-in");
         return;
@@ -69,6 +75,26 @@ export function ConfirmEmailForm({
         toast.error(handleCognitoError(error));
       }
       console.error("Error confirming email:", error);
+    }
+  }
+
+  async function createUserOnDatabase(email: string, name: string, id: string) {
+    try {
+      const response = await UserService.createUser({
+        email,
+        name,
+        id,
+      });
+      if (!response) {
+        throw new Error("Falha ao criar usuário");
+      }
+      toast.success("Usuário criado com sucesso!");
+      return;
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(handleCognitoError(error));
+      }
+      console.error("Error creating user on database:", error);
     }
   }
 

@@ -46,8 +46,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     syncSession();
 
     const unsubscribe = Hub.listen("auth", async (data) => {
-      console.log("Auth event:", data);
-
       if (data.payload.event === "signedIn") {
         await syncSession();
       }

@@ -74,9 +74,16 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
         name: values.name,
       });
 
-      if (response.nextStep.signUpStep === "CONFIRM_SIGN_UP") {
+      if (
+        response.nextStep.signUpStep === "CONFIRM_SIGN_UP" &&
+        response.userId
+      ) {
         toast.success("Conta criada com sucesso! Verifique seu e-mail.");
-        router.push(`/confirm-email?email=${encodeURIComponent(values.email)}`);
+        const params = new URLSearchParams();
+        params.set("email", values.email);
+        params.set("name", values.name);
+        params.set("id", response.userId);
+        router.push(`/confirm-email?${params.toString()}`);
         return;
       }
       throw new Error("Falha ao criar conta");
