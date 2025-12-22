@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Cog, Home, LogOut, PlusCircle, User, X, Wallet } from "lucide-react";
 import { LoadingLink } from "@/components/loading-link";
 import { useNavigationLoadingContext } from "@/contexts/navigation-loading-context";
-import { useUser } from "@/contexts/user-context";
+import { useAuth } from "@/contexts/auth-context";
 import { useLogoutConfirmation } from "@/hooks/use-logout-confirmation";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,7 @@ const itemsApplication: SidebarItem[] = [
 
 export const SidebarItems = () => {
     const { startLoading } = useNavigationLoadingContext()
-    const { logout } = useUser()
+    const { logout } = useAuth()
     const { ConfirmationDialog, confirmLogout } = useLogoutConfirmation()
     const { isMobile, setOpenMobile, state } = useSidebar()
     
@@ -40,7 +40,7 @@ export const SidebarItems = () => {
         const confirmed = await confirmLogout()
         if (confirmed) {
             startLoading()
-            logout()
+            await logout()
         }
     }
     

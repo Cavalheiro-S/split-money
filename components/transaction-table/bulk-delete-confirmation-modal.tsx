@@ -10,11 +10,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
+import { errorLogger } from "@/lib/error-logger";
 import { RecurringTransactionService } from "@/services/recurring-transaction.service";
 import { TransactionService } from "@/services/transaction.service";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface BulkDeleteConfirmationModalProps<T = ResponseGetTransactions> {
   selectedIds: string[];
@@ -32,7 +33,6 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
   onSuccess,
 }: BulkDeleteConfirmationModalProps<T>) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { toast } = useToast();
 
   const getItemId = (item: T): string => {
     const transaction = item as unknown as ResponseGetTransactions;
@@ -102,30 +102,22 @@ export function BulkDeleteConfirmationModal<T = ResponseGetTransactions>({
       }
 
       if (totalSucceeded > 0) {
-        toast({
-          title: "Deleção concluída",
-          description: `${totalSucceeded} de ${totalProcessed} transações foram excluídas com sucesso.`,
-        });
+        toast.success(
+          `${totalSucceeded} de ${totalProcessed} transações foram excluídas com sucesso.`
+        );
       }
 
       if (totalFailed > 0) {
-        toast({
-          title: "Algumas deleções falharam",
-          description: `${totalFailed} transações não puderam ser excluídas. Verifique os detalhes.`,
-          variant: "destructive",
-        });
+        toast.warning(
+          `${totalFailed} transações não puderam ser excluídas. Verifique os detalhes.`
+        );
       }
 
       await onSuccess();
       onClose();
     } catch (error) {
-      console.error("Erro na deleção em massa:", error);
-      toast({
-        title: "Erro na deleção",
-        description:
-          "Ocorreu um erro ao excluir as transações. Tente novamente.",
-        variant: "destructive",
-      });
+      errorLogger.logAPIError(error as Error, "/api/transactions/bulk-delete");
+      toast.error("Ocorreu um erro ao excluir as transações. Tente novamente.");
     } finally {
       setIsDeleting(false);
     }

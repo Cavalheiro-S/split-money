@@ -54,4 +54,16 @@ export class ApiService {
       throw new Error("Falha na comunicação com o servidor. Tente novamente.");
     }
   }
+
+  protected static async requestWithoutAuth<T>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<T> {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, options);
+    if (!response?.ok && response) {
+      const errorData: ApiErrorResponse = await response.json();
+      throw new Error(errorData.message || "Erro ao conectar com a API");
+    }
+    return response?.json();
+  }
 }

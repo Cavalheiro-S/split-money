@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 import ClarityTag from "@/components/clarity";
-import { SessionInitializer } from "@/components/session-initializer";
 import { NavigationLoader } from "@/components/navigation-loader";
-import { QueryProvider } from "@/providers/query-provider";
-import { UserProvider } from "@/contexts/user-context";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/contexts/auth-context";
 import { NavigationLoadingProvider } from "@/contexts/navigation-loading-context";
+import { QueryProvider } from "@/providers/query-provider";
+import type { Metadata } from "next";
+import { AmplifyProvider } from "../lib/amplify";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Split Money",
@@ -24,16 +24,17 @@ export default function RootLayout({
         <ClarityTag />
       </head>
       <body className="antialiased">
-        <UserProvider>
-          <NavigationLoadingProvider>
-            <QueryProvider>
-              <SessionInitializer />
-              <NavigationLoader />
-              {children}
-              <Toaster />
-            </QueryProvider>
-          </NavigationLoadingProvider>
-        </UserProvider>
+        <Toaster />
+        <AmplifyProvider>
+          <AuthProvider>
+            <NavigationLoadingProvider>
+              <QueryProvider>
+                <NavigationLoader />
+                {children}
+              </QueryProvider>
+            </NavigationLoadingProvider>
+          </AuthProvider>
+        </AmplifyProvider>
       </body>
     </html>
   );

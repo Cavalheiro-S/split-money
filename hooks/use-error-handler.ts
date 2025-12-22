@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useErrorLogger } from "@/lib/error-logger";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface ErrorHandlerOptions {
   showToast?: boolean;
@@ -28,11 +28,7 @@ export const useErrorHandler = () => {
       }
 
       if (showToast) {
-        toast({
-          title: "Erro",
-          description: normalizedError.message || fallbackMessage,
-          variant: "destructive",
-        });
+        toast.error(normalizedError.message || fallbackMessage);
       }
     },
     [logUIError]
@@ -53,11 +49,7 @@ export const useErrorHandler = () => {
       }
 
       if (showToast) {
-        toast({
-          title: "Erro de API",
-          description: normalizedError.message || fallbackMessage,
-          variant: "destructive",
-        });
+        toast.error(normalizedError.message || fallbackMessage);
       }
     },
     [logAPIError]
@@ -78,11 +70,7 @@ export const useErrorHandler = () => {
       }
 
       if (showToast) {
-        toast({
-          title: "Erro de Autenticação",
-          description: normalizedError.message || fallbackMessage,
-          variant: "destructive",
-        });
+        toast.error(normalizedError.message || fallbackMessage);
       }
     },
     [logAuthError]
@@ -103,11 +91,7 @@ export const useErrorHandler = () => {
       }
 
       if (showToast) {
-        toast({
-          title: "Erro de Dados",
-          description: normalizedError.message || fallbackMessage,
-          variant: "destructive",
-        });
+        toast.error(normalizedError.message || fallbackMessage);
       }
     },
     [logDataError]
@@ -128,11 +112,7 @@ export const useErrorHandler = () => {
       }
 
       if (showToast) {
-        toast({
-          title: "Erro de Conexão",
-          description: normalizedError.message || fallbackMessage,
-          variant: "destructive",
-        });
+        toast.error(normalizedError.message || fallbackMessage);
       }
     },
     [logNetworkError]

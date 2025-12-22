@@ -1,13 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import {
+  SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-  SidebarInset,
 } from "@/components/ui/sidebar";
-import { useAuthGuard } from "@/hooks/use-auth-guard";
-import { Skeleton } from "@/components/ui/skeleton";
+import dynamic from "next/dynamic";
 
 const SidebarItems = dynamic(
   () => import("@/components/sidebar/items").then((mod) => mod.SidebarItems),
@@ -24,22 +22,6 @@ export default function LoggedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { loading, isAuthenticated } = useAuthGuard();
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-12 rounded-full mx-auto" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // O hook redirecionará automaticamente
-  }
 
   return (
     <SidebarProvider>
