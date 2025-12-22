@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/contexts/auth-context";
 import { UserService } from "@/services/user.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, Loader2, User, X } from "lucide-react";
@@ -13,151 +12,162 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const formSchema = z.object({
-    email: z.string().email("Email inválido"),
+  email: z.string().email("Email inválido"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function Page() {
-    const [isEditingEmail, setIsEditingEmail] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isPageLoading, setIsPageLoading] = useState(true);
-    const { user } = useAuth();
-    const [localUser, setLocalUser] = useState<User | null>(user);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [localUser, setLocalUser] = useState<User | null>(null);
 
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            email: localUser?.email || "",
-        },
-    });
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: localUser?.email || "",
+    },
+  });
 
-    const handleSaveEmail = async (data: FormValues) => {
-        setIsLoading(true);
-        try {
-            const response = await UserService.updateEmail(data.email);
-            if (response.data && localUser?.id) {
-                setLocalUser({ ...localUser, email: response.data });
-            }
-            setIsEditingEmail(false);
-        } catch (error) {
-            console.error("Erro ao atualizar email:", error);
-        } finally {
-            setIsLoading(false);
-        }
+  const handleSaveEmail = async (data: FormValues) => {
+    setIsLoading(true);
+    try {
+      const response = await UserService.updateEmail(data.email);
+      if (response.data && localUser?.id) {
+        setLocalUser({ ...localUser, email: response.data });
+      }
+      setIsEditingEmail(false);
+    } catch (error) {
+      console.error("Erro ao atualizar email:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await UserService.getMe();
+        setLocalUser(response.data);
+        form.reset({ email: response.data.email });
+      } catch (error) {
+        console.error("Erro ao carregar dados do usuário:", error);
+      } finally {
+        setIsPageLoading(false);
+      }
     };
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await UserService.getMe();
-                setLocalUser(response.data);
-                form.reset({ email: response.data.email });
-            } catch (error) {
-                console.error("Erro ao carregar dados do usuário:", error);
-            } finally {
-                setIsPageLoading(false);
-            }
-        };
+    fetchUserData();
+  }, [form]);
 
-        fetchUserData();
-    }, [form]);
-
-    if (isPageLoading) {
-        return (
-            <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
-                <div className="flex flex-col gap-10 w-full bg-white p-5 rounded-lg shadow-sm">
-                    <div className="flex items-center gap-2">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="flex flex-col gap-2">
-                            <Skeleton className="h-5 w-20" />
-                            <Skeleton className="h-4 w-40" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-2">
-                            <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-4 w-32" />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <Skeleton className="h-5 w-24" />
-                            <Skeleton className="h-4 w-48" />
-                        </div>
-                        <div className="flex gap-2">
-                            <Skeleton className="h-10 w-32" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
+  if (isPageLoading) {
     return (
-        <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
-            <div className="flex flex-col gap-10 w-full bg-white p-5 rounded-lg shadow-sm">
-                <div className="flex items-center gap-2">
-                    <User className="w-10 h-10" />
-                    <div className="flex flex-col">
-                        <h3 className="font-semibold">Perfil</h3>
-                        <span className="text-sm text-muted-foreground">Gerencie as informações do seu perfil</span>
-                    </div>
-                </div>
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <h4 className="font-semibold">Nome</h4>
-                        <p className="text-sm text-muted-foreground">{localUser?.name}</p>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <h4 className="font-semibold">Email</h4>
-                        <div className="flex items-center gap-2">
-                            {isEditingEmail ? (
-                                <form onSubmit={form.handleSubmit(handleSaveEmail)} className="flex items-center gap-2">
-                                    <Input
-                                        type="email"
-                                        {...form.register("email")}
-                                        className="max-w-sm"
-                                    />
-                                    <Button
-                                        type="submit"
-                                        variant="ghost"
-                                        size="icon"
-                                        disabled={isLoading}
-                                    >
-                                        {isLoading ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                            <Check className="h-4 w-4" />
-                                        )}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => setIsEditingEmail(false)}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </form>
-                            ) : (
-                                <>
-                                    <p className="text-sm text-muted-foreground">{localUser?.email}</p>
-                                    {/* <Button
+      <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
+        <div className="flex flex-col gap-10 w-full bg-white p-5 rounded-lg shadow-sm">
+          <div className="flex items-center gap-2">
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-5 w-20" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
+      <div className="flex flex-col gap-10 w-full bg-white p-5 rounded-lg shadow-sm">
+        <div className="flex items-center gap-2">
+          <User className="w-10 h-10" />
+          <div className="flex flex-col">
+            <h3 className="font-semibold">Perfil</h3>
+            <span className="text-sm text-muted-foreground">
+              Gerencie as informações do seu perfil
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h4 className="font-semibold">Nome</h4>
+            <p className="text-sm text-muted-foreground">{localUser?.name}</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h4 className="font-semibold">Email</h4>
+            <div className="flex items-center gap-2">
+              {isEditingEmail ? (
+                <form
+                  onSubmit={form.handleSubmit(handleSaveEmail)}
+                  className="flex items-center gap-2"
+                >
+                  <Input
+                    type="email"
+                    {...form.register("email")}
+                    className="max-w-sm"
+                  />
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    size="icon"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsEditingEmail(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </form>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground">
+                    {localUser?.email}
+                  </p>
+                  {/* <Button
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => setIsEditingEmail(true)}
                                     >
                                         <Pencil className="h-4 w-4" />
                                     </Button> */}
-                                </>
-                            )}
-                        </div>
-                    </div>
-                    <div className="flex gap-2">
-                        <Button onClick={() => redirect("/forgot-password")} variant="outline">Alterar senha</Button>
-                        {/* <Button variant="destructive">Excluir conta</Button> */}
-                    </div>
-                </div>
+                </>
+              )}
             </div>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => redirect("/forgot-password")}
+              variant="outline"
+            >
+              Alterar senha
+            </Button>
+            {/* <Button variant="destructive">Excluir conta</Button> */}
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
