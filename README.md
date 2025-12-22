@@ -21,6 +21,11 @@ Acesse a aplicação em produção: **[split-money.vercel.app](https://split-mon
 - ✅ Redefinição de senha via token
 - ✅ Middleware de autenticação para proteção de rotas
 - ✅ Gerenciamento de sessão com refresh automático
+- ✅ Integração com AWS Amplify e Amazon Cognito
+- ✅ Tokens seguros em cookies httpOnly (proteção XSS)
+- ✅ Sincronização automática de sessão
+
+> 📚 **[Ver documentação completa de autenticação →](./docs/AUTHENTICATION.md)**
 
 ### 💰 **Gestão Avançada de Transações**
 - ✅ **CRUD completo** de transações (Create, Read, Update, Delete)
@@ -202,6 +207,9 @@ split-money/
 │   ├── forms/            # Formulários
 │   ├── ui/               # Componentes shadcn/ui
 │   └── transaction-table/ # Tabela de transações
+├── docs/                  # Documentação
+│   ├── AUTHENTICATION.md  # Doc de autenticação
+│   └── SENTRY.md         # Configuração Sentry
 ├── contexts/             # React Contexts
 ├── hooks/                # Hooks customizados
 ├── lib/                  # Utilitários e configurações
@@ -242,11 +250,27 @@ A aplicação é totalmente responsiva e funciona perfeitamente em:
 
 ## 🔒 **Segurança**
 
-- **Autenticação JWT** segura
+- **Autenticação JWT** segura com AWS Cognito
+- **Cookies httpOnly** - proteção contra XSS
+- **sameSite cookies** - proteção contra CSRF
 - **Middleware** de proteção de rotas
+- **Validação JWT** com JWKS
 - **Validação** de entrada com Zod
 - **Sanitização** de dados
 - **HTTPS** em produção
+- **Rate limiting** implementado
+
+> 🔐 **[Ver documentação de segurança →](./docs/AUTHENTICATION.md#segurança)**
+
+## 📚 **Documentação**
+
+### **Autenticação**
+- 📖 [Documentação Completa de Autenticação](./docs/AUTHENTICATION.md) - Guia detalhado
+- 🎨 [Diagramas de Fluxo](./docs/AUTHENTICATION_FLOW.md) - Fluxos visuais em Mermaid
+- ⚡ [Guia Rápido de Referência](./docs/AUTH_QUICK_REFERENCE.md) - Snippets e exemplos
+
+### **Outras Documentações**
+- 🐛 [Configuração do Sentry](./docs/SENTRY.md) - Monitoramento de erros
 
 ## 📊 **Analytics**
 

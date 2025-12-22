@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
 import { errorLogger } from "@/lib/error-logger";
+import { handleCognitoError } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import { AuthService } from "@/services/auth.service";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -63,6 +64,12 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         password: values.password,
       });
 
+      if (response.nextStep.signInStep === "CONFIRM_SIGN_UP") {
+        toast.info("Por favor, confirme seu email para continuar");
+        router.push(`/confirm-email?email=${encodeURIComponent(values.email)}`);
+        return;
+      }
+
       if (response.isSignedIn) {
         const user = await login();
         if (user) {
@@ -75,8 +82,9 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         return;
       }
     } catch (error) {
-      toast.error("Falha ao fazer login");
-      errorLogger.logAuthError(error as Error);
+      if (error instanceof Error) {
+        toast.error(handleCognitoError(error));
+      }
       errorLogger.logAuthError(new Error("Falha ao fazer login"));
       return;
     }

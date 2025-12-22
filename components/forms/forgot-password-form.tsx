@@ -1,71 +1,61 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { AuthExceptions } from "@/enums/exceptions/auth"
-import { cn } from "@/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader, DollarSign, Mail, ArrowLeft, Shield } from "lucide-react"
-import { LoadingLink } from "@/components/loading-link"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
+import { LoadingLink } from "@/components/loading-link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { AuthService } from "@/services/auth.service";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, DollarSign, Loader, Mail, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { handleCognitoError } from "@/lib/errors";
 
 const formSchema = z.object({
   email: z
     .string({ required_error: "Email é obrigatório" })
     .email({ message: "Email inválido" }),
-})
+});
 
-type ForgotPasswordFormProps = React.ComponentPropsWithoutRef<"div">
+type ForgotPasswordFormProps = React.ComponentPropsWithoutRef<"div">;
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: ForgotPasswordFormProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch("/api/auth/forgot-password", {
-        body: JSON.stringify(values),
-        method: "POST",
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok) {
-        toast.success("Código de recuperação enviado com sucesso!")
-        router.push(`/reset-password?email=${values.email}`)
-        return
-      }
+      const response = await AuthService.resetPassword(values.email);
 
-      switch (data.error?.code) {
-        case AuthExceptions.InvalidInput:
-          toast.error("Dados inválidos. Verifique as informações e tente novamente.")
-          break;
-        case AuthExceptions.UserNotFound:
-          toast.error("Usuário não encontrado.")
-          break;
-        case AuthExceptions.Default:
-          toast.error("Erro ao enviar código de recuperação. Tente novamente mais tarde.")
-          break;
-        default:
-          toast.error(data.message || "Falha ao enviar código de recuperação")
+      if (response.isPasswordReset) {
+        toast.success("Código de recuperação enviado com sucesso!");
+        router.push(`/reset-password?email=${values.email}`);
       }
-    }
-    catch (error) {
-      toast.error("Falha ao enviar código de recuperação")
-      console.log(error)
+      throw new Error("Falha ao enviar código de recuperação");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(handleCognitoError(error));
+      }
+      console.error("Error sending recovery code:", error);
     }
   }
 
@@ -76,9 +66,7 @@ export function ForgotPasswordForm({
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4 shadow-sm">
           <DollarSign className="w-8 h-8 text-primary" />
         </div>
-        <h1 className="text-2xl font-bold text-foreground mb-2">
-          Split Money
-        </h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Split Money</h1>
         <p className="text-muted-foreground text-sm max-w-xs mx-auto">
           Recupere o acesso à sua conta
         </p>
@@ -107,11 +95,11 @@ export function ForgotPasswordForm({
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input 
-                        placeholder="seu@email.com" 
+                      <Input
+                        placeholder="seu@email.com"
                         type="email"
                         className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20 pl-10"
-                        {...field} 
+                        {...field}
                       />
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     </div>
@@ -121,12 +109,12 @@ export function ForgotPasswordForm({
               )}
             />
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors mt-6"
               disabled={form.formState.isLoading || form.formState.isSubmitting}
             >
-              {(form.formState.isLoading || form.formState.isSubmitting) ? (
+              {form.formState.isLoading || form.formState.isSubmitting ? (
                 <>
                   <Loader className="mr-2 h-4 w-4 animate-spin" />
                   Enviando código...
@@ -144,8 +132,8 @@ export function ForgotPasswordForm({
         <div className="mt-6 pt-6 border-t border-border">
           <p className="text-center text-sm text-muted-foreground">
             Lembrou sua senha?{" "}
-            <LoadingLink 
-              href="/sign-in" 
+            <LoadingLink
+              href="/sign-in"
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Fazer login
@@ -165,8 +153,8 @@ export function ForgotPasswordForm({
               Segurança em primeiro lugar
             </h3>
             <p className="text-xs text-muted-foreground">
-              O código de recuperação será enviado para seu email e expira em 15 minutos. 
-              Nunca compartilhe este código com ninguém.
+              O código de recuperação será enviado para seu email e expira em 15
+              minutos. Nunca compartilhe este código com ninguém.
             </p>
           </div>
         </div>
@@ -174,7 +162,7 @@ export function ForgotPasswordForm({
 
       {/* Botão voltar */}
       <div className="mt-6 text-center">
-        <LoadingLink 
+        <LoadingLink
           href="/sign-in"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
@@ -183,5 +171,5 @@ export function ForgotPasswordForm({
         </LoadingLink>
       </div>
     </div>
-  )
-} 
+  );
+}

@@ -7,6 +7,8 @@ import {
   fetchAuthSession,
   confirmSignUp,
   resendSignUpCode,
+  resetPassword,
+  confirmResetPassword
 } from "aws-amplify/auth";
 
 export interface SignUpParams {
@@ -49,6 +51,26 @@ export class AuthService {
       return result;
     } catch (error) {
       console.error("Error signing up:", error);
+      throw error;
+    }
+  }
+
+  static async resetPassword(email: string) {
+    try {
+      const result = await resetPassword({ username: email });
+      return result;
+    } catch (error) {
+      console.error("Error forgot password:", error);
+      throw error;
+    }
+  }
+
+  static async confirmResetPassword({ email, code, newPassword }: { email: string; code: string; newPassword: string }) {
+    try {
+      const result = await confirmResetPassword({ username: email, confirmationCode: code, newPassword });
+      return result;
+    } catch (error) {
+      console.error("Error confirming reset password:", error);
       throw error;
     }
   }
