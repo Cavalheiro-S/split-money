@@ -4,6 +4,7 @@ import { AuthService } from "@/services/auth.service";
 import { clearAuthTokens, setAuthTokens } from "@/utils/auth";
 import { AuthUser } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
+import { useRouter } from "next/navigation";
 import { createContext, ReactNode, useContext, useEffect } from "react";
 
 export interface SessionData {
@@ -20,6 +21,8 @@ export interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
+
   useEffect(() => {
     async function syncSession() {
       try {
@@ -68,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     await AuthService.signOut();
     await clearAuthTokens();
-    window.location.href = "/sign-in";
+    router.replace("/sign-in");
   };
 
   const value: AuthContextType = {

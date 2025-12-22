@@ -5,7 +5,6 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { NavigationLoadingProvider } from "@/contexts/navigation-loading-context";
 import { QueryProvider } from "@/providers/query-provider";
 import type { Metadata } from "next";
-import "../lib/amplify";
 import { AmplifyProvider } from "../lib/amplify";
 import "./globals.css";
 
@@ -26,16 +25,16 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <Toaster />
-        <AuthProvider>
-          <AmplifyProvider>
+        <AmplifyProvider>
+          <AuthProvider>
             <NavigationLoadingProvider>
               <QueryProvider>
                 <NavigationLoader />
                 {children}
               </QueryProvider>
             </NavigationLoadingProvider>
-          </AmplifyProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </AmplifyProvider>
       </body>
     </html>
   );

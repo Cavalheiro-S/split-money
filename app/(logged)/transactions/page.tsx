@@ -57,7 +57,7 @@ export default function Page() {
   }, 0);
 
   return (
-    <div className="flex flex-col min-h-screen col-start-2 gap-6 px-6 lg:px-10 mt-6 lg:mt-10 bg-gray-50 py-6 lg:py-10">
+    <div className="flex flex-col min-h-screen col-start-2 gap-6">
       <TableTransaction.Container>
         <TableTransaction.Header
           title="Transações"
