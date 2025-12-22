@@ -4,9 +4,9 @@ import { LoadingLink } from "@/components/loading-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
-import { AuthExceptions } from "@/enums/exceptions/auth";
 import { errorLogger } from "@/lib/error-logger";
 import { cn } from "@/lib/utils";
+import { AuthService } from "@/services/auth.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   DollarSign,
@@ -58,36 +58,27 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch("/api/auth/sign-in", {
-        body: JSON.stringify(values),
-        method: "POST",
+      const response = await AuthService.signIn({
+        email: values.email,
+        password: values.password,
       });
 
-      const data = (await response.json()) as ResponseSignIn & {
-        expiresAt?: number;
-      };
-
-      if (!response.ok) {
-        if (data.error?.code === AuthExceptions.InvalidInput) {
-          toast.error("Email ou senha inválidos");
-          errorLogger.logAuthError(new Error("Email ou senha inválidos"));
-          return;
-        } else {
-          toast.error("Falha ao fazer login");
+      if (response.isSignedIn) {
+        const user = await login();
+        if (user) {
+          toast.success("Login realizado com sucesso");
+          router.push("/dashboard");
           return;
         }
-      }
-
-      if (data.accessToken && data.user) {
-        const expiresIn = data.expiresIn || 24 * 60 * 60;
-        login(data.accessToken, data.user, expiresIn);
-        
-        router.push("/dashboard");
+        toast.error("Falha ao fazer login");
+        errorLogger.logAuthError(new Error("Falha ao fazer login"));
         return;
       }
     } catch (error) {
       toast.error("Falha ao fazer login");
-      errorLogger.logAPIError(error as Error, "/api/auth/sign-in");
+      errorLogger.logAuthError(error as Error);
+      errorLogger.logAuthError(new Error("Falha ao fazer login"));
+      return;
     }
   }
 

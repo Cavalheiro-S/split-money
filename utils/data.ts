@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "@/consts/storage";
+import { AuthService } from "@/services/auth.service";
 
 let tokenCache: string | null = null;
 let tokenPromise: Promise<string> | null = null;
@@ -64,7 +65,7 @@ export function clearTokenCache() {
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   try {
-    const accessToken = await getToken();
+    const accessToken = await AuthService.getToken();
 
     const apiResponse = await fetch(url, {
       ...options,

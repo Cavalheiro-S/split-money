@@ -28,6 +28,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@aws-amplify/ui-react": "^6.13.2",
     "@hookform/resolvers": "^3.10.0",
     "@microsoft/clarity": "^1.0.0",
     "@radix-ui/react-alert-dialog": "^1.1.6",
@@ -48,6 +49,7 @@
     "@tanstack/react-table": "^8.21.2",
     "@tanstack/react-virtual": "^3.13.13",
     "@types/axios": "^0.9.36",
+    "aws-amplify": "^6.15.9",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
