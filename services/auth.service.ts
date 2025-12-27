@@ -28,6 +28,9 @@ export class AuthService {
       const result = await signIn({
         username: email,
         password,
+        options: {
+          authFlowType: "USER_PASSWORD_AUTH",
+        }
       });
       return result;
     } catch (error) {
