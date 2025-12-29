@@ -78,7 +78,7 @@ export const DialogNewTag = () => {
                 <FormItem>
                   <FormLabel>Tag</FormLabel>
                   <FormControl>
-                    <Input placeholder="Tag" {...field} />
+                    <Input placeholder="Ex: Urgente, Essencial, Recorrente, etc." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
