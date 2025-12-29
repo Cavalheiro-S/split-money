@@ -1,92 +1,36 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  useCategories,
-  useDeleteCategory,
-  useDeletePaymentStatus,
-  useDeleteTag,
-  usePaymentStatuses,
-  useTags,
-} from "@/hooks/queries";
-import { format } from "date-fns";
-import { Cog, LoaderCircle, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { DialogNewCategory } from "./(components)/dialog-new-category";
-import { DialogNewStatus } from "./(components)/dialog-new-status";
-import { DialogNewTag } from "./(components)/dialog-new-tag";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CircleDollarSign, Cog, FolderOpen, Tag } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
-  const [openCategoryDialogId, setOpenCategoryDialogId] = useState<
-    string | null
-  >(null);
-  const [openTagDialogId, setOpenTagDialogId] = useState<string | null>(null);
+  const router = useRouter();
 
-  const { data: paymentStatusData, isLoading: loadingPaymentStatus } =
-    usePaymentStatuses();
-  const { data: categoriesData, isLoading: loadingCategories } =
-    useCategories();
-  const { data: tagsData, isLoading: loadingTags } = useTags();
-  const deletePaymentStatus = useDeletePaymentStatus();
-  const deleteCategory = useDeleteCategory();
-  const deleteTag = useDeleteTag();
-
-  const paymentStatus = paymentStatusData?.data || [];
-  const categories = categoriesData?.data || [];
-  const tags = tagsData?.data || [];
-
-  const handleDeleteStatus = (id: string) => {
-    deletePaymentStatus.mutate(id, {
-      onSuccess: () => {
-        setOpenDialogId(null);
-      },
-    });
-  };
-
-  const handleDeleteCategory = (id: string) => {
-    deleteCategory.mutate(id, {
-      onSuccess: () => {
-        setOpenCategoryDialogId(null);
-      },
-    });
-  };
-
-  const handleDeleteTag = (id: string) => {
-    deleteTag.mutate(id, {
-      onSuccess: () => {
-        setOpenTagDialogId(null);
-      },
-    });
-  };
-
-  const LoadingComponent = () => (
-    <div className="flex justify-center items-center w-full h-full">
-      <LoaderCircle className="animate-spin" />
-    </div>
-  );
-
-  const isInitialLoading =
-    loadingPaymentStatus || loadingCategories || loadingTags;
+  const configSections = [
+    {
+      title: "Categorias",
+      description: "Gerencie as categorias das suas transações",
+      icon: FolderOpen,
+      url: "/categories",
+      color: "text-blue-500",
+    },
+    {
+      title: "Tags",
+      description: "Organize suas transações com tags personalizadas",
+      icon: Tag,
+      url: "/tags",
+      color: "text-green-500",
+    },
+    {
+      title: "Status de Pagamento",
+      description: "Configure os status de pagamento disponíveis",
+      icon: CircleDollarSign,
+      url: "/payment-status",
+      color: "text-purple-500",
+    },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen items-center w-full gap-10 px-10 bg-gray-100 py-10">
@@ -96,273 +40,40 @@ export default function Page() {
           <div className="flex flex-col">
             <h3 className="font-semibold">Configurações</h3>
             <span className="text-sm text-muted-foreground">
-              Gerencie as configurações do seu perfil
+              Gerencie as configurações do seu perfil e da aplicação
             </span>
           </div>
         </div>
-        {isInitialLoading ? (
-          <LoadingComponent />
-        ) : (
-          <div>
-            <div className="flex w-full justify-between items-center">
-              <div className="flex flex-col">
-                <h3 className="font-semibold">Status de pagamento</h3>
-                <span className="text-sm text-muted-foreground">
-                  Gerencie os status de pagamento disponíveis
-                </span>
-              </div>
-              <DialogNewStatus />
-            </div>
-            <div className="mt-6 rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Data Criação</TableHead>
-                    <TableHead className="w-[100px] text-right">
-                      Ações
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paymentStatus?.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <Badge variant="secondary">{item.description}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {format(item.created_at, "dd/MM/yyyy")}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <AlertDialog
-                          open={openDialogId === item.id}
-                          onOpenChange={(open) =>
-                            setOpenDialogId(open ? item.id : null)
-                          }
-                        >
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Confirmar exclusão
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza que deseja remover o status &quot;
-                                {item.description}&quot;? Esta ação não pode ser
-                                desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel
-                                disabled={deletePaymentStatus.isPending}
-                              >
-                                Cancelar
-                              </AlertDialogCancel>
-                              <Button
-                                onClick={() => handleDeleteStatus(item.id)}
-                                className="bg-red-500 hover:bg-red-600"
-                                disabled={deletePaymentStatus.isPending}
-                              >
-                                {deletePaymentStatus.isPending ? (
-                                  <div className="flex items-center gap-2">
-                                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                                    Removendo...
-                                  </div>
-                                ) : (
-                                  "Remover"
-                                )}
-                              </Button>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
 
-            {/* Categories */}
-            <div className="flex w-full justify-between items-center mt-10">
-              <div className="flex flex-col">
-                <h3 className="font-semibold">Categorias</h3>
-                <span className="text-sm text-muted-foreground">
-                  Gerencie as categorias disponíveis
-                </span>
-              </div>
-              <DialogNewCategory />
-            </div>
-            <div className="mt-6 rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Categoria</TableHead>
-                    <TableHead>Data Criação</TableHead>
-                    <TableHead className="w-[100px] text-right">
-                      Ações
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories?.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <Badge variant="secondary">{item.description}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {format(item.created_at, "dd/MM/yyyy")}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <AlertDialog
-                          open={openCategoryDialogId === item.id}
-                          onOpenChange={(open) =>
-                            setOpenCategoryDialogId(open ? item.id : null)
-                          }
-                        >
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Confirmar exclusão
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza que deseja remover a categoria
-                                &quot;{item.description}&quot;? Esta ação não
-                                pode ser desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel
-                                disabled={deleteCategory.isPending}
-                              >
-                                Cancelar
-                              </AlertDialogCancel>
-                              <Button
-                                onClick={() => handleDeleteCategory(item.id)}
-                                className="bg-red-500 hover:bg-red-600"
-                                disabled={deleteCategory.isPending}
-                              >
-                                {deleteCategory.isPending ? (
-                                  <div className="flex items-center gap-2">
-                                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                                    Removendo...
-                                  </div>
-                                ) : (
-                                  "Remover"
-                                )}
-                              </Button>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {configSections.map((section) => (
+            <Card key={section.url} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(section.url)}>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <section.icon className={`w-8 h-8 ${section.color}`} />
+                  <CardTitle className="text-lg">{section.title}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">
+                  {section.description}
+                </CardDescription>
+                <Button variant="outline" className="w-full">
+                  Acessar
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-            {/* Tags */}
-            <div className="flex w-full justify-between items-center mt-10">
-              <div className="flex flex-col">
-                <h3 className="font-semibold">Tags</h3>
-                <span className="text-sm text-muted-foreground">
-                  Gerencie as tags disponíveis
-                </span>
-              </div>
-              <DialogNewTag />
-            </div>
-            <div className="mt-6 rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tag</TableHead>
-                    <TableHead>Data Criação</TableHead>
-                    <TableHead className="w-[100px] text-right">
-                      Ações
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tags?.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <Badge variant="secondary">{item.description}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {format(item.created_at, "dd/MM/yyyy")}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <AlertDialog
-                          open={openTagDialogId === item.id}
-                          onOpenChange={(open) =>
-                            setOpenTagDialogId(open ? item.id : null)
-                          }
-                        >
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Confirmar exclusão
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza que deseja remover a tag &quot;
-                                {item.description}&quot;? Esta ação não pode ser
-                                desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel disabled={deleteTag.isPending}>
-                                Cancelar
-                              </AlertDialogCancel>
-                              <Button
-                                onClick={() => handleDeleteTag(item.id)}
-                                className="bg-red-500 hover:bg-red-600"
-                                disabled={deleteTag.isPending}
-                              >
-                                {deleteTag.isPending ? (
-                                  <div className="flex items-center gap-2">
-                                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                                    Removendo...
-                                  </div>
-                                ) : (
-                                  "Remover"
-                                )}
-                              </Button>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        )}
+        <div className="mt-6 p-6 bg-gray-50 rounded-lg border">
+          <h4 className="font-semibold mb-2">Sobre as Configurações</h4>
+          <p className="text-sm text-muted-foreground">
+            Utilize as seções acima para personalizar sua experiência no Split Money. 
+            Você pode criar e gerenciar categorias, tags e status de pagamento para 
+            organizar melhor suas transações financeiras.
+          </p>
+        </div>
       </div>
     </div>
   );

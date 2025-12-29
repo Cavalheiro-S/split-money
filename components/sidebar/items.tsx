@@ -2,7 +2,7 @@
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, useSidebar } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Cog, Home, LogOut, PlusCircle, User, X, Wallet } from "lucide-react";
+import { CircleDollarSign, Cog, FolderOpen, Home, LogOut, PlusCircle, Tag, User, X, Wallet } from "lucide-react";
 import { LoadingLink } from "@/components/loading-link";
 import { useNavigationLoadingContext } from "@/contexts/navigation-loading-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -27,6 +27,21 @@ const itemsApplication: SidebarItem[] = [
         title: "Transações",
         url: "/transactions",
         Icon: PlusCircle,
+    },
+    {
+        title: "Categorias",
+        url: "/categories",
+        Icon: FolderOpen,
+    },
+    {
+        title: "Tags",
+        url: "/tags",
+        Icon: Tag,
+    },
+    {
+        title: "Status de Pagamento",
+        url: "/payment-status",
+        Icon: CircleDollarSign,
     },
 ]
 
