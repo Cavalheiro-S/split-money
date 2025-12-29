@@ -1,15 +1,17 @@
 import { TransactionFrequencyEnum } from "@/enums/transaction";
-import { useCreateTransaction, useUpdateTransaction } from "@/hooks/queries";
+import {
+  useCategories,
+  useCreateTransaction,
+  usePaymentStatuses,
+  useUpdateTransaction,
+} from "@/hooks/queries";
 import { cn } from "@/lib/utils";
-import { CategoryService } from "@/services/category.service";
-import { PaymentStatusService } from "@/services/payment-status.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, Info, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { NumericFormat } from "react-number-format";
+import { ControllerRenderProps, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -76,12 +78,12 @@ export function TransactionForm({
   onOpenChange,
   updateData,
 }: TransactionFormProps) {
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [amountDisplayValue, setAmountDisplayValue] = useState("");
   const { mutate: createTransaction } = useCreateTransaction();
   const { mutate: updateTransaction } = useUpdateTransaction();
+  const { data: categories } = useCategories();
+  const { data: paymentStatuses } = usePaymentStatuses();
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(schema),
@@ -106,60 +108,49 @@ export function TransactionForm({
     formState: { isSubmitting },
   } = form;
 
-  // Carrega os dados da transação quando disponível e quando as listas estão carregadas
-  useEffect(() => {
-    if (transaction && isDataLoaded) {
-      setValue("amount", transaction.amount);
-      setValue("category", transaction.categories?.id || "");
-      setValue("date", new Date(transaction.date));
-      setValue("description", transaction.description);
-      setValue("recurrent", { active: false, frequency: "daily", quantity: 1 });
-      setValue("type", transaction.type);
-      setValue("paymentStatusId", transaction.payment_status?.id || "");
-    } else if (!transaction) {
-      reset();
-    }
-  }, [transaction, setValue, reset, isDataLoaded]);
-
-  const getCategories = async () => {
-    try {
-      setIsLoading(true);
-      const res = await CategoryService.getCategories();
-      setCategories(res.data);
-    } catch (error) {
-      toast.error("Erro ao carregar categorias");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getPaymentStatus = async () => {
-    try {
-      setIsLoading(true);
-      const res = await PaymentStatusService.getPaymentStatus();
-      setPaymentStatus(res.data);
-    } catch (error) {
-      toast.error("Erro ao carregar status de pagamento");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setIsLoading(true);
-    setIsDataLoaded(false);
-    Promise.all([getPaymentStatus(), getCategories()])
-      .catch((error) => {
-        toast.error("Erro ao carregar dados");
-        console.error(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-        setIsDataLoaded(true);
-      });
+  const formatCurrency = useCallback((value: number): string => {
+    if (!value || value === 0) return "";
+    return value.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }, []);
+
+  const handleAmountChange = useCallback(
+    (
+      e: React.ChangeEvent<HTMLInputElement>,
+      field: ControllerRenderProps<TransactionFormData, "amount">
+    ) => {
+      const inputValue = e.target.value;
+
+      const numbersOnly = inputValue.replace(/\D/g, "");
+
+      if (!numbersOnly) {
+        setAmountDisplayValue("");
+        field.onChange(0);
+        return;
+      }
+
+      const valueInCents = parseInt(numbersOnly, 10);
+      const valueInReais = valueInCents / 100;
+
+      const formatted = valueInReais.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      setAmountDisplayValue(formatted);
+      field.onChange(valueInReais);
+    },
+    []
+  );
+
+  const handleAmountFocus = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      setTimeout(() => e.target.select(), 0);
+    },
+    []
+  );
 
   const onSubmit = useCallback(
     async (data: TransactionFormData) => {
@@ -198,10 +189,14 @@ export function TransactionForm({
         setIsLoading(false);
       }
     },
-    [transaction, updateData, onOpenChange, createTransaction, updateTransaction]
+    [
+      transaction,
+      updateData,
+      onOpenChange,
+      createTransaction,
+      updateTransaction,
+    ]
   );
-
-  // Atalho de teclado para salvar (Ctrl+S / Cmd+S)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
@@ -215,6 +210,22 @@ export function TransactionForm({
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [form, isSubmitting, isLoading, onSubmit]);
+
+  useEffect(() => {
+    if (transaction) {
+      setValue("amount", transaction.amount);
+      setValue("category", transaction.categories?.id || "");
+      setValue("date", new Date(transaction.date));
+      setValue("description", transaction.description);
+      setValue("recurrent", { active: false, frequency: "daily", quantity: 1 });
+      setValue("type", transaction.type);
+      setValue("paymentStatusId", transaction.payment_status?.id || "");
+      setAmountDisplayValue(formatCurrency(transaction.amount));
+    } else if (!transaction) {
+      reset();
+      setAmountDisplayValue("");
+    }
+  }, [transaction, setValue, reset, formatCurrency]);
 
   return (
     <Form {...form}>
@@ -280,39 +291,34 @@ export function TransactionForm({
             )}
           />
 
-          <Controller
-            name="amount"
+          <FormField
             control={form.control}
-            render={({ field, fieldState }) => (
+            name="amount"
+            render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium">Valor</FormLabel>
                 <FormControl>
-                  <NumericFormat
-                    customInput={Input}
-                    thousandSeparator="."
-                    decimalSeparator=","
-                    prefix="R$ "
-                    decimalScale={2}
-                    fixedDecimalScale
-                    allowNegative={false}
-                    placeholder="R$ 0,00"
-                    disabled={isLoading || isSubmitting}
-                    className="h-10 sm:h-11 text-sm text-left font-medium"
-                    onValueChange={(values) => {
-                      field.onChange(values.floatValue || 0);
-                    }}
-                    value={field.value}
-                    aria-label="Campo de valor da transação"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                      R$
+                    </span>
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0,00"
+                      disabled={isLoading || isSubmitting}
+                      className="h-10 sm:h-11 text-sm pl-10 font-medium"
+                      value={amountDisplayValue}
+                      onChange={(e) => handleAmountChange(e, field)}
+                      onFocus={handleAmountFocus}
+                      aria-label="Campo de valor da transação"
+                    />
+                  </div>
                 </FormControl>
                 <FormDescription className="text-xs sm:text-sm text-muted-foreground">
-                  Digite o valor da transação em reais
+                  Digite apenas números - a formatação é automática
                 </FormDescription>
-                {fieldState.error && (
-                  <p className="text-sm font-medium text-destructive">
-                    {fieldState.error.message}
-                  </p>
-                )}
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -385,7 +391,7 @@ export function TransactionForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="z-50">
-                    {categories.map((category) => (
+                    {categories?.data.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.description}
                       </SelectItem>
@@ -425,7 +431,7 @@ export function TransactionForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="z-50">
-                  {paymentStatus.map((status) => (
+                  {paymentStatuses?.data.map((status) => (
                     <SelectItem key={status.id} value={status.id}>
                       {status.description}
                     </SelectItem>
