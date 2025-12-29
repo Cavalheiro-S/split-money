@@ -10,11 +10,18 @@ export default function Page() {
 
   const configSections = [
     {
+      title: "Preferências",
+      description: "Configure suas preferências e informações financeiras",
+      icon: Cog,
+      url: "/preferences",
+      color: "text-blue-500",
+    },
+    {
       title: "Categorias",
       description: "Gerencie as categorias das suas transações",
       icon: FolderOpen,
       url: "/categories",
-      color: "text-blue-500",
+      color: "text-orange-500",
     },
     {
       title: "Tags",
