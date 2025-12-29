@@ -77,7 +77,7 @@ export const DialogNewCategory = () => {
                 <FormItem>
                   <FormLabel>Categoria</FormLabel>
                   <FormControl>
-                    <Input placeholder="Categoria" {...field} />
+                    <Input placeholder="Ex: Alimentação, Transporte, Moradia, etc." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

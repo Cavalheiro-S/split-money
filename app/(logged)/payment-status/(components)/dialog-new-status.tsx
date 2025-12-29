@@ -78,7 +78,7 @@ export const DialogNewStatus = () => {
                 <FormItem>
                   <FormLabel>Status</FormLabel>
                   <FormControl>
-                    <Input placeholder="Status" {...field} />
+                    <Input placeholder="Ex: Pago, Pendente, Agendado, etc." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
