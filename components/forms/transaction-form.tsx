@@ -80,8 +80,8 @@ export function TransactionForm({
 }: TransactionFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [amountDisplayValue, setAmountDisplayValue] = useState("");
-  const { mutate: createTransaction } = useCreateTransaction();
-  const { mutate: updateTransaction } = useUpdateTransaction();
+  const { mutateAsync: createTransaction } = useCreateTransaction();
+  const { mutateAsync: updateTransaction } = useUpdateTransaction();
   const { data: categories } = useCategories();
   const { data: paymentStatuses } = usePaymentStatuses();
 

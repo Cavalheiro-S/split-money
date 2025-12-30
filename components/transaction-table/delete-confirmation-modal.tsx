@@ -11,11 +11,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { RecurringTransactionService } from "@/services/recurring-transaction.service";
-import { TransactionService } from "@/services/transaction.service";
+import {
+  useDeleteRecurringTransaction,
+  useDeleteTransaction,
+} from "@/hooks/queries";
+import { errorLogger } from "@/lib/error-logger";
 import { DollarSign, Landmark, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 interface DeleteTransactionConfirmationModalProps {
   trigger: React.ReactNode;
@@ -33,23 +35,25 @@ export function DeleteTransactionConfirmationModal({
   onOpenChange,
 }: DeleteTransactionConfirmationModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { mutateAsync: deleteTransaction } = useDeleteTransaction();
+  const { mutateAsync: deleteRecurringTransaction } =
+    useDeleteRecurringTransaction();
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
       if (transaction.is_virtual && transaction.recurrent_transaction_id) {
-        await RecurringTransactionService.deleteRecurringTransaction(
-          transaction.recurrent_transaction_id
-        );
+        await deleteRecurringTransaction(transaction.recurrent_transaction_id);
       } else {
-        await TransactionService.deleteTransaction(transaction.id);
+        await deleteTransaction(transaction.id);
       }
-      toast.success("Transação excluída com sucesso");
       await onDeleteSuccess?.();
       onOpenChange?.(false);
     } catch (error) {
-      toast.error("Erro ao excluir transação");
-      console.error("Erro ao excluir transação:", error);
+      errorLogger.logAPIError(
+        error as Error,
+        `/${transaction.is_virtual ? "recurring-transaction" : "transaction"}/${transaction.id}`
+      );
     } finally {
       setIsDeleting(false);
     }
