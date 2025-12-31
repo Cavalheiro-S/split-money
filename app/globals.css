@@ -102,4 +102,9 @@
   .animate-shimmer {
     animation: shimmer 1.5s infinite;
   }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
 }

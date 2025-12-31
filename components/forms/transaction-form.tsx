@@ -3,6 +3,7 @@ import {
   useCategories,
   useCreateTransaction,
   usePaymentStatuses,
+  useTags,
   useUpdateTransaction,
 } from "@/hooks/queries";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,7 @@ const schema = z.object({
     })
     .optional(),
   paymentStatusId: z.string().optional(),
+  tagId: z.string().optional(),
 });
 
 export type TransactionFormData = z.infer<typeof schema>;
@@ -84,6 +86,7 @@ export function TransactionForm({
   const { mutateAsync: updateTransaction } = useUpdateTransaction();
   const { data: categories } = useCategories();
   const { data: paymentStatuses } = usePaymentStatuses();
+  const { data: tags } = useTags();
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(schema),
@@ -98,6 +101,7 @@ export function TransactionForm({
         quantity: 1,
       },
       paymentStatusId: "",
+      tagId: "",
     },
   });
 
@@ -107,6 +111,11 @@ export function TransactionForm({
     watch,
     formState: { isSubmitting },
   } = form;
+
+  const tagIdValue = watch("tagId");
+  const categoryValue = watch("category");
+  const typeValue = watch("type");
+  const paymentStatusValue = watch("paymentStatusId");
 
   const formatCurrency = useCallback((value: number): string => {
     if (!value || value === 0) return "";
@@ -169,6 +178,7 @@ export function TransactionForm({
             : undefined,
           paymentStatusId: data.paymentStatusId || undefined,
           categoryId: data.category || undefined,
+          tagId: data.tagId || undefined,
         };
         if (transaction) {
           await updateTransaction({
@@ -213,19 +223,35 @@ export function TransactionForm({
 
   useEffect(() => {
     if (transaction) {
-      setValue("amount", transaction.amount);
-      setValue("category", transaction.categories?.id || "");
-      setValue("date", new Date(transaction.date));
-      setValue("description", transaction.description);
-      setValue("recurrent", { active: false, frequency: "daily", quantity: 1 });
-      setValue("type", transaction.type);
-      setValue("paymentStatusId", transaction.payment_status?.id || "");
+      reset({
+        amount: transaction.amount,
+        category: transaction.categories?.id || "",
+        date: new Date(transaction.date),
+        description: transaction.description,
+        recurrent: { active: false, frequency: "daily", quantity: 1 },
+        type: transaction.type,
+        paymentStatusId: transaction.payment_status?.id || "",
+        tagId: transaction.tags?.id || "",
+      });
       setAmountDisplayValue(formatCurrency(transaction.amount));
-    } else if (!transaction) {
-      reset();
+    } else {
+      reset({
+        description: "",
+        date: new Date(),
+        category: "",
+        amount: 0,
+        recurrent: {
+          active: false,
+          frequency: "daily",
+          quantity: 1,
+        },
+        paymentStatusId: "",
+        tagId: "",
+        type: "outcome",
+      });
       setAmountDisplayValue("");
     }
-  }, [transaction, setValue, reset, formatCurrency]);
+  }, [transaction, reset, formatCurrency]);
 
   return (
     <Form {...form}>
@@ -261,10 +287,10 @@ export function TransactionForm({
               <FormItem>
                 <FormLabel className="text-sm font-medium">Tipo</FormLabel>
                 <Select
+                  key={`type-${typeValue || "empty"}`}
                   disabled={isLoading || isSubmitting}
-                  value={field.value}
+                  value={typeValue || undefined}
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger className="h-10 sm:h-11 text-sm">
@@ -380,10 +406,10 @@ export function TransactionForm({
               <FormItem>
                 <FormLabel className="text-sm font-medium">Categoria</FormLabel>
                 <Select
+                  key={`category-${categoryValue || "empty"}`}
                   disabled={isLoading || isSubmitting}
-                  value={field.value}
+                  value={categoryValue || undefined}
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger className="h-10 sm:h-11 text-sm">
@@ -402,6 +428,59 @@ export function TransactionForm({
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="tagId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Tag</FormLabel>
+                <Select
+                  key={tagIdValue || "empty"}
+                  disabled={isLoading || isSubmitting}
+                  value={
+                    tagIdValue && tagIdValue !== "" ? tagIdValue : undefined
+                  }
+                  onValueChange={(value) => {
+                    setValue("tagId", value, { shouldValidate: false });
+                    field.onChange(value);
+                  }}
+                >
+                  <FormControl>
+                    <SelectTrigger className="h-10 sm:h-11 text-sm">
+                      <SelectValue placeholder="Selecione uma tag (opcional)" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="z-50">
+                    {tags?.data.map((tag) => (
+                      <SelectItem key={tag.id} value={tag.id}>
+                        {tag.description}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {tagIdValue && tagIdValue !== "" && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-muted-foreground hover:text-foreground"
+                    onClick={() => {
+                      setValue("tagId", "", {
+                        shouldValidate: false,
+                        shouldDirty: true,
+                      });
+                      field.onChange("");
+                    }}
+                    disabled={isLoading || isSubmitting}
+                  >
+                    Remover tag
+                  </Button>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {/* Status de pagamento em linha única */}
@@ -414,10 +493,10 @@ export function TransactionForm({
                 Status de pagamento
               </FormLabel>
               <Select
-                value={field.value}
+                key={`paymentStatus-${paymentStatusValue || "empty"}`}
+                value={paymentStatusValue || undefined}
                 disabled={isLoading || isSubmitting}
                 onValueChange={field.onChange}
-                defaultValue={field.value}
               >
                 <FormControl>
                   <SelectTrigger className="h-10 sm:h-11 text-sm">
