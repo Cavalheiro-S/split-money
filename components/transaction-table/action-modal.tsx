@@ -33,6 +33,7 @@ function TransactionActionModal({ trigger, transaction, open, onOpenChange, upda
         </DialogHeader>
         <div className="py-2">
           <TransactionForm 
+            key={transaction?.id || "new"}
             transaction={transaction}
             onOpenChange={onOpenChange}
             updateData={updateData}
