@@ -5,7 +5,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/auth-context";
 import dynamic from "next/dynamic";
+import { Loader } from "lucide-react";
 
 const SidebarItems = dynamic(
   () => import("@/components/sidebar/items").then((mod) => mod.SidebarItems),
@@ -13,7 +15,7 @@ const SidebarItems = dynamic(
     loading: () => (
       <div className="w-64 h-screen bg-gray-100 animate-pulse border-r" />
     ),
-    ssr: false, // Sidebar navigation is client-side mostly implies user interaction
+    ssr: false,
   }
 );
 
@@ -22,6 +24,18 @@ export default function LoggedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isInitializing } = useAuth();
+
+  if (isInitializing) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Verificando sessão...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
