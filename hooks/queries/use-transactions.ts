@@ -1,12 +1,13 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { RecurringTransactionService } from "@/services/recurring-transaction.service";
 import {
-  TransactionService,
   TransactionFilters,
+  TransactionService,
 } from "@/services/transaction.service";
-import { queryKeys } from "./query-keys";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { queryKeys } from "./query-keys";
 
 /**
  * Hook para buscar lista de transações com paginação e filtros
@@ -68,43 +69,41 @@ export function useUpdateTransaction() {
 }
 
 /**
- * Hook para deletar transação com optimistic update
+ * Hook para deletar transação
  */
 export function useDeleteTransaction() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => TransactionService.deleteTransaction(id),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({
-        queryKey: queryKeys.transactions.lists(),
-      });
-      const previousData = queryClient.getQueriesData({
-        queryKey: queryKeys.transactions.lists(),
-      });
-      queryClient.setQueriesData(
-        { queryKey: queryKeys.transactions.lists() },
-        (old: any) => {
-          if (!old?.data) return old;
-          return {
-            ...old,
-            data: old.data.filter((t: ResponseGetTransactions) => t.id !== id),
-          };
-        }
-      );
-
-      return { previousData };
-    },
-    onError: (error: Error, _, context) => {
-      if (context?.previousData) {
-        context.previousData.forEach(([key, data]) => {
-          queryClient.setQueryData(key, data);
-        });
-      }
+    onError: (error: Error) => {
       toast.error(error.message || "Erro ao deletar transação");
     },
     onSuccess: () => {
       toast.success("Transação deletada com sucesso!");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.transactions.lists(),
+      });
+    },
+  });
+}
+
+/**
+ * Hook para deletar transação recorrente
+ */
+export function useDeleteRecurringTransaction() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      RecurringTransactionService.deleteRecurringTransaction(id),
+    onError: (error: Error) => {
+      toast.error(error.message || "Erro ao deletar transação recorrente");
+    },
+    onSuccess: () => {
+      toast.success("Transação recorrente deletada com sucesso!");
     },
     onSettled: () => {
       queryClient.invalidateQueries({
@@ -123,46 +122,11 @@ export function useBulkDeleteTransactions() {
   return useMutation({
     mutationFn: (ids: string[]) =>
       TransactionService.bulkDeleteTransactions(ids),
-    onMutate: async (ids) => {
-      await queryClient.cancelQueries({
-        queryKey: queryKeys.transactions.lists(),
-      });
-
-      const previousData = queryClient.getQueriesData({
-        queryKey: queryKeys.transactions.lists(),
-      });
-
-      queryClient.setQueriesData(
-        { queryKey: queryKeys.transactions.lists() },
-        (old: any) => {
-          if (!old?.data) return old;
-          return {
-            ...old,
-            data: old.data.filter(
-              (t: ResponseGetTransactions) => !ids.includes(t.id)
-            ),
-          };
-        }
-      );
-
-      return { previousData };
-    },
-    onError: (error: Error, ids, context) => {
-      if (context?.previousData) {
-        context.previousData.forEach(([key, data]) => {
-          queryClient.setQueryData(key, data);
-        });
-      }
+    onError: (error: Error) => {
       toast.error(error.message || "Erro ao deletar transações");
     },
-    onSuccess: (response) => {
-      const { succeeded: successful, failed } = response.summary;
-      if (successful > 0) {
-        toast.success(`${successful} transação(ões) deletada(s) com sucesso!`);
-      }
-      if (failed > 0) {
-        toast.warning(`${failed} transação(ões) não puderam ser deletadas`);
-      }
+    onSuccess: () => {
+      toast.success("Transações deletadas com sucesso!");
     },
     onSettled: () => {
       queryClient.invalidateQueries({
@@ -193,7 +157,6 @@ export function useBulkDeleteRecurringTransactions() {
           `${failed} transação(ões) recorrente(s) não puderam ser deletadas`
         );
       }
-      // Invalida ambas as listas
       queryClient.invalidateQueries({
         queryKey: queryKeys.transactions.lists(),
       });
