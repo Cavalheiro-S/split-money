@@ -32,9 +32,18 @@ export async function middleware(request: NextRequest) {
         const decoded = await validateToken(token);
         if (decoded) {
           return NextResponse.redirect(new URL("/dashboard", request.url));
+        } else {
+          const response = NextResponse.next();
+          response.cookies.delete(STORAGE_KEYS.JWT_TOKEN);
+          response.cookies.delete("idToken");
+          return response;
         }
       } catch (error) {
-        console.error("Erro ao validar token:", error);
+        console.error("Erro ao validar token em rota pública:", error);
+        const response = NextResponse.next();
+        response.cookies.delete(STORAGE_KEYS.JWT_TOKEN);
+        response.cookies.delete("idToken");
+        return response;
       }
     }
     return NextResponse.next();

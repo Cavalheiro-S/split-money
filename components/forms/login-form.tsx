@@ -59,6 +59,15 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      const currentUser = await AuthService.getCurrentUser();
+      if (currentUser) {
+        const user = await login();
+        if (user) {
+          router.push("/dashboard");
+          return;
+        }
+      }
+
       const response = await AuthService.signIn({
         email: values.email,
         password: values.password,
@@ -83,6 +92,14 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       }
     } catch (error) {
       if (error instanceof Error) {
+        if (error.name === "UserAlreadyAuthenticatedException") {
+          const user = await login();
+          if (user) {
+            toast.success("Você já está autenticado");
+            router.push("/dashboard");
+            return;
+          }
+        }
         toast.error(handleCognitoError(error));
       }
       errorLogger.logAuthError(new Error("Falha ao fazer login"));
