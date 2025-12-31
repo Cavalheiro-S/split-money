@@ -114,6 +114,10 @@ export class AuthService {
       const user = await getCurrentUser();
       return user;
     } catch (error) {
+      const errorObj = error as { name?: string };
+      if (errorObj?.name === "UserUnAuthenticatedException") {
+        return null;
+      }
       console.error("Error getting current user:", error);
       return null;
     }
@@ -124,7 +128,11 @@ export class AuthService {
     try {
       const session = await fetchAuthSession();
       return session;
-    } catch (error) {
+    } catch (error) {   
+      const errorObj = error as { name?: string };
+      if (errorObj?.name === "UserUnAuthenticatedException") {
+        return null;
+      }
       console.error("Error getting auth session:", error);
       return null;
     }
@@ -135,6 +143,10 @@ export class AuthService {
       const session = await fetchAuthSession();
       return session.tokens?.accessToken?.toString() || null;
     } catch (error) {
+      const errorObj = error as { name?: string };
+      if (errorObj?.name === "UserUnAuthenticatedException") {
+        return null;
+      }
       console.error("Error getting token:", error);
       return null;
     }

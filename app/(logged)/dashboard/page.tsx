@@ -58,7 +58,7 @@ export default function Page() {
         <TableTransaction.Header
           onChangeDate={(date) => {
             setDateIncome(date);
-            setPaginationIncome({ ...paginationIncome, page: 1 }); // Reset para página 1
+            setPaginationIncome({ ...paginationIncome, page: 1 });
           }}
           title="Últimos lançamentos"
           subtitle="Aqui você pode ver os seus lançamentos recentes"
