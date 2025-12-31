@@ -2,7 +2,11 @@
 
 import { TableTransaction } from "@/components/transaction-table";
 import { useTransactions } from "@/hooks/queries";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { MetricsCards } from "@/components/dashboard/metrics-cards";
+import { EvolutionChart } from "@/components/dashboard/evolution-chart";
+import { DistributionChart } from "@/components/dashboard/distribution-chart";
+import { subMonths, format } from "date-fns";
 
 export default function Page() {
   const [dateIncome, setDateIncome] = useState<Date>(new Date());
@@ -52,8 +56,79 @@ export default function Page() {
     limit: 10,
   };
 
+  const metrics = useMemo(() => {
+    const totalIncome = incomes.reduce((sum, t) => sum + t.amount, 0);
+    const totalOutcome = outcomes.reduce((sum, t) => sum + t.amount, 0);
+    const balance = totalIncome - totalOutcome;
+    const totalTransactions = incomes.length + outcomes.length;
+    
+    return {
+      totalIncome,
+      totalOutcome,
+      balance,
+      totalTransactions,
+    };
+  }, [incomes, outcomes]);
+
+  const evolutionData = useMemo(() => {
+    const months = [];
+    const now = new Date();
+    
+    const incomeByMonth: Record<string, number> = {};
+    const outcomeByMonth: Record<string, number> = {};
+    
+    incomes.forEach((t) => {
+      const monthKey = format(new Date(t.date), "yyyy-MM");
+      incomeByMonth[monthKey] = (incomeByMonth[monthKey] || 0) + t.amount;
+    });
+    
+    outcomes.forEach((t) => {
+      const monthKey = format(new Date(t.date), "yyyy-MM");
+      outcomeByMonth[monthKey] = (outcomeByMonth[monthKey] || 0) + t.amount;
+    });
+    
+    for (let i = 5; i >= 0; i--) {
+      const monthDate = subMonths(now, i);
+      const monthKey = format(monthDate, "yyyy-MM");
+      months.push({
+        month: monthKey,
+        income: incomeByMonth[monthKey] || 0,
+        outcome: outcomeByMonth[monthKey] || 0,
+      });
+    }
+    
+    return months;
+  }, [incomes, outcomes]);
+
+  const allTransactions = useMemo(() => {
+    return [...incomes, ...outcomes];
+  }, [incomes, outcomes]);
+
   return (
-    <>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Acompanhe suas entradas e saídas
+        </p>
+      </div>
+
+      {/* Cards de Métricas */}
+      <MetricsCards
+        totalIncome={metrics.totalIncome}
+        totalOutcome={metrics.totalOutcome}
+        balance={metrics.balance}
+        totalTransactions={metrics.totalTransactions}
+      />
+
+      {/* Gráficos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <EvolutionChart data={evolutionData} />
+        <DistributionChart transactions={allTransactions} />
+      </div>
+
+      {/* Tabelas de Transações */}
       <TableTransaction.Container>
         <TableTransaction.Header
           onChangeDate={(date) => {
@@ -106,6 +181,6 @@ export default function Page() {
           showAlways
         />
       </TableTransaction.Container>
-    </>
+    </div>
   );
 }

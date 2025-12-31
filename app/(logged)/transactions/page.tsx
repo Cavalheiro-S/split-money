@@ -52,10 +52,6 @@ export default function Page() {
     setSelectedIds([]);
   };
 
-  const totalAmount = transactions.reduce((acc, item) => {
-    return item.type === "income" ? acc + item.amount : acc - item.amount;
-  }, 0);
-
   return (
     <div className="flex flex-col min-h-screen col-start-2 gap-6">
       <TableTransaction.Container>
@@ -63,7 +59,6 @@ export default function Page() {
           title="Transações"
           subtitle="Gerencie seus lançamentos financeiros"
           totalTransactions={transactions.length}
-          totalAmount={totalAmount}
           onChangeDate={(date) => {
             setFilters({ ...filters, date });
             setPagination({ ...pagination, page: 1 });
@@ -80,14 +75,21 @@ export default function Page() {
               setModalTransactionOpen(open);
             }}
             trigger={
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium">
                 Adicionar Transação
               </Button>
             }
           />
         </TableTransaction.Header>
 
-        <TableTransaction.StatsCards transactions={transactions} />
+        <TableTransaction.StatsCards
+          transactions={transactions}
+          onFilterClick={(newFilters) => {
+            setFilters({ ...filters, ...newFilters });
+            setPagination({ ...pagination, page: 1 });
+          }}
+          activeFilter={filters.type}
+        />
 
         <TableTransaction.BulkActionsBar
           selectedIds={selectedIds}

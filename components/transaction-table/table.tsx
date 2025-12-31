@@ -6,26 +6,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { TransactionFilters } from "@/services/transaction.service";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   ArrowDown,
   ArrowLeftRight,
   ArrowUp,
-  Clock,
-  DollarSign,
-  Landmark,
+  MoreHorizontal,
   Pencil,
   Search,
   Trash2,
 } from "lucide-react";
-import { useMemo, useState, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
+import { TransactionAvatar } from "./avatar";
 import { DeleteTransactionConfirmationModal } from "./delete-confirmation-modal";
 import MobileTransactionCard from "./mobile-transaction-card";
 
@@ -58,7 +65,6 @@ function TransactionTable({
   const [searchTerm, setSearchTerm] = useState("");
   const isMobile = useIsMobile();
 
-  // Debounce search para evitar filtrar a cada tecla digitada
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   const filteredData = useMemo(
@@ -126,21 +132,6 @@ function TransactionTable({
     }
   };
 
-  const renderTypeCell = (type: "income" | "outcome") => {
-    if (type === "income") {
-      return (
-        <div className="p-1 bg-green-100 rounded-full w-8 h-8 flex items-center justify-center">
-          <DollarSign className="w-5 h-5 text-green-600" />
-        </div>
-      );
-    }
-    return (
-      <div className="p-1 bg-red-100 rounded-full w-8 h-8 flex items-center justify-center">
-        <Landmark className="w-5 h-5 text-red-600" />
-      </div>
-    );
-  };
-
   const renderTableHead = (
     title: string,
     sort: NonNullable<TransactionFilters["sort"]>["sortBy"],
@@ -153,10 +144,16 @@ function TransactionTable({
         : "descending"
       : "none";
 
+    const isRightAligned = style?.includes("text-right");
+
     return (
       <TableHead
         aria-sort={sortOrder}
-        className={cn(isSorted && "bg-gray-100", style)}
+        className={cn(
+          isSorted && "bg-gray-100",
+          style,
+          isRightAligned && "text-right"
+        )}
       >
         <button
           type="button"
@@ -170,7 +167,10 @@ function TransactionTable({
               },
             })
           }
-          className="flex items-center gap-2 w-full h-full hover:bg-gray-200/50 p-2 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+          className={cn(
+            "flex items-center gap-2 w-full h-full hover:bg-gray-100/50 p-2 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500",
+            (sort === "amount" || sort === "date") && "justify-end"
+          )}
           aria-label={`Ordenar por ${title} ${
             isSorted
               ? filters?.sort?.sortOrder === "asc"
@@ -180,7 +180,9 @@ function TransactionTable({
           }`}
         >
           {renderSort(sort)}
-          <span>{title}</span>
+          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            {title}
+          </span>
         </button>
       </TableHead>
     );
@@ -192,27 +194,25 @@ function TransactionTable({
     }, 0);
   }, [filteredData]);
 
-  if (filteredData.length < 1 && !loading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 gap-4">
-        <div className="p-4 bg-gray-100 rounded-full">
-          <ArrowLeftRight className="w-8 h-8 text-gray-400" />
-        </div>
-        <div className="text-center space-y-2">
-          <h3 className="text-lg font-medium text-gray-900">
-            {searchTerm
-              ? "Nenhuma transação encontrada"
-              : "Nenhuma transação cadastrada"}
-          </h3>
-          <p className="text-sm text-gray-500 max-w-sm">
-            {searchTerm
-              ? `Não encontramos transações com "${searchTerm}". Tente outro termo de busca.`
-              : "Comece adicionando sua primeira transação para ter um controle melhor das suas finanças."}
-          </p>
-        </div>
+  const renderEmptyState = () => (
+    <div className="flex flex-col items-center justify-center p-12 gap-4">
+      <div className="p-4 bg-gray-100 rounded-full">
+        <ArrowLeftRight className="w-8 h-8 text-gray-400" />
       </div>
-    );
-  }
+      <div className="text-center space-y-2">
+        <h3 className="text-lg font-medium text-gray-900">
+          {searchTerm
+            ? "Nenhuma transação encontrada"
+            : "Nenhuma transação cadastrada"}
+        </h3>
+        <p className="text-sm text-gray-500 max-w-sm">
+          {searchTerm
+            ? `Não encontramos transações com "${searchTerm}". Tente outro termo de busca.`
+            : "Comece adicionando sua primeira transação para ter um controle melhor das suas finanças."}
+        </p>
+      </div>
+    </div>
+  );
 
   if (isMobile) {
     return (
@@ -277,260 +277,292 @@ function TransactionTable({
   return (
     <div className="space-y-4">
       {showSearch && (
-        <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg">
-          <Search className="w-4 h-4 text-gray-400" />
-          <Input
-            placeholder="Buscar por descrição..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-            aria-label="Filtrar transações por descrição"
-          />
-          {searchTerm && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSearchTerm("")}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              Limpar
-            </Button>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 my-4 pb-4 border-b border-gray-200">
+          <div className="relative w-full sm:w-auto sm:max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Buscar transação..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+              aria-label="Filtrar transações por descrição"
+            />
+          </div>
+          {onChangeFilters && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant={filters?.type === undefined ? "default" : "outline"}
+                size="sm"
+                onClick={() => onChangeFilters({ ...filters, type: undefined })}
+                className={cn(
+                  "h-8 text-xs",
+                  filters?.type === undefined &&
+                    "bg-indigo-600 hover:bg-indigo-700 text-white"
+                )}
+              >
+                Todos
+              </Button>
+              <Button
+                variant={filters?.type === "income" ? "default" : "outline"}
+                size="sm"
+                onClick={() => onChangeFilters({ ...filters, type: "income" })}
+                className={cn(
+                  "h-8 text-xs",
+                  filters?.type === "income" &&
+                    "bg-emerald-600 hover:bg-emerald-700 text-white"
+                )}
+              >
+                Receitas
+              </Button>
+              <Button
+                variant={filters?.type === "outcome" ? "default" : "outline"}
+                size="sm"
+                onClick={() => onChangeFilters({ ...filters, type: "outcome" })}
+                className={cn(
+                  "h-8 text-xs",
+                  filters?.type === "outcome" &&
+                    "bg-rose-600 hover:bg-rose-700 text-white"
+                )}
+              >
+                Despesas
+              </Button>
+            </div>
           )}
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <Table className="min-w-[900px]">
-          <TableHeader>
-            <TableRow className="hover:bg-transparent border-b-2">
-              {enableBulkSelection && (
-                <TableHead className="w-[50px] text-center">
-                  <Checkbox
-                    checked={isAllSelected}
-                    onCheckedChange={handleSelectAll}
-                    ref={(el: HTMLButtonElement | null) => {
-                      if (el) {
-                        (el as HTMLInputElement).indeterminate =
-                          isIndeterminate;
-                      }
-                    }}
-                    aria-label="Selecionar todas as transações"
-                  />
-                </TableHead>
-              )}
-              {renderTableHead("Tipo", "type", "w-[80px]")}
-              {renderTableHead("Descrição", "description")}
-              {renderTableHead("Data", "date")}
-              {renderTableHead("Categoria", "category")}
-              {renderTableHead("Status", "payment_status")}
-              {renderTableHead("Valor", "amount")}
-              {hasActions && (
-                <TableHead className="text-center w-[120px]">Ações</TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading
-              ? Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow
-                    role="loading"
-                    key={index}
-                    className="animate-pulse"
-                  >
-                    {enableBulkSelection && (
-                      <TableCell>
-                        <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded w-20"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded w-24"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded w-20"></div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded w-16"></div>
-                    </TableCell>
-                    {hasActions && (
-                      <TableCell>
-                        <div className="h-8 bg-gray-200 rounded w-16 mx-auto"></div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))
-              : filteredData?.map((item) => (
-                  <TableRow
-                    className={cn(
-                      item.type === "income"
-                        ? "hover:bg-green-100/30"
-                        : "hover:bg-red-100/30"
-                    )}
-                    key={item.id}
-                  >
-                    {enableBulkSelection && (
-                      <TableCell className="text-center">
-                        <Checkbox
-                          checked={selectedIds.includes(item.id)}
-                          onCheckedChange={(checked: boolean) =>
-                            handleSelectItem(item, checked)
+      {filteredData.length < 1 && !loading ? (
+        renderEmptyState()
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <Table className="min-w-full">
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-b border-gray-200">
+                  {enableBulkSelection && (
+                    <TableHead className="w-[50px] text-center pl-0">
+                      <Checkbox
+                        checked={isAllSelected}
+                        onCheckedChange={handleSelectAll}
+                        ref={(el: HTMLButtonElement | null) => {
+                          if (el) {
+                            (el as HTMLInputElement).indeterminate =
+                              isIndeterminate;
                           }
-                          aria-label={`Selecionar transação ${item.description}`}
-                        />
-                      </TableCell>
-                    )}
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        {renderTypeCell(item.type)}
-                        {item.is_virtual && (
-                          <div title="Transação virtual">
-                            <Clock className="w-4 h-4 text-gray-400" />
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate max-w-[200px]">
-                          {item.description}
-                        </span>
-                        {item.is_virtual && (
-                          <Badge variant="secondary" className="text-xs">
-                            Futura
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-600">
-                        {new Date(item.date).toLocaleDateString("pt-br")}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {item.categories?.description ? (
-                        <Badge variant="outline" className="text-xs">
-                          {item.categories.description}
-                        </Badge>
-                      ) : (
-                        <span className="text-sm text-gray-400">
-                          Sem categoria
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {item.payment_status?.description ? (
-                        <Badge
-                          variant={
-                            item.payment_status.description === "Pago"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {item.payment_status.description}
-                        </Badge>
-                      ) : (
-                        <span className="text-sm text-gray-400">
-                          Sem status
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={cn(
-                          "font-semibold",
-                          item.type === "income"
-                            ? "text-green-600"
-                            : "text-red-600"
-                        )}
+                        }}
+                        aria-label="Selecionar todas as transações"
+                        className="border-gray-600 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
+                      />
+                    </TableHead>
+                  )}
+                  {renderTableHead("Nome / Categoria", "description")}
+                  {renderTableHead("Status", "payment_status", "w-[120px]")}
+                  {renderTableHead("Data", "date", "w-[180px] text-right")}
+                  {renderTableHead("Valor", "amount", "w-[150px] text-right")}
+                  {hasActions && (
+                    <TableHead className="text-center w-[50px]"></TableHead>
+                  )}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading
+                  ? Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow
+                        role="loading"
+                        key={index}
+                        className="animate-pulse"
                       >
-                        {item.type === "income" ? "+" : "-"}
-                        {item.amount.toLocaleString("pt-BR", {
+                        {enableBulkSelection && (
+                          <TableCell>
+                            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                          </TableCell>
+                        )}
+                        <TableCell>
+                          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 bg-gray-200 rounded w-20"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 bg-gray-200 rounded w-20"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 bg-gray-200 rounded w-16"></div>
+                        </TableCell>
+                        {hasActions && (
+                          <TableCell>
+                            <div className="h-8 bg-gray-200 rounded w-16 mx-auto"></div>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))
+                  : filteredData?.map((item, index) => (
+                      <TableRow
+                        className={cn(
+                          "hover:bg-gray-50/50 transition-colors",
+                          index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                        )}
+                        key={item.id}
+                      >
+                        {enableBulkSelection && (
+                          <TableCell className="w-[50px] pl-4">
+                            <Checkbox
+                              checked={selectedIds.includes(item.id)}
+                              onCheckedChange={(checked: boolean) =>
+                                handleSelectItem(item, checked)
+                              }
+                              aria-label={`Selecionar transação ${item.description}`}
+                              className="border-gray-600 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 pl-0"
+                            />
+                          </TableCell>
+                        )}
+                        <TableCell>
+                          <div className="flex items-center gap-3 py-1">
+                            <TransactionAvatar name={item.description} />
+                            <div className="flex flex-col">
+                              <span className="font-medium text-sm text-gray-900">
+                                {item.description}
+                              </span>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                {item.categories?.description && (
+                                  <span className="text-xs text-gray-500">
+                                    {item.categories.description}
+                                  </span>
+                                )}
+                                {item.tags?.description && (
+                                  <>
+                                    {item.categories?.description && (
+                                      <span className="text-xs text-gray-400">
+                                        •
+                                      </span>
+                                    )}
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs h-5 px-1.5 border-gray-200 text-gray-600"
+                                    >
+                                      {item.tags.description}
+                                    </Badge>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={cn("text-xs font-medium")}
+                          >
+                            {item.payment_status?.description}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <span className="text-sm text-gray-600 tabular-nums">
+                            {format(new Date(item.date), "dd/MM/yyyy", {
+                              locale: ptBR,
+                            })}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <span
+                            className={cn(
+                              "font-semibold text-sm tabular-nums",
+                              item.type === "income"
+                                ? "text-emerald-600"
+                                : "text-rose-600"
+                            )}
+                          >
+                            {item.type === "income" ? "+" : "-"} R${" "}
+                            {item.amount.toLocaleString("pt-BR", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </span>
+                        </TableCell>
+
+                        {hasActions && (
+                          <TableCell className="w-[50px]">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 hover:bg-gray-100"
+                                  disabled={loading}
+                                >
+                                  <MoreHorizontal className="h-4 w-4 text-gray-700" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    onEditClick?.(item.id);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <Pencil className="mr-2 h-4 w-4" />
+                                  Editar
+                                </DropdownMenuItem>
+                                <DeleteTransactionConfirmationModal
+                                  transaction={item}
+                                  onDeleteSuccess={onDeleteSuccess}
+                                  trigger={
+                                    <DropdownMenuItem
+                                      className="cursor-pointer text-red-600 focus:text-red-600"
+                                      onSelect={(e) => e.preventDefault()}
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Excluir
+                                    </DropdownMenuItem>
+                                  }
+                                />
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                {!loading && (
+                  <TableRow className="border-t-2 border-gray-300 font-semibold">
+                    <TableCell
+                      colSpan={
+                        enableBulkSelection
+                          ? hasActions
+                            ? 4
+                            : 3
+                          : hasActions
+                          ? 3
+                          : 2
+                      }
+                      className="text-right font-semibold text-gray-700 text-sm"
+                    >
+                      Total{" "}
+                      {searchTerm
+                        ? `(${filteredData.length} de ${data.length})`
+                        : `(${data.length})`}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="font-bold text-lg tabular-nums text-gray-900">
+                        {total.toLocaleString("pt-BR", {
                           style: "currency",
                           currency: "BRL",
                         })}
                       </span>
                     </TableCell>
-                    {hasActions && (
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            disabled={loading}
-                            onClick={() => {
-                              onEditClick?.(item.id);
-                            }}
-                            variant="ghost"
-                            size="sm"
-                            className={cn(
-                              "h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            )}
-                            title={"Editar transação"}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <DeleteTransactionConfirmationModal
-                            transaction={item}
-                            onDeleteSuccess={onDeleteSuccess}
-                            trigger={
-                              <Button
-                                disabled={loading}
-                                variant="ghost"
-                                size="sm"
-                                className={cn(
-                                  "h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                )}
-                                title={"Excluir transação"}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            }
-                          />
-                        </div>
-                      </TableCell>
-                    )}
+                    {hasActions && <TableCell />}
                   </TableRow>
-                ))}
-            {!loading && (
-              <TableRow className="bg-gray-50 border-t-2">
-                <TableCell
-                  colSpan={
-                    enableBulkSelection
-                      ? hasActions
-                        ? 7
-                        : 6
-                      : hasActions
-                      ? 6
-                      : 5
-                  }
-                  className="text-right font-semibold text-gray-700"
-                >
-                  Total{" "}
-                  {searchTerm
-                    ? `(${filteredData.length} de ${data.length})`
-                    : `(${data.length})`}
-                </TableCell>
-                <TableCell className="text-left">
-                  <span className="font-bold text-lg">
-                    {total.toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </span>
-                </TableCell>
-                {hasActions && <TableCell />}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </>
+      )}
     </div>
   );
 }
