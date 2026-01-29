@@ -22,7 +22,6 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Type guard for auth errors
 interface AuthError {
   name: string;
   message?: string;
@@ -41,12 +40,10 @@ function isUserUnAuthenticatedError(error: unknown): boolean {
   return isAuthError(error) && error.name === "UserUnAuthenticatedException";
 }
 
-// Helper to check if session has valid tokens
 function hasValidTokens(session: AuthSession | null): boolean {
   return Boolean(session?.tokens?.accessToken && session?.tokens?.idToken);
 }
 
-// Helper to persist tokens from session
 async function persistSessionTokens(session: AuthSession): Promise<void> {
   if (!session.tokens?.idToken || !session.tokens?.accessToken) {
     throw new Error("Session tokens are missing");
@@ -62,13 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Centralized function to clear auth state
   const clearAuthState = useCallback(async () => {
     await clearAuthTokens();
     setIsAuthenticated(false);
   }, []);
 
-  // Validate session from Amplify and persist tokens
   const validateAndPersistSession = useCallback(async (): Promise<boolean> => {
     const session = await AuthService.getAuthSession();
 
@@ -85,19 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   }, []);
 
-  // Try to restore session from cookies first, then fall back to Amplify
   const syncSession = useCallback(async () => {
     try {
       setIsInitializing(true);
 
-      // First, try to validate existing cookie token
       const tokenResponse = await fetch("/api/auth/get-token");
 
       if (tokenResponse.ok) {
         const { accessToken } = await tokenResponse.json();
 
         if (accessToken) {
-          // Cookie has token, validate with Amplify session
           const session = await AuthService.getAuthSession();
 
           if (hasValidTokens(session)) {
@@ -108,14 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           }
 
-          // Cookie exists but Amplify session is invalid - still consider authenticated
-          // This handles cases where Amplify session expired but cookie is still valid
           setIsAuthenticated(true);
           return;
         }
       }
 
-      // No valid cookie token, try to establish session from Amplify
       const isValid = await validateAndPersistSession();
 
       if (isValid) {
@@ -123,10 +112,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // No valid session found
       await clearAuthState();
     } catch (error) {
-      // Only log unexpected errors, not normal unauthenticated state
       if (!isUserUnAuthenticatedError(error)) {
         console.error("Failed to sync session:", error);
       }
@@ -179,7 +166,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await AuthService.signOut();
     } catch (error) {
       console.error("Sign out request failed:", error);
-      // Continue with local cleanup even if remote sign out fails
     } finally {
       await clearAuthState();
       router.replace("/sign-in");
