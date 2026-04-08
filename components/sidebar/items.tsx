@@ -2,40 +2,40 @@
 
 import { LoadingLink } from "@/components/loading-link";
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAuth } from "@/contexts/auth-context";
 import { useNavigationLoadingContext } from "@/contexts/navigation-loading-context";
 import { useLogoutConfirmation } from "@/hooks/use-logout-confirmation";
 import { cn } from "@/lib/utils";
 import {
-    CircleDollarSign,
-    Cog,
-    FolderOpen,
-    Home,
-    LogOut,
-    PlusCircle,
-    Tag,
-    TrendingUp,
-    User,
-    UserRoundCog,
-    Wallet,
-    X,
+  CircleDollarSign,
+  Cog,
+  FolderOpen,
+  Home,
+  LogOut,
+  PlusCircle,
+  Tag,
+  TrendingUp,
+  User,
+  UserRoundCog,
+  Wallet,
+  X,
 } from "lucide-react";
 
 type SidebarItem = {
@@ -77,6 +77,21 @@ const itemsInvestments: SidebarItem[] = [
   {
     title: "Estratégia de Investimento",
     url: "/investment-strategy",
+    Icon: TrendingUp,
+  },
+  {
+    title: "Visão Geral",
+    url: "/dashboard",
+    Icon: Home,
+  },
+  {
+    title: "Transações",
+    url: "/transactions",
+    Icon: PlusCircle,
+  },
+  {
+    title: "Simulador",
+    url: "/simulador",
     Icon: TrendingUp,
   },
 ];
@@ -147,7 +162,7 @@ export const SidebarItems = () => {
           <div
             className={cn(
               "flex items-center gap-2 px-4 py-2",
-              state === "collapsed" && "px-0"
+              state === "collapsed" && "px-0",
             )}
           >
             {/* Logo com tooltip quando colapsada */}
