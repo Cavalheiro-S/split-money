@@ -32,6 +32,7 @@ import {
   PlusCircle,
   Tag,
   TrendingUp,
+  Upload,
   User,
   UserRoundCog,
   Wallet,
@@ -70,6 +71,11 @@ const itemsApplication: SidebarItem[] = [
     title: "Status de Pagamento",
     url: "/payment-status",
     Icon: CircleDollarSign,
+  },
+  {
+    title: "Importar",
+    url: "/import",
+    Icon: Upload,
   },
 ];
 

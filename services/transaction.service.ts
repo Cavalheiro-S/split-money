@@ -55,6 +55,16 @@ export class TransactionService extends ApiService {
         );
     }
 
+    static async bulkCreateTransactions(transactions: BulkCreateTransactionItem[]) {
+        return this.request<BulkCreateResponse>(
+            "/transaction/bulk-create",
+            {
+                method: "POST",
+                body: JSON.stringify({ transactions }),
+            }
+        );
+    }
+
     static async bulkDeleteTransactions(ids: string[]) {
         return this.request<BulkDeleteResponse>(
             "/transaction/bulk-delete",
