@@ -75,3 +75,39 @@ type BulkDeleteResponse = {
 type BulkDeleteRecurringResponse = BulkDeleteResponse & {
     info: string;
 }
+
+type BulkCreateTransactionItem = {
+    description: string;
+    date: string; // ISO YYYY-MM-DD
+    amount: number; // signed: negative = outcome, positive = income
+    type: "income" | "outcome";
+    note?: string;
+    categoryId?: string;
+    tagId?: string;
+    paymentStatusId?: string;
+    source: "ofx" | "csv";
+    externalId: string;
+}
+
+type BulkCreateRequest = {
+    transactions: BulkCreateTransactionItem[];
+}
+
+type BulkCreateSummary = {
+    total: number;
+    created: number;
+    skipped: number;
+    failed: number;
+}
+
+type BulkCreateResults = {
+    created: { id: string; external_id?: string }[];
+    skipped: string[];
+    failed: { externalId: string; reason: string }[];
+}
+
+type BulkCreateResponse = {
+    message: string;
+    summary: BulkCreateSummary;
+    results: BulkCreateResults;
+}
