@@ -57,7 +57,7 @@ export function GoalCumulativeChart({ contributions, targetAmount }: GoalCumulat
           width={52}
         />
         <Tooltip
-          formatter={(value: number) => [brl(value), "Acumulado"]}
+          formatter={(value) => [brl(Number(value) ?? 0), "Acumulado"]}
           contentStyle={{ fontSize: 12 }}
         />
         <ReferenceLine

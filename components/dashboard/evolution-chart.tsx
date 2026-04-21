@@ -80,7 +80,7 @@ export function EvolutionChart({ data, className }: EvolutionChartProps) {
                 border: "1px solid hsl(var(--border))",
                 borderRadius: "8px",
               }}
-              formatter={(value: number | undefined) => formatCurrency(value ?? 0)}
+              formatter={(value) => formatCurrency(Number(value) ?? 0)}
               labelFormatter={(label) => `Mês: ${formatMonth(String(label))}`}
             />
             <Legend />

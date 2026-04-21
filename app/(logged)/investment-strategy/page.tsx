@@ -317,7 +317,7 @@ export default function InvestmentStrategyPage() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number | undefined) => `${value || 0}%`}
+                  formatter={(value) => `${value || 0}%`}
                   contentStyle={{
                     backgroundColor: "white",
                     border: "1px solid #e5e7eb",

@@ -157,7 +157,7 @@ export function DistributionChart({
                 border: "1px solid hsl(var(--border))",
                 borderRadius: "8px",
               }}
-              formatter={(value: number | undefined) => formatCurrency(value ?? 0)}
+              formatter={(value) => formatCurrency((Number(value) ?? 0))}
             />
             <Legend
               formatter={(value) => {
