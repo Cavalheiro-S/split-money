@@ -61,4 +61,12 @@ export const queryKeys = {
     all: ['user'] as const,
     profile: () => [...queryKeys.user.all, 'profile'] as const,
   },
+
+  // Goals
+  goals: {
+    all: ['goals'] as const,
+    lists: () => [...queryKeys.goals.all, 'list'] as const,
+    detail: (id: string) => [...queryKeys.goals.all, 'detail', id] as const,
+    contributions: (goalId: string) => [...queryKeys.goals.all, 'contributions', goalId] as const,
+  },
 } as const

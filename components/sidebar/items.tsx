@@ -31,6 +31,7 @@ import {
   LogOut,
   PlusCircle,
   Tag,
+  Target,
   TrendingUp,
   Upload,
   User,
@@ -76,6 +77,11 @@ const itemsApplication: SidebarItem[] = [
     title: "Importar",
     url: "/import",
     Icon: Upload,
+  },
+  {
+    title: "Metas",
+    url: "/goals",
+    Icon: Target,
   },
 ];
 

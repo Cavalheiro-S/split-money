@@ -8,3 +8,4 @@ export * from "./use-transactions";
 export * from "./use-categories";
 export * from "./use-tags";
 export * from "./use-payment-statuses";
+export * from "./use-goals";
