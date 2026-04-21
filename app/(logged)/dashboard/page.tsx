@@ -40,7 +40,7 @@ export default function Page() {
     }
   );
 
-  const incomes = incomesData?.data || [];
+  const incomes = useMemo(() => incomesData?.data || [], [incomesData]);
   const incomePagination = incomesData?.pagination || {
     page: 1,
     totalPages: 1,
@@ -48,7 +48,7 @@ export default function Page() {
     limit: 10,
   };
 
-  const outcomes = outcomesData?.data || [];
+  const outcomes = useMemo(() => outcomesData?.data || [], [outcomesData]);
   const outcomePagination = outcomesData?.pagination || {
     page: 1,
     totalPages: 1,

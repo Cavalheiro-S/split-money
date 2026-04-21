@@ -62,7 +62,7 @@ export function GoalCard({ goal }: GoalCardProps) {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Deletar meta</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Isso removerá a meta "{goal.title}" e todas as contribuições. Ação irreversível.
+                    Isso removerá a meta &quot;{goal.title}&quot; e todas as contribuições. Ação irreversível.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
