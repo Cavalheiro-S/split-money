@@ -41,6 +41,15 @@ export default defineConfig({
     projects: [
       {
         extends: true,
+        test: {
+          name: "unit",
+          environment: "jsdom",
+          include: ["tests/unit/**/*.test.ts"],
+          setupFiles: ["./tests/setup.ts"],
+        },
+      },
+      {
+        extends: true,
         plugins: [
           storybookTest({
             configDir: path.join(dirname, ".storybook"),

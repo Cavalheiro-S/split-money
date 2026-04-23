@@ -97,6 +97,7 @@ type BulkCreateSummary = {
     total: number;
     created: number;
     skipped: number;
+    skipped_modified: number;
     failed: number;
 }
 

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     Select,
     SelectContent,
@@ -17,10 +18,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { applyCategoryRules } from "@/lib/category-rules";
+import { CategoryService } from "@/services/category.service";
 import { ImportService, type ImportSource, type ParsedTransaction } from "@/services/import.service";
 import { TransactionService } from "@/services/transaction.service";
 import { Loader2, Upload } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type SourceOption = {
@@ -51,6 +54,9 @@ const SOURCES: SourceOption[] = [
     },
 ];
 
+// Sentinel used in categoryOverrides to mean "user explicitly cleared the category"
+const CLEARED = "__cleared__";
+
 function formatBrl(value: number): string {
     return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
@@ -61,11 +67,26 @@ export default function ImportPage() {
     const [parsed, setParsed] = useState<ParsedTransaction[]>([]);
     const [parsing, setParsing] = useState(false);
     const [importing, setImporting] = useState(false);
+    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [categoryOverrides, setCategoryOverrides] = useState<Record<string, string>>({});
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingValue, setEditingValue] = useState("");
+    const [descriptionOverrides, setDescriptionOverrides] = useState<Record<string, string>>({});
+
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const currentSource = SOURCES.find((s) => s.value === source)!;
 
-    const totals = parsed.reduce(
+    useEffect(() => {
+        CategoryService.getCategories()
+            .then((res) => setCategories(res.data))
+            .catch(() => {});
+    }, []);
+
+    const selectedRows = parsed.filter((t) => selected.has(t.externalId));
+
+    const totals = selectedRows.reduce(
         (acc, t) => {
             if (t.type === "income") acc.income += t.amount;
             else acc.outcome += t.amount;
@@ -74,12 +95,76 @@ export default function ImportPage() {
         { income: 0, outcome: 0 }
     );
 
+    const allChecked = parsed.length > 0 && parsed.every((t) => selected.has(t.externalId));
+    const someChecked = parsed.some((t) => selected.has(t.externalId));
+
+    function toggleAll() {
+        if (allChecked) {
+            setSelected(new Set());
+        } else {
+            setSelected(new Set(parsed.map((t) => t.externalId)));
+        }
+    }
+
+    function toggleRow(externalId: string) {
+        setSelected((prev) => {
+            const next = new Set(prev);
+            if (next.has(externalId)) next.delete(externalId);
+            else next.add(externalId);
+            return next;
+        });
+    }
+
+    function getSuggestedCategory(t: ParsedTransaction): Category | undefined {
+        return applyCategoryRules(t.description, categories);
+    }
+
+    function getEffectiveCategoryId(t: ParsedTransaction): string | undefined {
+        const override = categoryOverrides[t.externalId];
+        if (override === CLEARED) return undefined;
+        if (override) return override;
+        return getSuggestedCategory(t)?.id;
+    }
+
+    function setCategoryOverride(externalId: string, value: string | undefined) {
+        setCategoryOverrides((prev) => ({
+            ...prev,
+            [externalId]: value ?? CLEARED,
+        }));
+    }
+
+    function getEffectiveDescription(t: ParsedTransaction): string {
+        return descriptionOverrides[t.externalId] ?? t.description;
+    }
+
+    // T6 – editing helpers
+    function startEdit(t: ParsedTransaction) {
+        setEditingId(t.externalId);
+        setEditingValue(getEffectiveDescription(t));
+    }
+
+    function commitEdit() {
+        if (editingId === null) return;
+        if (editingValue.trim()) {
+            setDescriptionOverrides((prev) => ({ ...prev, [editingId]: editingValue.trim() }));
+        }
+        setEditingId(null);
+    }
+
+    function cancelEdit() {
+        setEditingId(null);
+    }
+
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const picked = e.target.files?.[0];
         if (!picked) return;
 
         setFile(picked);
         setParsed([]);
+        setSelected(new Set());
+        setCategoryOverrides({});
+        setDescriptionOverrides({});
+        setEditingId(null);
         setParsing(true);
 
         try {
@@ -90,6 +175,7 @@ export default function ImportPage() {
                 toast.success(`${rows.length} transações lidas. Confira o preview abaixo.`);
             }
             setParsed(rows);
+            setSelected(new Set(rows.map((r) => r.externalId)));
         } catch (err) {
             console.error(err);
             toast.error(
@@ -106,25 +192,31 @@ export default function ImportPage() {
         setSource(next as ImportSource);
         setFile(null);
         setParsed([]);
+        setSelected(new Set());
+        setCategoryOverrides({});
+        setDescriptionOverrides({});
+        setEditingId(null);
         if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     const handleImport = async () => {
-        if (parsed.length === 0) return;
+        if (selectedRows.length === 0) return;
 
         setImporting(true);
         try {
-            const payload: BulkCreateTransactionItem[] = parsed.map((t) => ({
-                description: t.description,
+            const payload: BulkCreateTransactionItem[] = selectedRows.map((t) => ({
+                description: getEffectiveDescription(t),
                 date: t.date,
                 amount: t.type === "outcome" ? -Math.abs(t.amount) : Math.abs(t.amount),
                 type: t.type,
                 source: t.source,
                 externalId: t.externalId,
+                ...(getEffectiveCategoryId(t) ? { categoryId: getEffectiveCategoryId(t) } : {}),
             }));
 
             const res = await TransactionService.bulkCreateTransactions(payload);
             const { created, skipped, failed } = res.summary;
+            const skippedModified = (res.summary ).skipped_modified ?? 0;
 
             const parts: string[] = [];
             if (created > 0) parts.push(`${created} criadas`);
@@ -132,8 +224,18 @@ export default function ImportPage() {
             if (failed > 0) parts.push(`${failed} falharam`);
 
             toast.success(`Importação concluída: ${parts.join(", ") || "nada a fazer"}.`);
+
+            if (skippedModified > 0) {
+                toast.info(
+                    `${skippedModified} transação${skippedModified > 1 ? "ões" : ""} já importada${skippedModified > 1 ? "s" : ""} e modificada${skippedModified > 1 ? "s" : ""} por você foram mantidas com suas edições.`
+                );
+            }
+
             setFile(null);
             setParsed([]);
+            setSelected(new Set());
+            setCategoryOverrides({});
+            setDescriptionOverrides({});
             if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (err) {
             console.error(err);
@@ -202,11 +304,11 @@ export default function ImportPage() {
                         <div>
                             <CardTitle>2. Revise e importe</CardTitle>
                             <CardDescription>
-                                {parsed.length} transações · Entradas: {formatBrl(totals.income)} · Saídas:{" "}
-                                {formatBrl(totals.outcome)}
+                                {selectedRows.length} de {parsed.length} selecionadas · Entradas:{" "}
+                                {formatBrl(totals.income)} · Saídas: {formatBrl(totals.outcome)}
                             </CardDescription>
                         </div>
-                        <Button onClick={handleImport} disabled={importing}>
+                        <Button onClick={handleImport} disabled={importing || selectedRows.length === 0}>
                             {importing ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -215,7 +317,7 @@ export default function ImportPage() {
                             ) : (
                                 <>
                                     <Upload className="mr-2 h-4 w-4" />
-                                    Importar {parsed.length} transações
+                                    Importar {selectedRows.length} transações
                                 </>
                             )}
                         </Button>
@@ -225,35 +327,104 @@ export default function ImportPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
+                                        <TableHead className="w-10">
+                                            <Checkbox
+                                                checked={allChecked ? true : someChecked ? "indeterminate" : false}
+                                                onCheckedChange={toggleAll}
+                                                aria-label="Selecionar todas"
+                                            />
+                                        </TableHead>
                                         <TableHead>Data</TableHead>
                                         <TableHead>Descrição</TableHead>
+                                        <TableHead>Categoria</TableHead>
                                         <TableHead>Tipo</TableHead>
                                         <TableHead className="text-right">Valor</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {parsed.map((t) => (
-                                        <TableRow key={t.externalId}>
-                                            <TableCell className="whitespace-nowrap">{t.date}</TableCell>
-                                            <TableCell className="max-w-[340px] truncate" title={t.description}>
-                                                {t.description}
-                                            </TableCell>
-                                            <TableCell>
-                                                <span
-                                                    className={
-                                                        t.type === "income"
-                                                            ? "text-emerald-600 text-xs font-medium"
-                                                            : "text-rose-600 text-xs font-medium"
-                                                    }
-                                                >
-                                                    {t.type === "income" ? "Entrada" : "Saída"}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-right font-mono">
-                                                {formatBrl(t.amount)}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    {parsed.map((t) => {
+                                        const effectiveCategoryId = getEffectiveCategoryId(t);
+                                        const isEditing = editingId === t.externalId;
+
+                                        return (
+                                            <TableRow
+                                                key={t.externalId}
+                                                data-state={selected.has(t.externalId) ? "selected" : undefined}
+                                            >
+                                                <TableCell>
+                                                    <Checkbox
+                                                        checked={selected.has(t.externalId)}
+                                                        onCheckedChange={() => toggleRow(t.externalId)}
+                                                        aria-label="Selecionar linha"
+                                                    />
+                                                </TableCell>
+
+                                                <TableCell className="whitespace-nowrap">{t.date}</TableCell>
+                                                <TableCell className="max-w-[260px]">
+                                                    {isEditing ? (
+                                                        <input
+                                                            autoFocus
+                                                            value={editingValue}
+                                                            onChange={(e) => setEditingValue(e.target.value)}
+                                                            onBlur={commitEdit}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") commitEdit();
+                                                                if (e.key === "Escape") cancelEdit();
+                                                            }}
+                                                            className="w-full rounded border border-indigo-400 px-1.5 py-0.5 text-sm outline-none ring-2 ring-indigo-200"
+                                                        />
+                                                    ) : (
+                                                        <span
+                                                            className="block truncate cursor-text hover:underline hover:decoration-dashed"
+                                                            title={getEffectiveDescription(t)}
+                                                            onClick={() => startEdit(t)}
+                                                        >
+                                                            {getEffectiveDescription(t)}
+                                                        </span>
+                                                    )}
+                                                </TableCell>
+
+                                                <TableCell className="min-w-[160px]">
+                                                    <Select
+                                                        value={effectiveCategoryId ?? ""}
+                                                        onValueChange={(val) =>
+                                                            setCategoryOverride(
+                                                                t.externalId,
+                                                                val === "" ? undefined : val
+                                                            )
+                                                        }
+                                                    >
+                                                        <SelectTrigger className="h-7 text-xs">
+                                                            <SelectValue placeholder="Sem categoria" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {categories.map((c) => (
+                                                                <SelectItem key={c.id} value={c.id}>
+                                                                    {c.description}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    <span
+                                                        className={
+                                                            t.type === "income"
+                                                                ? "text-emerald-600 text-xs font-medium"
+                                                                : "text-rose-600 text-xs font-medium"
+                                                        }
+                                                    >
+                                                        {t.type === "income" ? "Entrada" : "Saída"}
+                                                    </span>
+                                                </TableCell>
+
+                                                <TableCell className="text-right font-mono">
+                                                    {formatBrl(t.amount)}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
                                 </TableBody>
                             </Table>
                         </div>
