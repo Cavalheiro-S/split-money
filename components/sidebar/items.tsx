@@ -143,11 +143,15 @@ export const SidebarItems = () => {
       },
     },
   ];
+  const closeMobileMenu = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
   const renderNavItem = ({ onClick, Icon, title, url }: SidebarItem) => {
     if (onClick) {
       return (
         <SidebarMenuItem key={title}>
-          <SidebarMenuButton onClick={onClick}>
+          <SidebarMenuButton onClick={() => { onClick(); closeMobileMenu(); }}>
             <Icon />
             <span>{title}</span>
           </SidebarMenuButton>
@@ -158,7 +162,7 @@ export const SidebarItems = () => {
     return (
       <SidebarMenuItem key={title}>
         <SidebarMenuButton asChild>
-          <LoadingLink href={url}>
+          <LoadingLink href={url} onClick={closeMobileMenu}>
             <Icon />
             <span>{title}</span>
           </LoadingLink>
